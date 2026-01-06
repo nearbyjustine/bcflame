@@ -1,0 +1,31 @@
+{
+  "name": "bcflame-backend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BC Flame Premium Portal - Strapi Backend",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/strapi": "4.16.2",
+    "@strapi/plugin-users-permissions": "4.16.2",
+    "@strapi/plugin-i18n": "4.16.2",
+    "pg": "8.11.3",
+    "better-sqlite3": "9.2.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^5.2.0",
+    "styled-components": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.10.6",
+    "@strapi/typescript-utils": "4.16.2"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=20.x.x",
+    "npm": ">=6.0.0"
+  }
+}
