@@ -11,7 +11,7 @@ services:
     environment:
       NODE_ENV: development
       # Points to host machine's Strapi instance
-      NEXT_PUBLIC_STRAPI_URL: http://host.docker.internal:1337
+      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
       NEXT_PUBLIC_APP_NAME: BC Flame Premium Portal
     ports:
