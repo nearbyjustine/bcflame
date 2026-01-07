@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: bcflame_frontend_dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      # Points to host machine's Strapi instance
+      NEXT_PUBLIC_STRAPI_URL: http://host.docker.internal:1337
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_NAME: BC Flame Premium Portal
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot-reload
+      - ./:/app
+      # Exclude node_modules - use container's version
+      - /app/node_modules
+      # Exclude .next build artifacts - use container's version
+      - /app/.next
+    command: npm run dev
+    extra_hosts:
+      # Allows container to access host machine's localhost
+      - "host.docker.internal:host-gateway"

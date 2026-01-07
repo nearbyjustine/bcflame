@@ -1,0 +1,21 @@
+{
+  "name": "bcflame",
+  "version": "1.0.0",
+  "description": "BC Flame Premium Client Portal - Monorepo",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run develop",
+    "dev:frontend": "cd frontend && docker-compose -f docker-compose.dev.yml up",
+    "dev": "npm run dev:backend & npm run dev:frontend",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=20.x.x"
+  },
+  "keywords": [
+    "strapi",
+    "nextjs",
+    "client-portal"
+  ],
+  "license": "UNLICENSED"
+}
