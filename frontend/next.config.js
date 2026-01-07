@@ -12,6 +12,16 @@ const nextConfig = {
     ],
   },
   output: 'standalone',
+  // Enable polling for Docker on macOS (file watching issues)
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      }
+    }
+    return config
+  },
 }
 
 module.exports = nextConfig

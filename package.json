@@ -8,8 +8,9 @@
     "db:start": "docker start bcflame_postgres",
     "db:stop": "docker stop bcflame_postgres",
     "db:reset": "docker rm -f bcflame_postgres && docker volume rm bcflame_postgres_data && npm run db:setup",
-    "dev:backend": "npm run db:setup && cd backend && npm run develop",
-    "dev:frontend": "cd frontend && docker-compose -f docker-compose.dev.yml up",
+    "dev:backend": "cd backend && npm run develop",
+    "dev:frontend-docker": "cd frontend && docker-compose -f docker-compose.dev.yml up",
+    "dev:frontend": "cd frontend && npm run dev",
     "dev": "npm run dev:backend & npm run dev:frontend",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
