@@ -99,12 +99,14 @@ export async function seedProducts(strapi: Strapi) {
       }));
 
       // Create product entry
+      // Note: Type assertion for pricing is necessary due to Strapi's complex component type system
       const createdProduct = await strapi.entityService.create(
         'api::product.product',
         {
           data: {
             name: product.name,
             sku: sanitizedSKU,
+            // Category is validated above with isValidCategory(), safe to assert
             category: product.category as 'Indica' | 'Hybrid' | 'Sativa',
             tagline: product.tagline || null,
             description: product.description || '',
