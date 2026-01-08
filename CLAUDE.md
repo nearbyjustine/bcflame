@@ -85,7 +85,7 @@ npm run strapi     # Strapi CLI commands
 
 **Next.js 14 App Router Structure:**
 - `app/(auth)/login/` - Public login page
-- `app/(portal)/dashboard/` - Protected portal routes (dashboard, products, orders, media-hub, profile)
+- `app/(portal)/dashboard/` - Protected main dashboard route (other protected portal routes like `products`, `orders`, `media-hub`, and `profile` are separate sibling directories under `app/(portal)/`)
 - `components/ui/` - shadcn/ui components (button, card, input)
 - `components/auth/LoginForm.tsx` - Login form component
 - `lib/api/strapi.ts` - Axios instance with JWT interceptor
