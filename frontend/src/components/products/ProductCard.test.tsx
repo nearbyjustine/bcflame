@@ -133,7 +133,7 @@ describe('ProductCard', () => {
   });
 
   it('displays category-specific styling', () => {
-    const { container } = render(<ProductCard product={mockProduct} />);
+    render(<ProductCard product={mockProduct} />);
     const categoryBadge = screen.getByText('Hybrid');
     expect(categoryBadge).toHaveClass('bg-purple-100');
   });
