@@ -1,9 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ProductCard } from './ProductCard';
 import type { Product } from '@/types/product';
 
 describe('ProductCard', () => {
+  beforeEach(() => {
+    // Mock the environment variable for image URL tests
+    process.env.NEXT_PUBLIC_STRAPI_URL = 'http://localhost:1337';
+  });
   const mockProduct: Product = {
     id: 1,
     attributes: {

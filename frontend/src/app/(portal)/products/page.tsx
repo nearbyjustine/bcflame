@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getProducts } from '@/lib/api/products';
 import { ProductCard } from '@/components/products/ProductCard';
 import type { Product } from '@/types/product';
@@ -13,25 +13,25 @@ export default function ProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('All');
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await getProducts(
-          categoryFilter !== 'All' ? { category: categoryFilter } : undefined
-        );
-        setProducts(response.data);
-      } catch (err) {
-        setError('Failed to load products. Please try again later.');
-        console.error('Error fetching products:', err);
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchProducts = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await getProducts(
+        categoryFilter !== 'All' ? { category: categoryFilter } : undefined
+      );
+      setProducts(response.data);
+    } catch (err) {
+      setError('Failed to load products. Please try again later.');
+      console.error('Error fetching products:', err);
+    } finally {
+      setIsLoading(false);
     }
-
-    fetchProducts();
   }, [categoryFilter]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const categories: CategoryFilter[] = ['All', 'Indica', 'Hybrid', 'Sativa'];
 
@@ -74,7 +74,7 @@ export default function ProductsPage() {
           <div className="text-center">
             <p className="text-destructive mb-4">{error}</p>
             <button
-              onClick={() => setCategoryFilter(categoryFilter)}
+              onClick={fetchProducts}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
             >
               Try Again

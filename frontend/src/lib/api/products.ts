@@ -9,6 +9,12 @@ export interface GetProductsParams {
   onSale?: boolean;
 }
 
+interface ProductFilters {
+  category?: { $eq: 'Indica' | 'Hybrid' | 'Sativa' };
+  featured?: { $eq: boolean };
+  on_sale?: { $eq: boolean };
+}
+
 /**
  * Fetch products from Strapi with optional filtering and pagination
  */
@@ -16,7 +22,7 @@ export async function getProducts(params?: GetProductsParams): Promise<ProductsR
   const { page = 1, pageSize = 25, category, featured, onSale } = params || {};
 
   // Build filters object
-  const filters: any = {};
+  const filters: ProductFilters = {};
 
   if (category) {
     filters.category = { $eq: category };

@@ -26,8 +26,8 @@ const formatPrice = (price: number): string => {
 export function ProductCard({ product }: ProductCardProps) {
   const { attributes } = product;
   const firstImage = attributes.images?.data?.[0];
-  const imageUrl = firstImage?.url
-    ? `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${firstImage.url}`
+  const imageUrl = firstImage?.url && process.env.NEXT_PUBLIC_STRAPI_URL
+    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${firstImage.url}`
     : null;
   const lowestPrice = attributes.pricing.reduce(
     (min, p) => (p.price < min ? p.price : min),
