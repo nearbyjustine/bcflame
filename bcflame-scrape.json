@@ -1,0 +1,340 @@
+{
+  "website": {
+    "name": "BC Flame Collective",
+    "tagline": "Light Up The Flame",
+    "slogan": "Superior Quality",
+    "established": 2022,
+    "url": "https://bcflameonline.com/",
+    "description": "BC Flame is dedicated to the BC community. We connect smokers with the finest strains at the most competitive prices."
+  },
+  "header": {
+    "promotional_banner": "Limited Time Launch Offer 40% Off Today With Code WELCOME40",
+    "navigation": {
+      "primary_menu": [
+        {
+          "label": "Home",
+          "url": "https://bcflameonline.com/"
+        },
+        {
+          "label": "Shop Products",
+          "url": "https://bcflameonline.com/shop/"
+        },
+        {
+          "label": "Contact",
+          "url": "https://bcflameonline.com/contact/"
+        },
+        {
+          "label": "FAQ",
+          "url": "https://bcflameonline.com/faq/"
+        },
+        {
+          "label": "About Us",
+          "url": "https://bcflameonline.com/about-us/"
+        },
+        {
+          "label": "My account",
+          "url": "https://bcflameonline.com/my-account/"
+        },
+        {
+          "label": "Refer",
+          "url": "https://bcflameonline.com/refer/"
+        }
+      ]
+    },
+    "shopping_cart": {
+      "url": "https://bcflameonline.com/cart/",
+      "items": 0
+    }
+  },
+  "hero_section": {
+    "heading": "How it works",
+    "description": "Find a variety of products in BC Flame's shop and get fast shipping straight to your door step, anywhere in Canada.",
+    "cta_button": {
+      "label": "SHOP NOW",
+      "url": "https://bcflameonline.com/shop/"
+    },
+    "steps": [
+      {
+        "number": 1,
+        "title": "Choose your buds",
+        "description": "Choose your products by adding to cart, then checkout & pay by E-transfer or Credit card"
+      },
+      {
+        "number": 2,
+        "title": "Sign up & Get Verified",
+        "description": "Send us a piece of ID so we can verify you. We'll accept the payment once we've verified you."
+      },
+      {
+        "number": 3,
+        "title": "Receive your order, Fast!",
+        "description": "Finally, we prep your order the next day, seal it real tight in smell-proof bags & ship it off to you!"
+      },
+      {
+        "number": 4,
+        "title": "Round the clock support",
+        "description": "If you have any questions, send us an email. We're always there for you. Our Email : info@bcflameonline.com"
+      }
+    ]
+  },
+  "quality_section": {
+    "heading": "BC Flame: Unrivalled Quality",
+    "subheading": "Crafting the perfect bud is an Art Form, with a Passion for Perfection",
+    "description": "Every inhalation is an exploration of rich flavors, captivating aromas, and effects that generate individual inspiration.",
+    "quote_author": "Avid Smoker",
+    "cta_button": {
+      "label": "SHOP NOW",
+      "url": "https://bcflameonline.com/shop/"
+    }
+  },
+  "why_choose_us": {
+    "heading": "WHY CHOOSE BC FLAME?",
+    "description": "We always make sure that you are satisfied. At BC Flame Collective, our top priority is making sure you get the best products on the market at the best prices.",
+    "features": [
+      {
+        "title": "Easy payments",
+        "description": "Enjoy a seamless and secure checkout experience with multiple payment options designed for your convenience."
+      },
+      {
+        "title": "Fast Delivery",
+        "description": "Get your orders delivered swiftly with our reliable shipping services, ensuring your items arrive on time, anywhere in Canada."
+      },
+      {
+        "title": "Quick Support",
+        "description": "Need assistance? Our dedicated support team is always ready to help you with any questions or concerns."
+      },
+      {
+        "title": "Refer a Friend",
+        "description": "Love our products? Share them with friends and earn rewards when they make a purchase!"
+      }
+    ]
+  },
+  "products": [
+    {
+      "id": 2683,
+      "name": "9 Pound Hammer",
+      "sku": "302",
+      "category": "Indica",
+      "url": "https://bcflameonline.com/shop/9-pound-hammer/",
+      "on_sale": true,
+      "tagline": "Heavy-Hitting Relief You Can Feel",
+      "description": "Looking for the kind of chill that melts stress like butter? Nine Pound Hammer lives up to its name. This powerhouse indica hits fast and hard, wrapping your body in deep relaxation and gently quieting the noise in your mind. Perfect for winding down after a long day or sinking into a peaceful night's rest.",
+      "full_description": "Crafted from a legendary trio of strains, Nine Pound Hammer carries a rich, fruity aroma layered with hints of citrus and a subtle diesel kick smooth on the draw but undeniably bold. Each inhale delivers a calming wave that lingers, leaving you grounded, content, and ready to recharge.\n\nLoved by seasoned smokers for its intense body high and calming effects, this strain is a go-to for easing tension, stubborn aches, and sleepless nights. Whether you're unwinding after a tough week or just looking to zone out in comfort, Nine Pound Hammer doesn't disappoint.",
+      "best_for": "Deep relaxation, evening use, stress & sleep support",
+      "warning": "You might not want to get off the couch after this one.",
+      "pricing": {
+        "7g": {
+          "amount": 55.00,
+          "currency": "USD"
+        },
+        "14g": {
+          "amount": 110.00,
+          "currency": "USD"
+        },
+        "28g": {
+          "amount": 200.00,
+          "currency": "USD"
+        }
+      },
+      "price_range": "$55.00 - $200.00",
+      "quantity_options": ["7g", "14g", "28g"],
+      "features": [
+        "Satisfaction Guaranteed",
+        "Super Fast Shipping",
+        "Secure Payments"
+      ]
+    },
+    {
+      "id": 2724,
+      "name": "Gas Gummies",
+      "sku": "402",
+      "category": "Hybrid",
+      "url": "https://bcflameonline.com/shop/gas-gummies/",
+      "on_sale": false,
+      "tagline": "Sweet, Gassy, and Surprisingly Chill This One Packs a Punch",
+      "description": "Gas Gummie hits like a candy coated freight train smooth, sweet, and shockingly powerful. A balanced hybrid born from Kandy Kush x OG #18, this strain blends the playful flavors of fruity gummies with the bold, diesel kick of a true gas strain. It's that rare combo of flavor and fire that seasoned users crave.",
+      "full_description": "With 20% THC, Gas Gummie isn't just for casual snacking. It offers a euphoric mental lift followed by a mellow, body hugging calm, making it perfect for evening hangs, creative daydreaming, or just turning the volume down on a noisy mind.\n\nThe effects creep in gently, like slipping under a warm blanket then boom, you're floating. While still being studied for full medicinal benefits, early fans report mood enhancement, stress relief, and good vibes all around.",
+      "flavor_profile": "Sweet candy, citrus, rich diesel",
+      "thc_content": "20%",
+      "best_for": "Balanced high, mood boost, chill nights in",
+      "warning": "May cause sudden couch appreciation and a mysteriously empty snack drawer.",
+      "pricing": {
+        "7g": {
+          "amount": 50.00,
+          "currency": "USD"
+        },
+        "14g": {
+          "amount": 95.00,
+          "currency": "USD"
+        },
+        "28g": {
+          "amount": 179.00,
+          "currency": "USD"
+        }
+      },
+      "price_range": "$50.00 - $179.00",
+      "quantity_options": ["7g", "14g", "28g"],
+      "features": [
+        "Satisfaction Guaranteed",
+        "Super Fast Shipping",
+        "Secure Payments"
+      ]
+    },
+    {
+      "id": 2667,
+      "name": "Gas Mask",
+      "sku": "304",
+      "category": "Indica",
+      "url": "https://bcflameonline.com/shop/gas-mask/",
+      "on_sale": true,
+      "tagline": "Too Loud for the Weak Lunged",
+      "description": "When Gas Mask enters the room, there's no hiding it. This pungent powerhouse hits like a chemical warning sign fuel, funk, and rot toned citrus so thick it practically slaps you. No kidding you might actually need a gas mask.",
+      "full_description": "Born from a backcross of Cherry Pie x Alien Kush F2, this strain doesn't waste time being polite. The high starts upstairs with a heavy, mind-numbing cerebral thump, then drips downward until every limb forgets its purpose. Stress? Gone. Motivation? Optional.",
+      "best_for": "Melting stress, late-night use, tuning out the world",
+      "warning": "Don't say you weren't warned. Gas Mask doesn't knock. It barges in.",
+      "pricing": {
+        "7g": {
+          "amount": 55.00,
+          "currency": "USD"
+        },
+        "14g": {
+          "amount": 110.00,
+          "currency": "USD"
+        },
+        "28g": {
+          "amount": 200.00,
+          "currency": "USD"
+        }
+      },
+      "price_range": "$55.00 - $200.00",
+      "quantity_options": ["7g", "14g", "28g"],
+      "features": [
+        "Satisfaction Guaranteed",
+        "Super Fast Shipping",
+        "Secure Payments"
+      ]
+    },
+    {
+      "id": 2702,
+      "name": "Kosher Kush",
+      "sku": "301",
+      "category": "Indica",
+      "url": "https://bcflameonline.com/shop/kosher-kush/",
+      "on_sale": true,
+      "tagline": "Legendary Flavor, Holy-Level Chill",
+      "description": "If you're after a strain that's earned its stripes, Kosher Kush is the real deal. This award-winning indica didn't just show up - it dominated, taking home multiple Cannabis Cup titles and winning the hearts (and lungs) of smokers worldwide.",
+      "full_description": "Kosher Kush is loud in the best way. Crack open a jar and you're greeted with deep, earthy aromas layered with notes of ripe fruit and spice rich, complex, and unforgettable. It's not just flavorful, it's mouthwatering.\n\nExpect a high that comes on thick and settles deep. The full-body relaxation is undeniable, melting stress, quieting pain, and setting the tone for some serious rest. Whether you're dealing with long days, late nights, or just need to shut the world off this strain delivers that blessed peace.",
+      "best_for": "Deep relaxation, pain relief, heavy sleep",
+      "awards": "Multiple Cannabis Cup titles",
+      "note": "Once you try Kosher Kush, you'll understand why it's been crowned again and again. Heavy. Healing. Holy.",
+      "pricing": {
+        "7g": {
+          "amount": 55.00,
+          "currency": "USD"
+        },
+        "14g": {
+          "amount": 110.00,
+          "currency": "USD"
+        },
+        "28g": {
+          "amount": 200.00,
+          "currency": "USD"
+        }
+      },
+      "price_range": "$55.00 - $200.00",
+      "quantity_options": ["7g", "14g", "28g"],
+      "features": [
+        "Satisfaction Guaranteed",
+        "Super Fast Shipping",
+        "Secure Payments"
+      ]
+    },
+    {
+      "id": 2675,
+      "name": "Platinum Bubba Kush",
+      "sku": "303",
+      "category": "Indica",
+      "url": "https://bcflameonline.com/shop/platinum-bubba-kush/",
+      "on_sale": true,
+      "tagline": "Creeps In, Locks Down, Shuts It All Off",
+      "description": "Don't let the sweetness fool you Platinum Bubba Kush is heavy medicine in a velvet glove. Born from the legendary union of Platinum OG Kush and Bubba Kush, this indica-dominant hitter is built for those who don't just want to relax they want to disappear into the couch.",
+      "full_description": "At first, it plays it cool. A floral-spiced Kush aroma lingers in the air, with hints of sweetness that pull you in. But give it a few minutes PBK is a true creeper, and when it kicks in, it doesn't ask permission. Pain? Gone. Appetite? Wide open. Sleep? Imminent.\n\nThe nugs are dense, dusted in trichomes, and kissed with purples a California classic that's slowly staking its claim in every serious stash across the map.",
+      "best_for": "Body pain, insomnia, appetite boost, full-body chill",
+      "note": "You won't see it coming. But once it hits, you won't want to move.",
+      "pricing": {
+        "7g": {
+          "amount": 55.00,
+          "currency": "USD"
+        },
+        "14g": {
+          "amount": 110.00,
+          "currency": "USD"
+        },
+        "28g": {
+          "amount": 200.00,
+          "currency": "USD"
+        }
+      },
+      "price_range": "$55.00 - $200.00",
+      "quantity_options": ["7g", "14g", "28g"],
+      "features": [
+        "Satisfaction Guaranteed",
+        "Super Fast Shipping",
+        "Secure Payments"
+      ]
+    },
+    {
+      "id": 2689,
+      "name": "Tom Ford Pink Kush",
+      "sku": "305",
+      "category": "Indica",
+      "url": "https://bcflameonline.com/shop/tom-ford-pink-kush/",
+      "on_sale": true,
+      "tagline": "Luxurious, Heavy-Hitting Pink Indica Bliss",
+      "description": "Tom Ford Pink Kush is a decadent indica known for its sweet, gassy aroma, frosty pink-tinged buds, and deep, full-body relaxation. Expect a smooth, sedating high that melts away stress and tension, perfect for nighttime use when you want to fully unwind and drift into restful sleep.",
+      "full_description": "Tom Ford Pink Kush is a premium, heavy indica prized for its dense, crystal-coated buds, rich pink and purple hues, and unmistakable sweet-gas profile. Each inhale delivers layers of vanilla, candy-like sweetness, and earthy fuel, creating a smooth, flavourful smoke that feels as luxurious as it looks.\n\nThe effects come on with a warm, euphoric wave that quiets a busy mind before sinking deep into the body, easing tight muscles, lingering aches, and built-up stress. As the high settles in, expect heavy eyelids, a calm, carefree mood, and a strong couch-lock that makes this strain best saved for evenings or lazy days with nothing on the schedule.\n\nA favourite among indica lovers, Tom Ford Pink Kush is often chosen for winding down after long days, supporting sleep, and taking the edge off discomfort. If you’re looking for a potent, top-shelf pink strain that delivers serious relaxation with dessert-like flavour, this one more than earns its reputation.",
+      "best_for": "Deep relaxation, evening use, stress & sleep support",
+      "warning": "You might not want to get off the couch after this one.",
+      "pricing": {
+        "7g": {
+          "amount": 55.00,
+          "currency": "USD"
+        },
+        "14g": {
+          "amount": 110.00,
+          "currency": "USD"
+        },
+        "28g": {
+          "amount": 200.00,
+          "currency": "USD"
+        }
+      },
+      "price_range": "$55.00 - $200.00",
+      "quantity_options": ["7g", "14g", "28g"],
+      "features": [
+        "Satisfaction Guaranteed",
+        "Super Fast Shipping",
+        "Secure Payments"
+      ]
+    }
+  ],
+  "pricing_summary": {
+    "indica_products": {
+      "7g": "$55.00",
+      "14g": "$110.00",
+      "28g": "$200.00",
+      "products": [
+        "9 Pound Hammer",
+        "Gas Mask",
+        "Kosher Kush",
+        "Platinum Bubba Kush",
+        "Tom Ford Pink Kush"
+      ]
+    },
+    "hybrid_products": {
+      "7g": "$50.00",
+      "14g": "$95.00",
+      "28g": "$179.00",
+      "products": ["Gas Gummies"]
+    }
+  }
+}
