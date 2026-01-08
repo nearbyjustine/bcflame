@@ -70,11 +70,17 @@ npm run db:reset
 ```bash
 # Frontend
 cd frontend
+npm run test       # Run Vitest unit tests
+npm run test:ui    # Run Vitest with UI
+npm run test:coverage  # Run tests with coverage report
 npm run build      # Production build
 npm run lint       # ESLint
 
 # Backend
 cd backend
+npm run test       # Run Vitest unit tests
+npm run test:watch # Run tests in watch mode
+npm run test:coverage  # Run tests with coverage report
 npm run build      # TypeScript compilation
 npm run strapi     # Strapi CLI commands
 ```
@@ -160,6 +166,304 @@ openssl rand -base64 32
 - Strapi Admin: http://localhost:1337/admin
 - Strapi API: http://localhost:1337/api
 - PostgreSQL: localhost:5432
+
+## Testing Strategy
+
+This project follows **Test-Driven Development (TDD)** principles. Write tests before implementation.
+
+### Test Framework: Vitest
+
+Both frontend and backend use **Vitest** for unit and integration testing.
+
+**Why Vitest:**
+- Fast execution with native ESM support
+- Compatible with Vite and Next.js
+- Jest-compatible API
+- Built-in coverage with c8
+- UI mode for debugging tests
+
+### Frontend Testing (`/frontend`)
+
+**Test Structure:**
+```
+frontend/
+├── src/
+│   ├── lib/
+│   │   ├── api/
+│   │   │   ├── strapi.ts
+│   │   │   └── strapi.test.ts
+│   │   └── utils/
+│   │       ├── formatters.ts
+│   │       └── formatters.test.ts
+│   ├── components/
+│   │   └── products/
+│   │       ├── ProductCard.tsx
+│   │       └── ProductCard.test.tsx
+│   └── stores/
+│       ├── authStore.ts
+│       └── authStore.test.ts
+├── vitest.config.ts
+└── package.json
+```
+
+**Testing Patterns:**
+- **Unit Tests**: Test individual functions, utilities, and components in isolation
+- **Integration Tests**: Test API services with mocked axios responses
+- **Component Tests**: Test React components with @testing-library/react
+- **Store Tests**: Test Zustand stores with state transitions
+
+**Coverage Target**: 70%+ for all modules
+
+**Example Unit Test:**
+```typescript
+// frontend/src/lib/utils/formatters.test.ts
+import { describe, it, expect } from 'vitest'
+import { formatPrice, formatDate } from './formatters'
+
+describe('formatPrice', () => {
+  it('formats USD currency correctly', () => {
+    expect(formatPrice(55.00, 'USD')).toBe('$55.00')
+  })
+
+  it('handles zero price', () => {
+    expect(formatPrice(0, 'USD')).toBe('$0.00')
+  })
+})
+```
+
+**Example Component Test:**
+```typescript
+// frontend/src/components/products/ProductCard.test.tsx
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { ProductCard } from './ProductCard'
+
+describe('ProductCard', () => {
+  it('renders product name and price', () => {
+    const product = {
+      id: 1,
+      name: 'Test Product',
+      price_range: '$50.00 - $100.00',
+      category: 'Indica'
+    }
+
+    render(<ProductCard product={product} />)
+
+    expect(screen.getByText('Test Product')).toBeInTheDocument()
+    expect(screen.getByText('$50.00 - $100.00')).toBeInTheDocument()
+  })
+})
+```
+
+**Running Tests:**
+```bash
+cd frontend
+npm run test              # Run all tests
+npm run test:ui           # Open Vitest UI
+npm run test:coverage     # Generate coverage report
+npm run test -- ProductCard  # Run specific test file
+```
+
+### Backend Testing (`/backend`)
+
+**Test Structure:**
+```
+backend/
+├── src/
+│   ├── api/
+│   │   └── product/
+│   │       ├── controllers/
+│   │       │   ├── product.ts
+│   │       │   └── product.test.ts
+│   │       ├── services/
+│   │       │   ├── product.ts
+│   │       │   └── product.test.ts
+│   │       └── routes/
+│   │           └── product.ts
+│   └── utils/
+│       ├── inquiry-number.ts
+│       └── inquiry-number.test.ts
+├── tests/
+│   ├── helpers/
+│   │   └── strapi.ts
+│   └── integration/
+│       └── product.test.ts
+├── vitest.config.ts
+└── package.json
+```
+
+**Testing Patterns:**
+- **Unit Tests**: Test services, controllers, and utilities in isolation
+- **Integration Tests**: Test API endpoints with test database
+- **Lifecycle Tests**: Test Strapi lifecycle hooks (beforeCreate, afterCreate, etc.)
+- **Permission Tests**: Test role-based access control
+
+**Coverage Target**: 70%+ for services and controllers
+
+**Example Service Test:**
+```typescript
+// backend/src/api/order-inquiry/services/inquiry-number.test.ts
+import { describe, it, expect } from 'vitest'
+import { generateInquiryNumber } from './inquiry-number'
+
+describe('generateInquiryNumber', () => {
+  it('generates inquiry number with correct format', () => {
+    const inquiryNumber = generateInquiryNumber()
+    expect(inquiryNumber).toMatch(/^INQ-\d{8}-\d{4}$/)
+  })
+
+  it('includes current date in YYYYMMDD format', () => {
+    const inquiryNumber = generateInquiryNumber()
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    expect(inquiryNumber).toContain(today)
+  })
+})
+```
+
+**Example Integration Test:**
+```typescript
+// backend/tests/integration/product.test.ts
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { setupStrapi, cleanupStrapi } from '../helpers/strapi'
+
+describe('Product API', () => {
+  beforeAll(async () => {
+    await setupStrapi()
+  })
+
+  afterAll(async () => {
+    await cleanupStrapi()
+  })
+
+  it('GET /api/products returns all products', async () => {
+    const response = await request(strapi.server.httpServer)
+      .get('/api/products')
+      .expect(200)
+
+    expect(response.body.data).toBeInstanceOf(Array)
+  })
+
+  it('GET /api/products/:id returns single product', async () => {
+    const response = await request(strapi.server.httpServer)
+      .get('/api/products/1')
+      .expect(200)
+
+    expect(response.body.data).toHaveProperty('id')
+    expect(response.body.data).toHaveProperty('attributes')
+  })
+})
+```
+
+**Running Tests:**
+```bash
+cd backend
+npm run test              # Run all tests
+npm run test:watch        # Run tests in watch mode
+npm run test:coverage     # Generate coverage report
+npm run test -- inquiry   # Run specific test file
+```
+
+### TDD Workflow
+
+**Red-Green-Refactor Cycle:**
+
+1. **RED**: Write a failing test first
+   ```typescript
+   // Write the test
+   it('should format price correctly', () => {
+     expect(formatPrice(50)).toBe('$50.00')
+   })
+   // Test fails - formatPrice doesn't exist yet
+   ```
+
+2. **GREEN**: Write minimal code to make the test pass
+   ```typescript
+   // Implement the function
+   export function formatPrice(amount: number): string {
+     return `$${amount.toFixed(2)}`
+   }
+   // Test passes
+   ```
+
+3. **REFACTOR**: Improve code while keeping tests green
+   ```typescript
+   // Refactor with currency support
+   export function formatPrice(amount: number, currency = 'USD'): string {
+     return new Intl.NumberFormat('en-US', {
+       style: 'currency',
+       currency
+     }).format(amount)
+   }
+   // Tests still pass
+   ```
+
+**Development Flow:**
+1. Create `.test.ts` or `.test.tsx` file next to implementation file
+2. Write test cases for the feature you're about to implement
+3. Run tests (they should fail)
+4. Implement the feature
+5. Run tests (they should pass)
+6. Refactor code
+7. Commit code with tests
+
+**Best Practices:**
+- One test file per implementation file
+- Test file naming: `filename.test.ts` or `filename.test.tsx`
+- Group related tests with `describe` blocks
+- Use descriptive test names: `it('should do something when condition')`
+- Mock external dependencies (axios, Strapi SDK, etc.)
+- Avoid testing implementation details, test behavior
+- Keep tests simple and readable
+- Aim for fast test execution (<5 seconds for unit tests)
+
+### Configuration
+
+**Frontend Vitest Config** (`frontend/vitest.config.ts`):
+```typescript
+import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/test/setup.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.test.{ts,tsx}',
+        '**/*.config.{ts,js}',
+      ],
+    },
+  },
+})
+```
+
+**Backend Vitest Config** (`backend/vitest.config.ts`):
+```typescript
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    globals: true,
+    setupFiles: './tests/setup.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'tests/',
+        '**/*.test.ts',
+        'config/',
+      ],
+    },
+  },
+})
+```
 
 ## Development Patterns
 

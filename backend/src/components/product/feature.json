@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_product_features",
+  "info": {
+    "displayName": "Product Feature",
+    "description": "Product features and benefits"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "icon": {
+      "type": "string",
+      "maxLength": 100
+    }
+  }
+}

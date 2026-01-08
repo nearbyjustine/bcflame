@@ -1,0 +1,89 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product",
+    "description": "Cannabis product catalog"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "sku": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 50
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["Indica", "Hybrid", "Sativa"],
+      "required": true
+    },
+    "tagline": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "full_description": {
+      "type": "richtext"
+    },
+    "best_for": {
+      "type": "text"
+    },
+    "warning": {
+      "type": "text"
+    },
+    "thc_content": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "flavor_profile": {
+      "type": "text"
+    },
+    "product_url": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "on_sale": {
+      "type": "boolean",
+      "default": false
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    },
+    "pricing": {
+      "type": "component",
+      "repeatable": true,
+      "required": true,
+      "component": "product.pricing"
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.feature"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

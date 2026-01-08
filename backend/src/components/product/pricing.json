@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_product_pricings",
+  "info": {
+    "displayName": "Product Pricing",
+    "description": "Pricing information for different weight options"
+  },
+  "options": {},
+  "attributes": {
+    "weight": {
+      "type": "enumeration",
+      "enum": ["7g", "14g", "28g"],
+      "required": true
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD",
+      "maxLength": 3
+    }
+  }
+}
