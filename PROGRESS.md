@@ -191,11 +191,11 @@ curl http://localhost:1337/api/products?filters[on_sale][$eq]=true
 
 ## 🔗 Quick Links
 
-- **Plan**: [/Users/justinecastaneda/.claude/plans/swift-wandering-gem.md](file:///Users/justinecastaneda/.claude/plans/swift-wandering-gem.md)
-- **CLAUDE.md**: [/Users/justinecastaneda/Desktop/bcflame/CLAUDE.md](file:///Users/justinecastaneda/Desktop/bcflame/CLAUDE.md)
-- **Product Schema**: [/Users/justinecastaneda/Desktop/bcflame/backend/src/api/product/content-types/product/schema.json](file:///Users/justinecastaneda/Desktop/bcflame/backend/src/api/product/content-types/product/schema.json)
-- **Seeder README**: [/Users/justinecastaneda/Desktop/bcflame/backend/database/README.md](file:///Users/justinecastaneda/Desktop/bcflame/backend/database/README.md)
-- **Product Seeder**: [/Users/justinecastaneda/Desktop/bcflame/backend/database/seeders/product-seeder.ts](file:///Users/justinecastaneda/Desktop/bcflame/backend/database/seeders/product-seeder.ts)
+- **Plan**: `.claude/plans/plan.md`
+- **CLAUDE.md**: `CLAUDE.md`
+- **Product Schema**: `backend/src/api/product/content-types/product/schema.json`
+- **Seeder README**: `backend/database/README.md`
+- **Product Seeder**: `backend/database/seeders/product-seeder.ts`
 
 ---
 

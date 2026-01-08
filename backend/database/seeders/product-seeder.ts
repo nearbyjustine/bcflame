@@ -3,6 +3,7 @@
  * Seeds products from bcflame-scrape.json into Strapi database
  */
 
+import type { Strapi } from '@strapi/strapi';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -40,12 +41,12 @@ interface ScrapedData {
   products: ProductData[];
 }
 
-export async function seedProducts(strapi: any) {
+export async function seedProducts(strapi: Strapi) {
   console.log('🌱 Starting product seeder...');
 
   try {
     // Read scraped data
-    const scrapedDataPath = path.join(process.cwd(), '..', 'bcflame-scrape.json');
+    const scrapedDataPath = path.join(strapi.dirs.app.root, '..', 'bcflame-scrape.json');
     const scrapedData: ScrapedData = JSON.parse(
       fs.readFileSync(scrapedDataPath, 'utf-8')
     );
@@ -53,16 +54,13 @@ export async function seedProducts(strapi: any) {
     console.log(`Found ${scrapedData.products.length} products to seed`);
 
     // Check if products already exist
-    const existingProducts = await strapi.entityService.findMany(
-      'api::product.product',
-      {
-        filters: {},
-      }
+    const productCount = await strapi.entityService.count(
+      'api::product.product'
     );
 
-    if (existingProducts && existingProducts.length > 0) {
+    if (productCount > 0) {
       console.log('⚠️  Products already exist. Skipping seeding.');
-      console.log(`Found ${existingProducts.length} existing products`);
+      console.log(`Found ${productCount} existing products`);
       return;
     }
 
@@ -94,7 +92,7 @@ export async function seedProducts(strapi: any) {
           data: {
             name: product.name,
             sku: sanitizedSKU,
-            category: product.category,
+            category: product.category as 'Indica' | 'Hybrid' | 'Sativa',
             tagline: product.tagline || null,
             description: product.description || '',
             full_description: product.full_description || null,
@@ -106,7 +104,7 @@ export async function seedProducts(strapi: any) {
             on_sale: product.on_sale,
             featured: false,
             sort_order: 0,
-            pricing,
+            pricing: pricing as any,
             features,
             publishedAt: new Date(),
           },
