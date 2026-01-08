@@ -13,6 +13,12 @@ import {
   sanitizeSKU,
 } from '../../src/utils/product-transformer';
 
+interface ProductPricingComponent {
+  weight: '7g' | '14g' | '28g';
+  amount: number;
+  currency: string;
+}
+
 interface ProductData {
   id: number;
   name: string;
@@ -85,6 +91,13 @@ export async function seedProducts(strapi: Strapi) {
       // Sanitize SKU
       const sanitizedSKU = sanitizeSKU(product.sku);
 
+      // Map pricing with proper types
+      const pricingComponents: ProductPricingComponent[] = pricing.map(p => ({
+        weight: p.weight as '7g' | '14g' | '28g',
+        amount: p.amount,
+        currency: p.currency,
+      }));
+
       // Create product entry
       const createdProduct = await strapi.entityService.create(
         'api::product.product',
@@ -104,7 +117,7 @@ export async function seedProducts(strapi: Strapi) {
             on_sale: product.on_sale,
             featured: false,
             sort_order: 0,
-            pricing: pricing as any,
+            pricing: pricingComponents as any,
             features,
             publishedAt: new Date(),
           },
