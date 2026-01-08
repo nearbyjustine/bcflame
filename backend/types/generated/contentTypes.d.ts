@@ -362,6 +362,72 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
+export interface ApiProductProduct extends Schema.CollectionType {
+  collectionName: 'products';
+  info: {
+    singularName: 'product';
+    pluralName: 'products';
+    displayName: 'Product';
+    description: 'Cannabis product catalog';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    sku: Attribute.String &
+      Attribute.Required &
+      Attribute.Unique &
+      Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    category: Attribute.Enumeration<['Indica', 'Hybrid', 'Sativa']> &
+      Attribute.Required;
+    tagline: Attribute.String &
+      Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    description: Attribute.Text & Attribute.Required;
+    full_description: Attribute.RichText;
+    best_for: Attribute.Text;
+    warning: Attribute.Text;
+    thc_content: Attribute.String &
+      Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    flavor_profile: Attribute.Text;
+    product_url: Attribute.String &
+      Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+      }>;
+    on_sale: Attribute.Boolean & Attribute.DefaultTo<false>;
+    featured: Attribute.Boolean & Attribute.DefaultTo<false>;
+    sort_order: Attribute.Integer & Attribute.DefaultTo<0>;
+    pricing: Attribute.Component<'product.pricing', true> & Attribute.Required;
+    features: Attribute.Component<'product.feature', true>;
+    images: Attribute.Media;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::product.product',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::product.product',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -778,6 +844,7 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::product.product': ApiProductProduct;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;
