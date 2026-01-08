@@ -18,6 +18,7 @@ async function runSeeders() {
 
   const app = await appContext.start();
 
+  let exitCode = 0;
   try {
     // Run seeders in order
     await seedProducts(app);
@@ -25,10 +26,10 @@ async function runSeeders() {
     console.log('\n✅ All seeders completed successfully!');
   } catch (error) {
     console.error('\n❌ Seeding failed:', error);
-    process.exit(1);
+    exitCode = 1;
   } finally {
     await app.destroy();
-    process.exit(0);
+    process.exit(exitCode);
   }
 }
 
