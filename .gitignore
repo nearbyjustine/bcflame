@@ -53,3 +53,7 @@ yarn-error.log*
 .cache/
 .temp/
 tmp/
+
+# Strapi
+.strapi
+generated/
