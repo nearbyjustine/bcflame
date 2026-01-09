@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -17,10 +17,10 @@ const getCategoryStyles = (category: 'Indica' | 'Hybrid' | 'Sativa') => {
   return styles[category];
 };
 
-const formatPrice = (price: number): string => {
+const formatPrice = (price: number, currency = 'USD'): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency,
   }).format(price);
 };
 
@@ -29,20 +29,20 @@ export function ProductCard({ product }: ProductCardProps) {
   const images = attributes.images?.data || [];
 
   // State for selected size (default to first available pricing)
-  const [selectedPricing, setSelectedPricing] = useState<ProductPricing>(
-    attributes.pricing[0]
+  const [selectedPricing, setSelectedPricing] = useState<ProductPricing | null>(
+    attributes.pricing?.[0] || null
   );
 
   // State for current image index in carousel
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const handlePreviousImage = () => {
+  const handlePreviousImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
+  }, [images.length]);
 
-  const handleNextImage = () => {
+  const handleNextImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
+  }, [images.length]);
 
   const currentImage = images[currentImageIndex];
   const imageUrl = currentImage?.attributes?.url && process.env.NEXT_PUBLIC_STRAPI_URL
@@ -101,9 +101,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
                 {/* Image Indicators */}
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {images.map((_, index) => (
+                  {images.map((image, index) => (
                     <button
-                      key={index}
+                      key={image.id}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`w-2 h-2 rounded-full transition-all ${
                         index === currentImageIndex
@@ -160,31 +160,36 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Size selector - button group/pills */}
-        <div className="mb-4">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Select Size:</p>
-          <div className="flex gap-2">
-            {attributes.pricing.map((pricing) => (
-              <button
-                key={pricing.id}
-                onClick={() => setSelectedPricing(pricing)}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border-2 transition-all ${
-                  selectedPricing.id === pricing.id
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background hover:border-primary/50'
-                }`}
-              >
-                {pricing.weight}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Size selector and price display - only show if pricing is available */}
+        {selectedPricing && attributes.pricing?.length > 0 && (
+          <>
+            {/* Size selector - button group/pills */}
+            <div className="mb-4">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Select Size:</p>
+              <div className="flex gap-2">
+                {attributes.pricing.map((pricing) => (
+                  <button
+                    key={pricing.id}
+                    onClick={() => setSelectedPricing(pricing)}
+                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border-2 transition-all ${
+                      selectedPricing.id === pricing.id
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:border-primary/50'
+                    }`}
+                  >
+                    {pricing.weight}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* Dynamic price display */}
-        <div className="flex items-center justify-between pt-2 border-t">
-          <p className="text-sm text-muted-foreground">Price</p>
-          <p className="text-xl font-bold">{formatPrice(selectedPricing.amount)}</p>
-        </div>
+            {/* Dynamic price display */}
+            <div className="flex items-center justify-between pt-2 border-t">
+              <p className="text-sm text-muted-foreground">Price</p>
+              <p className="text-xl font-bold">{formatPrice(selectedPricing.amount, selectedPricing.currency)}</p>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

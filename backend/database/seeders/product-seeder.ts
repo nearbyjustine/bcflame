@@ -14,6 +14,18 @@ import {
 } from '../../src/utils/product-transformer';
 
 /**
+ * Sanitize product name for safe filesystem usage
+ * Prevents path traversal attacks
+ */
+function sanitizeProductName(name: string): string {
+  return name
+    .replace(/[/\\]/g, '') // Remove path separators
+    .replace(/\.\./g, '')  // Remove parent directory references
+    .replace(/\0/g, '')    // Remove null bytes
+    .trim();
+}
+
+/**
  * Upload product images from local filesystem to Strapi
  * Returns array of uploaded file IDs
  */
@@ -23,6 +35,9 @@ async function uploadProductImages(
 ): Promise<number[]> {
   const imageIds: number[] = [];
 
+  // Sanitize product name to prevent path traversal
+  const sanitizedName = sanitizeProductName(productName);
+
   // Path to product images (assuming they're in frontend/public/product_images)
   const imagesDir = path.join(
     strapi.dirs.app.root,
@@ -30,12 +45,12 @@ async function uploadProductImages(
     'frontend',
     'public',
     'product_images',
-    productName
+    sanitizedName
   );
 
   // Check if images directory exists
   if (!fs.existsSync(imagesDir)) {
-    console.warn(`⚠️  No images found for product: ${productName}`);
+    console.warn(`⚠️  No images found for product: ${sanitizedName}`);
     return imageIds;
   }
 
@@ -46,7 +61,7 @@ async function uploadProductImages(
   });
 
   if (imageFiles.length === 0) {
-    console.warn(`⚠️  No valid image files found for product: ${productName}`);
+    console.warn(`⚠️  No valid image files found for product: ${sanitizedName}`);
     return imageIds;
   }
 
@@ -55,15 +70,15 @@ async function uploadProductImages(
     const aHas3b = a.toLowerCase().includes('-3b');
     const bHas3b = b.toLowerCase().includes('-3b');
 
-    // If one has -3b and the other doesn't, non-3b comes first
-    if (aHas3b && !bHas3b) return 1;
-    if (!aHas3b && bHas3b) return -1;
+    // Files without '-3b' come first. Number(aHas3b) - Number(bHas3b) achieves this.
+    const primarySort = Number(aHas3b) - Number(bHas3b);
+    if (primarySort !== 0) return primarySort;
 
     // Otherwise, sort alphabetically
     return a.localeCompare(b);
   });
 
-  console.log(`  📸 Found ${imageFiles.length} images for ${productName}`);
+  console.log(`  📸 Found ${imageFiles.length} images for ${sanitizedName}`);
 
   // Upload each image
   for (const imageFile of imageFiles) {
@@ -75,7 +90,7 @@ async function uploadProductImages(
       const fileData = {
         path: imagePath,
         name: imageFile,
-        type: `image/${path.extname(imageFile).slice(1).replace('jpg', 'jpeg')}`,
+        type: `image/${path.extname(imageFile).slice(1).toLowerCase().replace('jpg', 'jpeg')}`,
         size: stats.size,
       };
 
@@ -84,8 +99,8 @@ async function uploadProductImages(
         data: {
           fileInfo: {
             name: imageFile,
-            alternativeText: `${productName} product image`,
-            caption: productName,
+            alternativeText: `${sanitizedName} product image`,
+            caption: sanitizedName,
           },
         },
         files: fileData,
