@@ -13,6 +13,101 @@ import {
   sanitizeSKU,
 } from '../../src/utils/product-transformer';
 
+/**
+ * Upload product images from local filesystem to Strapi
+ * Returns array of uploaded file IDs
+ */
+async function uploadProductImages(
+  strapi: Strapi,
+  productName: string
+): Promise<number[]> {
+  const imageIds: number[] = [];
+
+  // Path to product images (assuming they're in frontend/public/product_images)
+  const imagesDir = path.join(
+    strapi.dirs.app.root,
+    '..',
+    'frontend',
+    'public',
+    'product_images',
+    productName
+  );
+
+  // Check if images directory exists
+  if (!fs.existsSync(imagesDir)) {
+    console.warn(`⚠️  No images found for product: ${productName}`);
+    return imageIds;
+  }
+
+  // Read all image files from directory
+  const imageFiles = fs.readdirSync(imagesDir).filter((file) => {
+    const ext = path.extname(file).toLowerCase();
+    return ['.png', '.jpg', '.jpeg', '.webp'].includes(ext);
+  });
+
+  if (imageFiles.length === 0) {
+    console.warn(`⚠️  No valid image files found for product: ${productName}`);
+    return imageIds;
+  }
+
+  // Sort images: single product images first (without -3b), then 3-piece images (with -3b)
+  imageFiles.sort((a, b) => {
+    const aHas3b = a.toLowerCase().includes('-3b');
+    const bHas3b = b.toLowerCase().includes('-3b');
+
+    // If one has -3b and the other doesn't, non-3b comes first
+    if (aHas3b && !bHas3b) return 1;
+    if (!aHas3b && bHas3b) return -1;
+
+    // Otherwise, sort alphabetically
+    return a.localeCompare(b);
+  });
+
+  console.log(`  📸 Found ${imageFiles.length} images for ${productName}`);
+
+  // Upload each image
+  for (const imageFile of imageFiles) {
+    const imagePath = path.join(imagesDir, imageFile);
+    const stats = fs.statSync(imagePath);
+
+    try {
+      // Create a file object that mimics a multipart upload
+      const fileData = {
+        path: imagePath,
+        name: imageFile,
+        type: `image/${path.extname(imageFile).slice(1).replace('jpg', 'jpeg')}`,
+        size: stats.size,
+      };
+
+      // Upload file to Strapi using the upload service
+      const uploadedFiles = await strapi.plugins.upload.services.upload.upload({
+        data: {
+          fileInfo: {
+            name: imageFile,
+            alternativeText: `${productName} product image`,
+            caption: productName,
+          },
+        },
+        files: fileData,
+      });
+
+      // uploadedFiles is an array, get the first (and only) file
+      const uploadedFile = Array.isArray(uploadedFiles) ? uploadedFiles[0] : uploadedFiles;
+
+      if (uploadedFile && uploadedFile.id) {
+        imageIds.push(uploadedFile.id);
+        console.log(`    ✅ Uploaded: ${imageFile} (ID: ${uploadedFile.id})`);
+      } else {
+        console.error(`    ❌ Upload succeeded but no ID returned for ${imageFile}`);
+      }
+    } catch (error) {
+      console.error(`    ❌ Failed to upload ${imageFile}:`, error);
+    }
+  }
+
+  return imageIds;
+}
+
 interface ProductPricingComponent {
   weight: '7g' | '14g' | '28g';
   amount: number;
@@ -98,6 +193,10 @@ export async function seedProducts(strapi: Strapi) {
         currency: p.currency,
       }));
 
+      // Upload product images
+      console.log(`  📦 Uploading images for ${product.name}...`);
+      const imageIds = await uploadProductImages(strapi, product.name);
+
       // Create product entry
       // Note: Type assertion for pricing is necessary due to Strapi's complex component type system
       const createdProduct = await strapi.entityService.create(
@@ -121,12 +220,13 @@ export async function seedProducts(strapi: Strapi) {
             sort_order: 0,
             pricing: pricingComponents as any,
             features,
+            images: imageIds.length > 0 ? imageIds : undefined,
             publishedAt: new Date(),
           },
         }
       );
 
-      console.log(`✅ Created product: ${createdProduct.name} (ID: ${createdProduct.id})`);
+      console.log(`✅ Created product: ${createdProduct.name} (ID: ${createdProduct.id}) with ${imageIds.length} images`);
     }
 
     console.log('🎉 Product seeding completed successfully!');
