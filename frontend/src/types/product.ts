@@ -5,9 +5,9 @@
 
 export interface ProductPricing {
   id: number;
-  quantity: string;
-  price: number;
-  unit: string;
+  weight: string;
+  amount: number;
+  currency: string;
 }
 
 export interface ProductFeature {

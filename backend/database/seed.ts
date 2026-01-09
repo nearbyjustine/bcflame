@@ -5,7 +5,11 @@
 
 import Strapi from '@strapi/strapi';
 import path from 'path';
+import { config } from 'dotenv';
 import { seedProducts } from './seeders/product-seeder';
+
+// Load environment variables from .env file
+config({ path: path.resolve(__dirname, '..', '.env') });
 
 async function runSeeders() {
   console.log('🚀 Starting database seeding...\n');
