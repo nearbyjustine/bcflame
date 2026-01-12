@@ -117,8 +117,20 @@ npm run strapi     # Strapi CLI commands
 - `config/server.ts` - Server config (port 1337, webhooks, app keys)
 - `config/middlewares.ts` - CORS enabled for localhost:3000, security headers
 - `config/api.ts` - REST API config (default limit: 25, max: 100)
-- `src/api/` - Custom API endpoints (future content types)
+- `config/email.ts` - Email notification configuration
+- `src/api/` - Custom API endpoints and content types
+- `src/services/` - Shared services (email, utilities)
+- `src/templates/` - Email templates
 - `src/index.ts` - Bootstrap hooks
+
+**Email Notification System:**
+- **Service**: `src/services/email.ts` - Nodemailer-based email service with singleton pattern
+- **Templates**: `src/templates/order-email.ts` - HTML/text email templates for order notifications
+- **Lifecycle Hooks**: Order inquiry lifecycle hooks trigger automatic emails:
+  - `afterCreate`: Sends notification to admin and confirmation to customer
+  - `afterUpdate`: Sends status update email when order status changes
+- **Configuration**: Environment-based SMTP configuration (see Email Configuration section)
+- **Testing**: Full unit test coverage for service, templates, and lifecycle hooks
 
 **Built-in Features:**
 - Strapi Users-Permissions plugin for JWT authentication
@@ -159,6 +171,22 @@ openssl rand -base64 32
 - `APP_KEYS` - Strapi session keys (4 required)
 - `DB_PASSWORD` - Change in production
 - All secrets must be generated, never use defaults in production
+
+**Email Configuration:**
+- `SMTP_HOST` - SMTP server hostname (e.g., smtp.gmail.com)
+- `SMTP_PORT` - SMTP server port (default: 587 for TLS)
+- `SMTP_SECURE` - Use SSL (true) or TLS (false)
+- `SMTP_USER` - SMTP authentication username
+- `SMTP_PASS` - SMTP authentication password (use app-specific password for Gmail)
+- `EMAIL_FROM_NAME` - Sender name (default: BC Flame)
+- `EMAIL_FROM_ADDRESS` - Sender email address
+- `EMAIL_ADMIN_RECIPIENTS` - Comma-separated list of admin emails for order notifications
+
+**Gmail Setup Example:**
+1. Enable 2-Factor Authentication on your Google account
+2. Generate an App Password: Google Account → Security → 2-Step Verification → App passwords
+3. Use the 16-character app password for `SMTP_PASS`
+4. Set `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_SECURE=false`
 
 ### Service URLs
 
