@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bud_styles",
+  "info": {
+    "singularName": "bud-style",
+    "pluralName": "bud-styles",
+    "displayName": "Bud Style",
+    "description": "Global library of bud style options"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["trim_quality", "flower_grade", "visual_style"],
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
