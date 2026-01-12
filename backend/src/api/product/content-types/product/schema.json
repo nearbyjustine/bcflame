@@ -84,6 +84,21 @@
       "multiple": true,
       "required": false,
       "allowedTypes": ["images"]
+    },
+    "customization_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "available_photos": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "selection_limits": {
+      "type": "component",
+      "repeatable": true,
+      "component": "customization.selection-limits"
     }
   }
 }

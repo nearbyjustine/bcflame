@@ -162,11 +162,197 @@ describe('Product API Service', () => {
       });
     });
 
+    it('should not filter when featured is false', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      await getProducts({ featured: false });
+
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 25,
+          },
+        },
+      });
+    });
+
     it('should handle API errors', async () => {
       const error = new Error('Network error');
       vi.mocked(strapiApi.get).mockRejectedValue(error);
 
       await expect(getProducts()).rejects.toThrow('Network error');
+    });
+
+    it('should search products by name', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      await getProducts({ search: 'OG Kush' });
+
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 25,
+          },
+          filters: {
+            name: {
+              $containsi: 'OG Kush',
+            },
+          },
+        },
+      });
+    });
+
+    it('should filter by price range', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      await getProducts({ minPrice: 10, maxPrice: 50 });
+
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 25,
+          },
+          filters: {
+            pricing: {
+              amount: {
+                $gte: 10,
+                $lte: 50,
+              },
+            },
+          },
+        },
+      });
+    });
+
+    it('should filter by THC content range', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      await getProducts({ minTHC: 15, maxTHC: 25 });
+
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 25,
+          },
+          filters: {
+            thc_content: {
+              $gte: 15,
+              $lte: 25,
+            },
+          },
+        },
+      });
+    });
+
+    it('should combine multiple filters', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 25,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      await getProducts({
+        search: 'Kush',
+        category: 'Indica',
+        featured: true,
+        onSale: true,
+        minPrice: 10,
+        maxPrice: 50,
+      });
+
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 25,
+          },
+          filters: {
+            name: {
+              $containsi: 'Kush',
+            },
+            category: {
+              $eq: 'Indica',
+            },
+            featured: {
+              $eq: true,
+            },
+            on_sale: {
+              $eq: true,
+            },
+            pricing: {
+              amount: {
+                $gte: 10,
+                $lte: 50,
+              },
+            },
+          },
+        },
+      });
     });
   });
 

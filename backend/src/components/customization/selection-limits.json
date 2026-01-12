@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_customization_selection_limits",
+  "info": {
+    "displayName": "Selection Limits",
+    "description": "Min/max selection limits for customization options"
+  },
+  "options": {},
+  "attributes": {
+    "option_type": {
+      "type": "enumeration",
+      "enum": ["photos", "bud_styles", "backgrounds", "fonts", "prebagging"],
+      "required": true
+    },
+    "min_selections": {
+      "type": "integer",
+      "default": 1,
+      "min": 0
+    },
+    "max_selections": {
+      "type": "integer",
+      "default": 5,
+      "min": 1
+    }
+  }
+}

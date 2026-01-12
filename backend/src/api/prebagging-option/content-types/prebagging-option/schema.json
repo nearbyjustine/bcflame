@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "prebagging_options",
+  "info": {
+    "singularName": "prebagging-option",
+    "pluralName": "prebagging-options",
+    "displayName": "Pre-Bagging Option",
+    "description": "Global library of pre-bagging packaging options"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "packaging_type": {
+      "type": "enumeration",
+      "enum": ["mylar_bag", "glass_jar", "preroll_tube", "child_resistant_container", "tin_container"],
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "available_weights": {
+      "type": "json",
+      "default": ["3.5g", "7g", "14g", "28g"]
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    },
+    "unit_size": {
+      "type": "decimal",
+      "required": false
+    },
+    "unit_size_unit": {
+      "type": "enumeration",
+      "enum": ["g", "oz"],
+      "default": "g"
+    }
+  }
+}

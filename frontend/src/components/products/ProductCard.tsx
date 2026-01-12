@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { Settings } from 'lucide-react';
 import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface ProductCardProps {
   product: Product;
+  onCustomize?: () => void;
 }
 
 const getCategoryStyles = (category: 'Indica' | 'Hybrid' | 'Sativa') => {
@@ -24,7 +27,7 @@ const formatPrice = (price: number, currency = 'USD'): string => {
   }).format(price);
 };
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, onCustomize }: ProductCardProps) {
   const { attributes } = product;
   const images = attributes.images?.data || [];
 
@@ -189,6 +192,19 @@ export function ProductCard({ product }: ProductCardProps) {
               <p className="text-xl font-bold">{formatPrice(selectedPricing.amount, selectedPricing.currency)}</p>
             </div>
           </>
+        )}
+
+        {/* Customize button - only show if customization is enabled */}
+        {attributes.customization_enabled && onCustomize && (
+          <div className="mt-4 pt-4 border-t">
+            <Button
+              onClick={onCustomize}
+              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:opacity-90 transition-opacity"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Customize & Order
+            </Button>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "font_styles",
+  "info": {
+    "singularName": "font-style",
+    "pluralName": "font-styles",
+    "displayName": "Font Style",
+    "description": "Global library of font options"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "font_family": {
+      "type": "string",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["sans_serif", "serif", "display", "script"],
+      "required": true
+    },
+    "preview_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
