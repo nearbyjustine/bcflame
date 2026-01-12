@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "order_inquiries",
+  "info": {
+    "singularName": "order-inquiry",
+    "pluralName": "order-inquiries",
+    "displayName": "Order Inquiry",
+    "description": "Customer product customization inquiry"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "inquiry_number": {
+      "type": "string",
+      "required": false,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "reviewing", "approved", "rejected", "fulfilled"],
+      "default": "pending",
+      "required": true
+    },
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product"
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "selected_photos": {
+      "type": "json"
+    },
+    "selected_bud_styles": {
+      "type": "json"
+    },
+    "selected_backgrounds": {
+      "type": "json"
+    },
+    "selected_fonts": {
+      "type": "json"
+    },
+    "selected_prebagging": {
+      "type": "json"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "reviewed_at": {
+      "type": "datetime"
+    },
+    "reviewed_by": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "admin::user"
+    },
+    "total_weight": {
+      "type": "decimal",
+      "required": false,
+      "default": 0
+    },
+    "weight_unit": {
+      "type": "enumeration",
+      "enum": ["g", "oz", "lb"],
+      "default": "g",
+      "required": true
+    }
+  }
+}

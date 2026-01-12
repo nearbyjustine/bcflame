@@ -1,0 +1,7 @@
+/**
+ * bud-style router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::bud-style.bud-style');

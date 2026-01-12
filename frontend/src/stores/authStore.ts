@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 import { strapiApi } from '@/lib/api/strapi';
+import { getUserProfile, uploadUserLogo, type UserProfile } from '@/lib/api/user';
 
 interface User {
   id: number;
@@ -17,19 +18,23 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  userProfile: UserProfile | null;
 
   login: (identifier: string, password: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  fetchUserProfile: () => Promise<void>;
+  uploadLogo: (file: File) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
       isLoading: true,
+      userProfile: null,
 
       login: async (identifier, password) => {
         try {
@@ -47,6 +52,9 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
+
+          // Fetch user profile after login
+          await get().fetchUserProfile();
         } catch (error) {
           set({
             user: null,
@@ -64,6 +72,7 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           token: null,
           isAuthenticated: false,
+          userProfile: null,
         });
       },
 
@@ -85,14 +94,37 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
+
+          // Fetch user profile after auth check
+          await get().fetchUserProfile();
         } catch (error) {
           Cookies.remove('jwt');
           set({
             user: null,
             token: null,
             isAuthenticated: false,
-            isLoading: false
+            isLoading: false,
+            userProfile: null,
           });
+        }
+      },
+
+      fetchUserProfile: async () => {
+        try {
+          const profile = await getUserProfile();
+          set({ userProfile: profile });
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+        }
+      },
+
+      uploadLogo: async (file: File) => {
+        try {
+          const updatedProfile = await uploadUserLogo(file);
+          set({ userProfile: updatedProfile });
+        } catch (error) {
+          console.error('Logo upload failed:', error);
+          throw error;
         }
       },
     }),

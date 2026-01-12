@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "background_styles",
+  "info": {
+    "singularName": "background-style",
+    "pluralName": "background-styles",
+    "displayName": "Background Style",
+    "description": "Global library of background options"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["solid_color", "gradient", "texture", "image"],
+      "required": true
+    },
+    "color_hex": {
+      "type": "string"
+    },
+    "preview_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

@@ -1,0 +1,78 @@
+'use client';
+
+import React from 'react';
+
+interface BudStyle {
+  id: number;
+  attributes: {
+    name: string;
+    category: string;
+    description?: string;
+    image?: { data: { attributes: { url: string } } };
+  };
+}
+
+interface BudStyleSelectorProps {
+  budStyles: BudStyle[];
+  selectedIds: number[];
+  onToggle: (id: number) => void;
+  limits: {
+    min: number;
+    max: number;
+  };
+  label?: string;
+}
+
+export default function BudStyleSelector({
+  budStyles,
+  selectedIds,
+  onToggle,
+  limits,
+  label,
+}: BudStyleSelectorProps) {
+  const handleSelect = (id: number) => {
+    const isSelected = selectedIds.includes(id);
+    const isAtMax = selectedIds.length >= limits.max;
+
+    // Allow deselection even when at max, but prevent new selection
+    if (!isSelected && isAtMax) {
+      return;
+    }
+
+    onToggle(id);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-between items-center">
+        {label && (
+          <label className="text-sm font-bold text-neutral-600 uppercase tracking-widest">
+            {label}
+          </label>
+        )}
+        <div className="text-sm text-neutral-700 font-semibold">
+          {selectedIds.length} / {limits.max} Selected
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {budStyles.map(style => (
+          <button
+            key={style.id}
+            onClick={() => handleSelect(style.id)}
+            className={`w-full text-left p-4 rounded-xl border transition-all ${
+              selectedIds.includes(style.id)
+                ? 'border-orange-500 bg-orange-50 text-neutral-900 ring-2 ring-orange-200'
+                : 'border-neutral-200 text-neutral-700 hover:border-orange-300 hover:bg-orange-50/50'
+            }`}
+          >
+            <div className="font-semibold">{style.attributes.name}</div>
+            {style.attributes.description && (
+              <div className="text-sm text-neutral-600 mt-1">{style.attributes.description}</div>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

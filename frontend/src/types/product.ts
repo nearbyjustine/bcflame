@@ -51,6 +51,16 @@ export interface ImageFormat {
   url: string;
 }
 
+export interface SelectionLimit {
+  id: number;
+  option_type: 'photos' | 'bud_styles' | 'budStyles' | 'backgrounds' | 'fonts' | 'prebagging';
+  min_selections?: number;
+  max_selections?: number;
+  // Legacy support for old field names
+  min?: number;
+  max?: number;
+}
+
 export interface ProductAttributes {
   name: string;
   sku: string;
@@ -71,6 +81,11 @@ export interface ProductAttributes {
   images?: {
     data: ProductImage[];
   };
+  customization_enabled?: boolean;
+  available_photos?: {
+    data: ProductImage[];
+  };
+  selection_limits?: SelectionLimit[];
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;

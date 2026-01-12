@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 
@@ -35,6 +36,7 @@ export default function PortalLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster richColors position="top-right" />
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">

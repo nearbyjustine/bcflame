@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getProducts } from '@/lib/api/products';
 import { ProductCard } from '@/components/products/ProductCard';
+import { CustomizationModal } from '@/components/products/CustomizationModal';
 import type { Product } from '@/types/product';
 
 type CategoryFilter = 'All' | 'Indica' | 'Hybrid' | 'Sativa';
@@ -12,6 +13,7 @@ export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('All');
+  const [customizingProductId, setCustomizingProductId] = useState<number | null>(null);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -34,6 +36,16 @@ export default function ProductsPage() {
   }, [fetchProducts]);
 
   const categories: CategoryFilter[] = ['All', 'Indica', 'Hybrid', 'Sativa'];
+
+  const customizingProduct = products.find((p) => p.id === customizingProductId);
+
+  const handleCustomize = (productId: number) => {
+    setCustomizingProductId(productId);
+  };
+
+  const handleCloseModal = () => {
+    setCustomizingProductId(null);
+  };
 
   return (
     <div>
@@ -93,9 +105,22 @@ export default function ProductsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              onCustomize={() => handleCustomize(product.id)}
+            />
           ))}
         </div>
+      )}
+
+      {/* Customization Modal */}
+      {customizingProduct && (
+        <CustomizationModal
+          isOpen={!!customizingProduct}
+          onClose={handleCloseModal}
+          product={customizingProduct}
+        />
       )}
     </div>
   );
