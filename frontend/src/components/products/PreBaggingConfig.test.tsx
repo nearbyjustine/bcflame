@@ -154,7 +154,7 @@ describe('PreBaggingConfig', () => {
   });
 
   it('does not show bag count if option has no unit_size', () => {
-    const { container } = render(
+    render(
       <PreBaggingConfig
         options={mockOptions}
         selectedId={1} // No Pre-Bagging (no unit_size)

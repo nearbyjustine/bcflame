@@ -10,7 +10,7 @@ export default {
       handler: 'order-inquiry.batch',
       config: {
         policies: [],
-        middlewares: [],
+        middlewares: ['api::order-inquiry.require-auth'],
       },
     },
   ],

@@ -134,34 +134,38 @@ describe('customizationStore', () => {
   })
 
   describe('Pre-bagging selections', () => {
-    it('should add pre-bagging selection with quantity and custom text', () => {
-      useCustomizationStore.getState().updatePreBagging(1, 10, 'Custom branding')
+    it('should add pre-bagging selection with quantity, unit size, and custom text', () => {
+      useCustomizationStore.getState().updatePreBagging(1, 10, 3.5, 'g', 'Custom branding')
 
       const selections = useCustomizationStore.getState().preBaggingSelections
       expect(selections).toHaveLength(1)
       expect(selections[0]).toEqual({
         optionId: 1,
         quantity: 10,
+        unitSize: 3.5,
+        unitSizeUnit: 'g',
         customText: 'Custom branding'
       })
     })
 
     it('should update existing pre-bagging selection', () => {
-      useCustomizationStore.getState().updatePreBagging(1, 10, 'First')
-      useCustomizationStore.getState().updatePreBagging(1, 20, 'Updated')
+      useCustomizationStore.getState().updatePreBagging(1, 10, 3.5, 'g', 'First')
+      useCustomizationStore.getState().updatePreBagging(1, 20, 7, 'g', 'Updated')
 
       const selections = useCustomizationStore.getState().preBaggingSelections
       expect(selections).toHaveLength(1)
       expect(selections[0]).toEqual({
         optionId: 1,
         quantity: 20,
+        unitSize: 7,
+        unitSizeUnit: 'g',
         customText: 'Updated'
       })
     })
 
     it('should remove pre-bagging selection', () => {
-      useCustomizationStore.getState().updatePreBagging(1, 10)
-      useCustomizationStore.getState().updatePreBagging(2, 5)
+      useCustomizationStore.getState().updatePreBagging(1, 10, 3.5, 'g')
+      useCustomizationStore.getState().updatePreBagging(2, 5, 7, 'g')
       expect(useCustomizationStore.getState().preBaggingSelections).toHaveLength(2)
 
       useCustomizationStore.getState().removePreBagging(1)
@@ -223,7 +227,7 @@ describe('customizationStore', () => {
       useCustomizationStore.getState().toggleBudStyle(3)
       useCustomizationStore.getState().toggleBackground(4)
       useCustomizationStore.getState().toggleFont(5)
-      useCustomizationStore.getState().updatePreBagging(1, 10, 'Custom')
+      useCustomizationStore.getState().updatePreBagging(1, 10, 3.5, 'g', 'Custom')
 
       const selections = useCustomizationStore.getState().getSelections()
 
@@ -232,7 +236,7 @@ describe('customizationStore', () => {
         budStyles: [3],
         backgrounds: [4],
         fonts: [5],
-        preBagging: [{ optionId: 1, quantity: 10, customText: 'Custom' }]
+        preBagging: [{ optionId: 1, quantity: 10, unitSize: 3.5, unitSizeUnit: 'g', customText: 'Custom' }]
       })
     })
   })

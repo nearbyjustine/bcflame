@@ -2,9 +2,12 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ShoppingCart } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
+import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
+import { CartDrawer } from '@/components/layout/CartDrawer';
 
 export default function PortalLayout({
   children,
@@ -13,6 +16,9 @@ export default function PortalLayout({
 }) {
   const router = useRouter();
   const { user, logout, checkAuth, isLoading } = useAuthStore();
+  const { setOpen, getItemCount } = useCartStore();
+
+  const itemCount = getItemCount();
 
   useEffect(() => {
     checkAuth();
@@ -21,6 +27,10 @@ export default function PortalLayout({
   const handleLogout = () => {
     logout();
     router.push('/login');
+  };
+
+  const handleOpenCart = () => {
+    setOpen(true);
   };
 
   if (isLoading) {
@@ -37,6 +47,7 @@ export default function PortalLayout({
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-right" />
+      <CartDrawer />
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">
@@ -49,6 +60,19 @@ export default function PortalLayout({
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            {/* Cart Icon */}
+            <button
+              onClick={handleOpenCart}
+              className="relative p-2 rounded-full hover:bg-muted transition-colors"
+              aria-label="Open cart"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </button>
             <div className="text-sm">
               <p className="font-medium">{user?.companyName || user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>

@@ -71,8 +71,18 @@
     "pricing": {
       "type": "component",
       "repeatable": true,
-      "required": true,
+      "required": false,
       "component": "product.pricing"
+    },
+    "base_price_per_gram": {
+      "type": "decimal",
+      "required": false,
+      "min": 0
+    },
+    "pricing_model": {
+      "type": "enumeration",
+      "enum": ["per_gram", "tiered"],
+      "default": "per_gram"
     },
     "features": {
       "type": "component",

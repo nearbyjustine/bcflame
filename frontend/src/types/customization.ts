@@ -49,6 +49,8 @@ export interface PreBaggingOption {
     packaging_type: 'mylar_bag' | 'glass_jar' | 'preroll_tube' | 'child_resistant_container' | 'tin_container';
     description?: string;
     available_weights: string[];
+    unit_size: number;
+    unit_size_unit: string;
     image?: { data: StrapiImage | null };
     sort_order: number;
     createdAt: string;
@@ -78,8 +80,10 @@ export interface PhotoOption {
 
 export interface PreBaggingSelection {
   optionId: number;
-  weight: string;
   quantity: number;
+  unitSize: number;
+  unitSizeUnit: string;
+  customText?: string;
 }
 
 export interface CustomizationSelections {

@@ -77,6 +77,8 @@ export interface ProductAttributes {
   featured: boolean;
   sort_order: number;
   pricing: ProductPricing[];
+  base_price_per_gram?: number;
+  pricing_model?: 'per_gram' | 'tiered';
   features?: ProductFeature[];
   images?: {
     data: ProductImage[];

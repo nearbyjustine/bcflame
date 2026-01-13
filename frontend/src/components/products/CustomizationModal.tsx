@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, ShoppingCart, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -19,6 +19,7 @@ import PhotoSelectionGrid from './PhotoSelectionGrid'
 import BudStyleSelector from './BudStyleSelector'
 import BackgroundFontSelector from './BackgroundFontSelector'
 import PreBaggingConfig from './PreBaggingConfig'
+import { OrderConfirmationModal } from './OrderConfirmationModal'
 import {
   getBudStyles,
   getBackgroundStyles,
@@ -33,6 +34,7 @@ import type {
   FontStyle,
   PreBaggingOption,
 } from '@/types/customization'
+import { useCartStore } from '@/stores/cartStore'
 
 interface CustomizationModalProps {
   isOpen: boolean
@@ -76,6 +78,12 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
   // Loading states
   const [isLoadingOptions, setIsLoadingOptions] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // Order confirmation modal state
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  
+  // Cart store
+  const addToCart = useCartStore((state) => state.addItem)
 
   // Load customization options when modal opens
   useEffect(() => {
@@ -157,6 +165,81 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
     }
   }
 
+  // Calculate price and weight from selections
+  const calculatePriceAndWeight = () => {
+    // Calculate total weight from pre-bagging selections
+    const totalWeight = preBaggingSelections.reduce((sum, selection) => {
+      return sum + (selection.quantity * selection.unitSize)
+    }, 0)
+    const weightUnit = preBaggingSelections[0]?.unitSizeUnit || 'g'
+
+    // Calculate price - use base_price_per_gram if available, otherwise first pricing tier
+    let unitPrice = 0
+    if (product.attributes.base_price_per_gram) {
+      unitPrice = product.attributes.base_price_per_gram * totalWeight
+    } else if (product.attributes.pricing && product.attributes.pricing.length > 0) {
+      unitPrice = product.attributes.pricing[0].amount || 0
+    }
+
+    return { unitPrice, totalWeight, weightUnit }
+  }
+
+  const handleAddToCart = () => {
+    if (!user) {
+      toast.error('Authentication required', {
+        description: 'You must be logged in to add items to cart'
+      })
+      return
+    }
+
+    const selections = getSelections()
+    const { unitPrice, totalWeight, weightUnit } = calculatePriceAndWeight()
+
+    addToCart(product, selections, unitPrice, totalWeight, weightUnit)
+
+    toast.success('Added to cart!', {
+      description: `${product.attributes.name} has been added to your cart`
+    })
+
+    onClose()
+  }
+
+  const handleOrderNow = () => {
+    if (!user) {
+      toast.error('Authentication required', {
+        description: 'You must be logged in to place an order'
+      })
+      return
+    }
+    setShowConfirmation(true)
+  }
+
+  const handleConfirmOrder = async () => {
+    setIsSubmitting(true)
+
+    try {
+      const selections = getSelections()
+      const orderInquiry = await submitOrderInquiry(product.id, selections)
+
+      toast.success('Order inquiry submitted!', {
+        description: `Inquiry #: ${orderInquiry.attributes.inquiry_number}`
+      })
+
+      setShowConfirmation(false)
+      // Close modal after showing success
+      setTimeout(() => {
+        onClose()
+      }, 1000)
+    } catch (err: any) {
+      console.error('Error submitting order inquiry:', err)
+      toast.error('Failed to submit order inquiry', {
+        description: err.response?.data?.error?.message || 'Please try again or contact support.'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const handleSubmit = async () => {
     if (!user) {
       toast.error('Authentication required', {
@@ -216,7 +299,11 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
 
   const isStepValid = validateStep(currentStep)
 
+  // Calculate price and weight for confirmation modal
+  const { unitPrice, totalWeight, weightUnit } = calculatePriceAndWeight()
+
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         {isLoadingOptions ? (
@@ -313,19 +400,32 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  'Submit Order Inquiry'
-                )}
-              </Button>
+              <>
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={isSubmitting}
+                  variant="outline"
+                >
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Add to Cart
+                </Button>
+                <Button
+                  onClick={handleOrderNow}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="mr-2 h-4 w-4" />
+                      Order Now
+                    </>
+                  )}
+                </Button>
+              </>
             )}
           </div>
         </DialogFooter>
@@ -333,5 +433,19 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
         )}
       </DialogContent>
     </Dialog>
+
+    {/* Order Confirmation Modal */}
+    <OrderConfirmationModal
+      isOpen={showConfirmation}
+      onClose={() => setShowConfirmation(false)}
+      onConfirm={handleConfirmOrder}
+      isSubmitting={isSubmitting}
+      product={product}
+      selections={getSelections()}
+      unitPrice={unitPrice}
+      weight={totalWeight}
+      weightUnit={weightUnit}
+    />
+    </>
   )
 }

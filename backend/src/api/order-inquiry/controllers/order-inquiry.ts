@@ -7,6 +7,38 @@ import { generateInquiryNumber } from '../services/inquiry-number';
 
 export default factories.createCoreController('api::order-inquiry.order-inquiry', ({ strapi }) => ({
   /**
+   * Create a single order inquiry
+   * POST /api/order-inquiries
+   */
+  async create(ctx) {
+    strapi.log.info('═══════════════════════════════════════════════════════');
+    strapi.log.info('📦 ORDER INQUIRY CONTROLLER - CREATE');
+    strapi.log.info('═══════════════════════════════════════════════════════');
+    strapi.log.info(`User ID from ctx.state.user: ${ctx.state.user?.id || 'NOT SET'}`);
+    strapi.log.info(`User email: ${ctx.state.user?.email || 'N/A'}`);
+
+    // Get authenticated user
+    const userId = ctx.state.user?.id;
+    if (!userId) {
+      strapi.log.warn('📦 No authenticated user - returning 401');
+      return ctx.unauthorized('You must be authenticated to submit orders');
+    }
+
+    // Add customer to the request data
+    if (!ctx.request.body.data) {
+      ctx.request.body.data = {};
+    }
+
+    ctx.request.body.data.customer = userId;
+    strapi.log.info(`📦 Customer ID set in request body: ${userId}`);
+
+    // Call the default create controller
+    const response = await super.create(ctx);
+    strapi.log.info('📦 Order inquiry created successfully');
+    return response;
+  },
+
+  /**
    * Batch create multiple order inquiries
    * POST /api/order-inquiries/batch
    */
@@ -24,23 +56,41 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
         return ctx.unauthorized('You must be authenticated to submit orders');
       }
 
-      const createdInquiries = [];
-      const inquiryNumbers = [];
+      // Generate inquiry numbers upfront to detect collisions early
+      const inquiryNumbers = inquiries.map(() => generateInquiryNumber());
 
-      // Create each inquiry
-      for (const inquiryData of inquiries) {
-        const inquiry = await strapi.entityService.create('api::order-inquiry.order-inquiry', {
-          data: {
-            ...inquiryData,
-            customer: userId,
-            inquiry_number: generateInquiryNumber(),
-            status: 'pending',
-          },
-        });
-
-        createdInquiries.push(inquiry);
-        inquiryNumbers.push(inquiry.inquiry_number);
+      // Check for duplicates (very rare but possible with random generation)
+      const uniqueNumbers = new Set(inquiryNumbers);
+      if (uniqueNumbers.size !== inquiryNumbers.length) {
+        // Regenerate if collision detected
+        for (let i = 0; i < inquiryNumbers.length; i++) {
+          while (uniqueNumbers.has(inquiryNumbers[i])) {
+            inquiryNumbers[i] = generateInquiryNumber();
+          }
+          uniqueNumbers.add(inquiryNumbers[i]);
+        }
       }
+
+      // Use database transaction for atomic batch creation
+      // All inquiries are created or none are (rollback on error)
+      const createdInquiries = await strapi.db.transaction(async () => {
+        const results = [];
+
+        for (let i = 0; i < inquiries.length; i++) {
+          const inquiry = await strapi.entityService.create('api::order-inquiry.order-inquiry', {
+            data: {
+              ...inquiries[i],
+              customer: userId,
+              inquiry_number: inquiryNumbers[i],
+              status: 'pending',
+            },
+          });
+
+          results.push(inquiry);
+        }
+
+        return results;
+      });
 
       // Send batch email notification
       // TODO: Implement email service
@@ -52,7 +102,7 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
       return {
         data: createdInquiries,
         meta: {
-          inquiry_numbers: inquiryNumbers,
+          inquiry_numbers: createdInquiries.map(i => i.inquiry_number),
           total: createdInquiries.length,
         },
       };

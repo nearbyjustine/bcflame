@@ -208,6 +208,22 @@ export async function seedProducts(strapi: Strapi) {
         currency: p.currency,
       }));
 
+      // Calculate base_price_per_gram from the smallest weight tier
+      // This provides a reasonable per-gram price for any weight
+      let basePricePerGram = 0;
+      if (pricingComponents.length > 0) {
+        // Find the 7g pricing (smallest tier) to calculate per-gram price
+        const smallestTier = pricingComponents.find(p => p.weight === '7g');
+        if (smallestTier) {
+          basePricePerGram = parseFloat((smallestTier.amount / 7).toFixed(2));
+        } else {
+          // Fallback: use first available tier
+          const firstTier = pricingComponents[0];
+          const grams = parseInt(firstTier.weight.replace('g', ''));
+          basePricePerGram = parseFloat((firstTier.amount / grams).toFixed(2));
+        }
+      }
+
       // Upload product images
       console.log(`  📦 Uploading images for ${product.name}...`);
       const imageIds = await uploadProductImages(strapi, product.name);
@@ -234,8 +250,12 @@ export async function seedProducts(strapi: Strapi) {
             featured: false,
             sort_order: 0,
             pricing: pricingComponents as any,
+            base_price_per_gram: basePricePerGram,
+            pricing_model: 'per_gram',
             features,
             images: imageIds.length > 0 ? imageIds : undefined,
+            customization_enabled: true,
+            available_photos: imageIds.length > 0 ? imageIds : undefined,
             publishedAt: new Date(),
           },
         }

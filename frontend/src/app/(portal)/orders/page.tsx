@@ -40,6 +40,13 @@ const formatDate = (dateString: string): string => {
   }).format(date)
 }
 
+// Format status label with proper capitalization
+const formatStatusLabel = (status: string): string => {
+  return status
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
 export default function OrdersPage() {
   const [inquiries, setInquiries] = useState<OrderInquiry[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -148,7 +155,7 @@ export default function OrdersPage() {
                       <p className="text-sm text-muted-foreground">{productName}</p>
                     </div>
                     <Badge variant={getStatusVariant(inquiry.attributes.status)}>
-                      {inquiry.attributes.status.replace('_', ' ')}
+                      {formatStatusLabel(inquiry.attributes.status)}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -197,28 +204,29 @@ export default function OrdersPage() {
         </div>
       )}
 
-      {/* Detail Modal (Simple version - can be enhanced later) */}
+      {/* Enhanced Detail Modal */}
       {selectedInquiry && (
         <div
           className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
           onClick={handleCloseDetails}
         >
           <div
-            className="bg-card border border-border rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl"
+            className="bg-card border border-border rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Header */}
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold mb-2">
                   {selectedInquiry.attributes.inquiry_number}
                 </h2>
                 <Badge variant={getStatusVariant(selectedInquiry.attributes.status)}>
-                  {selectedInquiry.attributes.status.replace('_', ' ')}
+                  {formatStatusLabel(selectedInquiry.attributes.status)}
                 </Badge>
               </div>
               <button
                 onClick={handleCloseDetails}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted"
               >
                 <svg
                   className="w-6 h-6"
@@ -237,71 +245,133 @@ export default function OrdersPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Product Info */}
-              <div>
-                <h3 className="text-sm font-semibold mb-2">Product</h3>
-                <p className="text-muted-foreground">
-                  {selectedInquiry.attributes.product?.data?.attributes?.name || 'Unknown Product'}
-                </p>
-              </div>
-
-              {/* Customer Info */}
-              <div>
-                <h3 className="text-sm font-semibold mb-2">Contact Information</h3>
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <p>{selectedInquiry.attributes.customer_name}</p>
-                  <p>{selectedInquiry.attributes.customer_email}</p>
-                  {selectedInquiry.attributes.customer_phone && (
-                    <p>{selectedInquiry.attributes.customer_phone}</p>
-                  )}
+              {/* Product Info with Image */}
+              <div className="flex gap-4 p-4 bg-muted/30 rounded-xl border">
+                {(() => {
+                  const productImage = selectedInquiry.attributes.product?.data?.attributes?.images?.data?.[0];
+                  const imageUrl = productImage?.attributes?.url
+                    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${productImage.attributes.url}`
+                    : null;
+                  return imageUrl ? (
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                      <img
+                        src={imageUrl}
+                        alt={selectedInquiry.attributes.product?.data?.attributes?.name || 'Product'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : null;
+                })()}
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">
+                    {selectedInquiry.attributes.product?.data?.attributes?.name || 'Unknown Product'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground capitalize">
+                    Category: {selectedInquiry.attributes.product?.data?.attributes?.category || 'N/A'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    SKU: {selectedInquiry.attributes.product?.data?.attributes?.sku || 'N/A'}
+                  </p>
                 </div>
               </div>
 
-              {/* Selections */}
+              {/* Customer Info */}
+              <div className="p-4 border rounded-xl">
+                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Contact Information
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Name</p>
+                    <p className="font-medium">
+                      {selectedInquiry.attributes.customer?.data?.attributes?.username || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Email</p>
+                    <p className="font-medium">
+                      {selectedInquiry.attributes.customer?.data?.attributes?.email || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customization Selections */}
               {selectedInquiry.attributes.selections && (
-                <div>
-                  <h3 className="text-sm font-semibold mb-2">Customization Details</h3>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <p>Photos: {selectedInquiry.attributes.selections.photos?.length || 0}</p>
-                    <p>
-                      Bud Styles: {selectedInquiry.attributes.selections.budStyles?.length || 0}
-                    </p>
-                    <p>
-                      Backgrounds: {selectedInquiry.attributes.selections.backgrounds?.length || 0}
-                    </p>
-                    <p>Fonts: {selectedInquiry.attributes.selections.fonts?.length || 0}</p>
-                    {selectedInquiry.attributes.selections.preBagging &&
-                      selectedInquiry.attributes.selections.preBagging.length > 0 && (
-                        <div className="mt-2">
-                          <p className="font-semibold text-foreground mb-1">Pre-Bagging Options:</p>
+                <div className="p-4 border rounded-xl">
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    Customization Details
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3 bg-muted/30 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.photos?.length || 0}</p>
+                      <p className="text-xs text-muted-foreground">Photos</p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.budStyles?.length || 0}</p>
+                      <p className="text-xs text-muted-foreground">Bud Styles</p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.backgrounds?.length || 0}</p>
+                      <p className="text-xs text-muted-foreground">Backgrounds</p>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.fonts?.length || 0}</p>
+                      <p className="text-xs text-muted-foreground">Fonts</p>
+                    </div>
+                  </div>
+
+                  {/* Pre-Bagging Details */}
+                  {selectedInquiry.attributes.selections.preBagging &&
+                    selectedInquiry.attributes.selections.preBagging.length > 0 && (
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-sm font-semibold mb-2">Pre-Bagging Options</p>
+                        <div className="space-y-2">
                           {selectedInquiry.attributes.selections.preBagging.map((pb, index) => (
-                            <p key={index} className="ml-2">
-                              • Option #{pb.optionId}: Qty {pb.quantity}
-                              {pb.customText && ` - ${pb.customText}`}
-                            </p>
+                            <div key={index} className="flex items-center justify-between text-sm p-2 bg-muted/30 rounded-lg">
+                              <span>Option #{pb.optionId}</span>
+                              <div className="text-right">
+                                <span className="font-medium">Qty: {pb.quantity}</span>
+                                <span className="text-muted-foreground mx-2">×</span>
+                                <span className="text-muted-foreground">{pb.unitSize}{pb.unitSizeUnit}</span>
+                              </div>
+                            </div>
                           ))}
                         </div>
-                      )}
-                  </div>
+                      </div>
+                    )}
                 </div>
               )}
 
               {/* Additional Notes */}
-              {selectedInquiry.attributes.additional_notes && (
-                <div>
-                  <h3 className="text-sm font-semibold mb-2">Additional Notes</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedInquiry.attributes.additional_notes}
+              {(selectedInquiry.attributes.additional_notes || selectedInquiry.attributes.notes) && (
+                <div className="p-4 border rounded-xl">
+                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Additional Notes
+                  </h3>
+                  <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                    {selectedInquiry.attributes.additional_notes || selectedInquiry.attributes.notes}
                   </p>
                 </div>
               )}
 
               {/* Dates */}
-              <div className="pt-4 border-t border-border text-xs text-muted-foreground">
-                <p>Submitted: {formatDate(selectedInquiry.attributes.createdAt)}</p>
-                {selectedInquiry.attributes.updatedAt !==
-                  selectedInquiry.attributes.createdAt && (
-                  <p>Updated: {formatDate(selectedInquiry.attributes.updatedAt)}</p>
+              <div className="pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>Submitted: {formatDate(selectedInquiry.attributes.createdAt)}</span>
+                </div>
+                {selectedInquiry.attributes.updatedAt !== selectedInquiry.attributes.createdAt && (
+                  <span>Updated: {formatDate(selectedInquiry.attributes.updatedAt)}</span>
                 )}
               </div>
             </div>
