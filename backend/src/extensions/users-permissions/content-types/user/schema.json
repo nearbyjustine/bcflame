@@ -74,6 +74,36 @@
       ],
       "type": "media",
       "multiple": false
+    },
+    "firstName": {
+      "type": "string",
+      "required": false,
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "lastName": {
+      "type": "string",
+      "required": false,
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "company": {
+      "type": "string",
+      "required": false,
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "phone": {
+      "type": "string",
+      "required": false,
+      "minLength": 10,
+      "maxLength": 20
+    },
+    "businessLicense": {
+      "type": "string",
+      "required": false,
+      "minLength": 1,
+      "maxLength": 100
     }
   }
 }

@@ -32,7 +32,7 @@ interface CustomizationStore {
   toggleBudStyle: (styleId: number) => void
   toggleBackground: (bgId: number) => void
   toggleFont: (fontId: number) => void
-  updatePreBagging: (optionId: number, quantity: number, customText?: string) => void
+  updatePreBagging: (optionId: number, quantity: number, unitSize: number, unitSizeUnit: string, customText?: string) => void
   removePreBagging: (optionId: number) => void
   setStep: (step: number) => void
   validateStep: (step: number) => boolean
@@ -144,21 +144,21 @@ export const useCustomizationStore = create<CustomizationStore>((set, get) => ({
     }
   },
 
-  updatePreBagging: (optionId, quantity, customText) => {
+  updatePreBagging: (optionId, quantity, unitSize, unitSizeUnit, customText) => {
     const { preBaggingSelections } = get()
     const existingIndex = preBaggingSelections.findIndex((s) => s.optionId === optionId)
 
     if (existingIndex !== -1) {
       // Update existing selection
       const updated = [...preBaggingSelections]
-      updated[existingIndex] = { optionId, quantity, customText }
+      updated[existingIndex] = { optionId, quantity, unitSize, unitSizeUnit, customText }
       set({ preBaggingSelections: updated })
     } else {
       // Add new selection
       set({
         preBaggingSelections: [
           ...preBaggingSelections,
-          { optionId, quantity, customText },
+          { optionId, quantity, unitSize, unitSizeUnit, customText },
         ],
       })
     }

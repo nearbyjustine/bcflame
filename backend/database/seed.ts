@@ -7,6 +7,8 @@ import Strapi from '@strapi/strapi';
 import path from 'path';
 import { config } from 'dotenv';
 import { seedProducts } from './seeders/product-seeder';
+import { seedCustomization } from './seeders/customization-seeder';
+import { seedUsers } from './seeders/user-seeder';
 
 // Load environment variables from .env file
 config({ path: path.resolve(__dirname, '..', '.env') });
@@ -24,7 +26,13 @@ async function runSeeders() {
 
   let exitCode = 0;
   try {
-    // Run seeders in order
+    // Seed users first (required for order inquiries)
+    await seedUsers(app);
+
+    // Seed customization options next (used by products)
+    await seedCustomization(app);
+
+    // Run product seeder last
     await seedProducts(app);
 
     console.log('\n✅ All seeders completed successfully!');

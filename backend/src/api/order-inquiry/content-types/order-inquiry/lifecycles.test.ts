@@ -62,9 +62,11 @@ describe('Order Inquiry Lifecycles', () => {
             product: {
               id: 1,
               name: 'Test Product',
-              available_sizes: [
-                { size: '3.5g', price: 25.00 },
-                { size: '7g', price: 45.00 },
+              base_price_per_gram: 7.14,
+              pricing_model: 'per_gram',
+              pricing: [
+                { weight: '7g', amount: 50.00, currency: 'USD' },
+                { weight: '14g', amount: 90.00, currency: 'USD' },
               ],
             },
             customer: {
@@ -74,6 +76,8 @@ describe('Order Inquiry Lifecycles', () => {
               firstName: 'John',
               lastName: 'Doe',
               company: 'Test Company',
+              phone: '(555) 123-4567',
+              businessLicense: 'CA-LIC-123456',
             },
             total_weight: 100,
             weight_unit: 'g',
@@ -229,6 +233,134 @@ describe('Order Inquiry Lifecycles', () => {
       await lifecycles.beforeUpdate({ strapi: mockStrapi, event: mockEvent })
 
       expect(mockStrapi.db.query).toHaveBeenCalledWith('api::order-inquiry.order-inquiry')
+    })
+  })
+
+  describe('price calculation', () => {
+    it('calculates price using base_price_per_gram for custom weights', async () => {
+      // Set up mock for custom weight (10g) not in pricing tiers
+      mockStrapi.db.query().findOne.mockResolvedValueOnce({
+        id: 1,
+        inquiry_number: 'INQ-20260113-1234',
+        product: {
+          id: 1,
+          name: 'Test Product',
+          base_price_per_gram: 7.14,
+          pricing_model: 'per_gram',
+        },
+        customer: {
+          id: 1,
+          email: 'customer@test.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          company: 'Test Company',
+          phone: '(555) 123-4567',
+          businessLicense: 'CA-LIC-123456',
+        },
+        total_weight: 10,
+        weight_unit: 'g',
+        createdAt: '2026-01-13T10:00:00.000Z',
+      })
+
+      mockEvent.result.inquiry_number = 'INQ-20260113-1234'
+
+      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+
+      // Verify email was called with correct data including calculated price
+      expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
+        expect.objectContaining({
+          items: expect.arrayContaining([
+            expect.objectContaining({
+              unitPrice: 71.4, // 7.14 * 10g = 71.4
+            }),
+          ]),
+        })
+      )
+    })
+
+    it('falls back to tiered pricing when base_price_per_gram not available', async () => {
+      // Set up mock without base_price_per_gram
+      mockStrapi.db.query().findOne.mockResolvedValueOnce({
+        id: 1,
+        inquiry_number: 'INQ-20260113-1234',
+        product: {
+          id: 1,
+          name: 'Test Product',
+          pricing: [
+            { weight: '7g', amount: 50.00, currency: 'USD' },
+            { weight: '14g', amount: 90.00, currency: 'USD' },
+          ],
+        },
+        customer: {
+          id: 1,
+          email: 'customer@test.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          company: 'Test Company',
+          phone: '(555) 123-4567',
+          businessLicense: 'CA-LIC-123456',
+        },
+        total_weight: 7,
+        weight_unit: 'g',
+        createdAt: '2026-01-13T10:00:00.000Z',
+      })
+
+      mockEvent.result.inquiry_number = 'INQ-20260113-1234'
+
+      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+
+      // Verify email was called with correct tiered pricing
+      expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
+        expect.objectContaining({
+          items: expect.arrayContaining([
+            expect.objectContaining({
+              unitPrice: 50.00, // Matched 7g tier
+            }),
+          ]),
+        })
+      )
+    })
+
+    it('converts weight units correctly for price calculation', async () => {
+      // Set up mock for oz weight
+      mockStrapi.db.query().findOne.mockResolvedValueOnce({
+        id: 1,
+        inquiry_number: 'INQ-20260113-1234',
+        product: {
+          id: 1,
+          name: 'Test Product',
+          base_price_per_gram: 7.14,
+          pricing_model: 'per_gram',
+        },
+        customer: {
+          id: 1,
+          email: 'customer@test.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          company: 'Test Company',
+          phone: '(555) 123-4567',
+          businessLicense: 'CA-LIC-123456',
+        },
+        total_weight: 1,
+        weight_unit: 'oz',
+        createdAt: '2026-01-13T10:00:00.000Z',
+      })
+
+      mockEvent.result.inquiry_number = 'INQ-20260113-1234'
+
+      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+
+      // Verify email was called with correct converted price
+      // 1 oz = 28.35 grams, so 7.14 * 28.35 = 202.419
+      expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
+        expect.objectContaining({
+          items: expect.arrayContaining([
+            expect.objectContaining({
+              unitPrice: expect.closeTo(202.42, 0.1),
+            }),
+          ]),
+        })
+      )
     })
   })
 })

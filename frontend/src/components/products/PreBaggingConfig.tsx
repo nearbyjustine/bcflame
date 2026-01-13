@@ -2,25 +2,12 @@
 
 import React from 'react';
 import { ShoppingBag } from 'lucide-react';
-
-interface PreBaggingOption {
-  id: number;
-  attributes: {
-    name: string;
-    unit_size: number | null;
-    unit_size_unit: string;
-  };
-}
-
-interface PreBaggingSelection {
-  optionId: number;
-  quantity: number;
-}
+import type { PreBaggingOption, PreBaggingSelection } from '@/types/customization';
 
 interface PreBaggingConfigProps {
   options: PreBaggingOption[];
   selections: PreBaggingSelection[];
-  onUpdate: (optionId: number, quantity: number) => void;
+  onUpdate: (optionId: number, quantity: number, unitSize: number, unitSizeUnit: string, customText?: string) => void;
   onRemove: (optionId: number) => void;
 }
 
@@ -31,11 +18,11 @@ export default function PreBaggingConfig({
   onRemove,
 }: PreBaggingConfigProps) {
 
-  const handleQuantityChange = (optionId: number, quantity: number) => {
+  const handleQuantityChange = (optionId: number, quantity: number, unitSize: number, unitSizeUnit: string) => {
     if (quantity <= 0) {
       onRemove(optionId);
     } else {
-      onUpdate(optionId, quantity);
+      onUpdate(optionId, quantity, unitSize, unitSizeUnit);
     }
   };
 
@@ -79,7 +66,7 @@ export default function PreBaggingConfig({
                 {/* Quantity selector */}
                 <div className="flex items-center space-x-4">
                   <button
-                    onClick={() => handleQuantityChange(option.id, Math.max(0, quantity - 1))}
+                    onClick={() => handleQuantityChange(option.id, Math.max(0, quantity - 1), option.attributes.unit_size, option.attributes.unit_size_unit)}
                     disabled={quantity === 0}
                     className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center text-lg font-bold text-neutral-700 hover:bg-neutral-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
@@ -88,12 +75,12 @@ export default function PreBaggingConfig({
                   <input
                     type="number"
                     value={quantity}
-                    onChange={(e) => handleQuantityChange(option.id, parseInt(e.target.value) || 0)}
+                    onChange={(e) => handleQuantityChange(option.id, parseInt(e.target.value) || 0, option.attributes.unit_size, option.attributes.unit_size_unit)}
                     min="0"
                     className="w-20 h-10 bg-white rounded-lg border border-neutral-300 text-center text-neutral-900 font-bold focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
                   />
                   <button
-                    onClick={() => handleQuantityChange(option.id, quantity + 1)}
+                    onClick={() => handleQuantityChange(option.id, quantity + 1, option.attributes.unit_size, option.attributes.unit_size_unit)}
                     className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center text-lg font-bold text-white hover:bg-orange-600 transition-colors"
                   >
                     +

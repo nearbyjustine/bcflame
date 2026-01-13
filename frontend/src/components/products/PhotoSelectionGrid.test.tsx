@@ -95,7 +95,7 @@ describe('PhotoSelectionGrid', () => {
   });
 
   it('shows checkmark icon on selected photos', () => {
-    const { container } = render(
+    render(
       <PhotoSelectionGrid
         photos={mockPhotos}
         selectedPhotoIndices={[0, 2]}
@@ -105,12 +105,12 @@ describe('PhotoSelectionGrid', () => {
     );
 
     // Should have checkmarks for selected photos
-    const checkmarks = container.querySelectorAll('.bg-orange-500');
+    const checkmarks = document.querySelectorAll('.bg-orange-500');
     expect(checkmarks.length).toBeGreaterThanOrEqual(2);
   });
 
   it('applies orange border to selected photos', () => {
-    const { container } = render(
+    render(
       <PhotoSelectionGrid
         photos={mockPhotos}
         selectedPhotoIndices={[1, 3]}

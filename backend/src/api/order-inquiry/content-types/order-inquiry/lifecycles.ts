@@ -6,28 +6,60 @@ import {
   generateOrderStatusUpdateEmail,
 } from '../../../../templates/order-email'
 
+// Access global strapi instance (Strapi 4 doesn't pass it in lifecycle events)
+declare const strapi: any
+
 /**
  * Format order data for email templates
  */
 function formatOrderDataForEmail(inquiry: any) {
+  // db.query returns direct objects, not wrapped in data/attributes
   const customer = inquiry.customer || {}
   const product = inquiry.product || {}
 
+  // Calculate unit price from base_price_per_gram
+  let unitPrice = 0
+  if (product.base_price_per_gram) {
+    // Convert weight to grams if needed
+    let weightInGrams = inquiry.total_weight
+    if (inquiry.weight_unit === 'oz') {
+      weightInGrams = inquiry.total_weight * 28.35
+    } else if (inquiry.weight_unit === 'lb') {
+      weightInGrams = inquiry.total_weight * 453.592
+    }
+    // Note: assuming weight_unit is 'g' if not oz or lb
+
+    unitPrice = product.base_price_per_gram * weightInGrams
+  }
+
+  // Fallback to tiered pricing if base_price_per_gram not set (backward compatibility)
+  if (unitPrice === 0 && product.pricing && Array.isArray(product.pricing)) {
+    const orderWeight = `${inquiry.total_weight}${inquiry.weight_unit}`
+    const matchingPrice = product.pricing.find(
+      (p: any) => p.weight === orderWeight
+    )
+    if (matchingPrice) {
+      unitPrice = matchingPrice.amount || 0
+    }
+  }
+  
   return {
     inquiryNumber: inquiry.inquiry_number,
     customerName: `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || customer.username || 'Customer',
-    customerEmail: customer.email,
+    customerEmail: customer.email || 'Not provided',
     customerCompany: customer.company || 'N/A',
+    customerPhone: customer.phone || 'Not provided',
+    customerBusinessLicense: customer.businessLicense || 'Not provided',
     items: [
       {
         productName: product.name || 'Product',
         size: `${inquiry.total_weight}${inquiry.weight_unit}`,
         quantity: 1,
-        unitPrice: 0, // Price TBD - inquiry stage
+        unitPrice: unitPrice,
       },
     ],
     totalItems: 1,
-    estimatedTotal: 0, // Price TBD
+    estimatedTotal: unitPrice, // Based on single item
     specialInstructions: inquiry.notes || '',
     createdAt: inquiry.createdAt,
   }
@@ -57,16 +89,27 @@ export default {
     }
 
     // Auto-set customer from authenticated user if not provided
-    if (!data.customer && event.state?.user) {
-      data.customer = event.state.user.id
+    // In Strapi 4 lifecycles, use requestContext to access HTTP context
+    if (!data.customer) {
+      // Try getting user from Strapi's request context (populated by middleware)
+      const requestContext = strapi.requestContext?.get?.()
+      const user = requestContext?.state?.user
+      
+      if (user?.id) {
+        data.customer = user.id
+        strapi.log.info(`beforeCreate - Customer set from requestContext: ${user.id}`)
+      } else {
+        strapi.log.warn('beforeCreate - No user found in requestContext')
+      }
     }
+
+    strapi.log.debug(`beforeCreate - Final customer ID: ${data.customer || 'NOT SET'}`)
   },
 
   /**
    * Before update - store previous status for comparison
    */
   async beforeUpdate(event: any) {
-    const { strapi } = event
     const { id } = event.params.where || {}
 
     if (id) {
@@ -87,16 +130,24 @@ export default {
    * After create - send notification emails
    */
   async afterCreate(event) {
-    const { result, strapi } = event
+    const { result } = event
 
     try {
-      // Fetch full inquiry data with relations
+      strapi.log.debug('afterCreate - result object:', JSON.stringify(result, null, 2))
+
+      // First fetch without populate to see the raw customer ID
+      const rawInquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+        where: { id: result.id },
+      })
+      strapi.log.debug('Raw inquiry (no populate):', JSON.stringify(rawInquiry, null, 2))
+
+      // Fetch full inquiry data with relations using db.query for better control
       const inquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id: result.id },
         populate: {
           customer: true,
           product: {
-            populate: ['available_sizes'],
+            populate: ['pricing'],
           },
         },
       })
@@ -106,10 +157,27 @@ export default {
         return
       }
 
-      strapi.log.info(`Order inquiry created: ${inquiry.inquiry_number}`)
+      // If customer wasn't populated, fetch it separately using the raw customer ID
+      if (!inquiry.customer && rawInquiry.customer) {
+        const customerId = typeof rawInquiry.customer === 'object' ? rawInquiry.customer.id : rawInquiry.customer
+        strapi.log.debug('Fetching customer separately with ID:', customerId)
+        inquiry.customer = await strapi.db.query('plugin::users-permissions.user').findOne({
+          where: { id: customerId },
+        })
+      }
 
-      // Get email service
-      const emailService = getEmailService()
+      strapi.log.info(`Order inquiry created: ${inquiry.inquiry_number}`)
+      strapi.log.debug('Full inquiry object:', JSON.stringify(inquiry, null, 2))
+      strapi.log.debug('Customer data:', JSON.stringify(inquiry.customer, null, 2))
+
+      // Get email service - with defensive check for configuration
+      let emailService
+      try {
+        emailService = getEmailService()
+      } catch (emailConfigError) {
+        strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
+        return
+      }
 
       // Format order data
       const orderData = formatOrderDataForEmail(inquiry)
@@ -158,7 +226,7 @@ export default {
    * After update - send status update email if status changed
    */
   async afterUpdate(event: any) {
-    const { result, params, state, strapi } = event
+    const { result, params, state } = event
 
     try {
       const previousStatus = state?.previousStatus
@@ -166,24 +234,43 @@ export default {
 
       // Only send email if status changed
       if (previousStatus && newStatus && previousStatus !== newStatus) {
-        // Fetch full inquiry data with relations
+        // Fetch full inquiry data with relations using db.query for better control
         const inquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
           where: { id: result.id },
           populate: {
             customer: true,
             product: {
-              populate: ['available_sizes'],
+              populate: ['pricing'],
             },
           },
         })
 
-        if (!inquiry || !inquiry.customer?.email) {
+        if (!inquiry) {
+          strapi.log.warn('Order inquiry not found:', result.id)
+          return
+        }
+
+        // If customer wasn't populated, fetch it separately
+        if (!inquiry.customer && result.customer) {
+          const customerId = typeof result.customer === 'object' ? result.customer.id : result.customer
+          inquiry.customer = await strapi.db.query('plugin::users-permissions.user').findOne({
+            where: { id: customerId },
+          })
+        }
+
+        if (!inquiry.customer?.email) {
           strapi.log.warn('Cannot send status update email - customer email not found')
           return
         }
 
-        // Get email service
-        const emailService = getEmailService()
+        // Get email service - with defensive check for configuration
+        let emailService
+        try {
+          emailService = getEmailService()
+        } catch (emailConfigError) {
+          strapi.log.warn('Email service not configured, skipping status update email:', emailConfigError)
+          return
+        }
 
         // Format order data
         const orderData = formatOrderDataForEmail(inquiry)

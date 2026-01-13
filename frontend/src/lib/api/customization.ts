@@ -79,10 +79,19 @@ export async function submitOrderInquiry(
   selections: CustomizationSelections,
   notes?: string
 ): Promise<OrderInquiry> {
-  // Calculate total weight from pre-bagging selections
+  // Calculate total weight from pre-bagging selections (quantity × unit_size)
   const totalWeight = selections.preBagging.reduce((sum, selection) => {
-    return sum + (selection.quantity || 0);
+    return sum + (selection.quantity * selection.unitSize);
   }, 0);
+
+  // Determine weight unit from selections (use first selection's unit or default to 'g')
+  const weightUnit = selections.preBagging[0]?.unitSizeUnit || 'g';
+
+  // DEBUG: Check if JWT cookie exists
+  const Cookies = (await import('js-cookie')).default;
+  const jwt = Cookies.get('jwt');
+  console.log('🔍 DEBUG: JWT cookie exists:', !!jwt);
+  console.log('🔍 DEBUG: JWT value:', jwt?.substring(0, 20) + '...');
 
   const response = await strapiApi.post<SingleOrderInquiryResponse>('/api/order-inquiries', {
     data: {
@@ -91,9 +100,15 @@ export async function submitOrderInquiry(
       selected_bud_styles: selections.budStyles,
       selected_backgrounds: selections.backgrounds,
       selected_fonts: selections.fonts,
-      selected_prebagging: selections.preBagging,
+      selected_prebagging: selections.preBagging.map((s) => ({
+        option_id: s.optionId,
+        quantity: s.quantity,
+        unit_size: s.unitSize,
+        unit_size_unit: s.unitSizeUnit,
+        custom_text: s.customText,
+      })),
       total_weight: totalWeight > 0 ? totalWeight : 0,
-      weight_unit: 'g',
+      weight_unit: weightUnit,
       notes,
     },
   });

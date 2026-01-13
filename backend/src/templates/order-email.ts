@@ -10,6 +10,8 @@ export interface OrderEmailData {
   customerName: string
   customerEmail: string
   customerCompany: string
+  customerPhone?: string
+  customerBusinessLicense?: string
   items: OrderItem[]
   totalItems: number
   estimatedTotal: number
@@ -139,6 +141,18 @@ export function generateNewOrderEmailForAdmin(data: OrderEmailData): EmailTempla
               <span class="info-label">Company:</span>
               <span>${data.customerCompany}</span>
             </div>
+            ${data.customerPhone ? `
+            <div class="info-row">
+              <span class="info-label">Phone:</span>
+              <span>${data.customerPhone}</span>
+            </div>
+            ` : ''}
+            ${data.customerBusinessLicense ? `
+            <div class="info-row">
+              <span class="info-label">Business License:</span>
+              <span>${data.customerBusinessLicense}</span>
+            </div>
+            ` : ''}
           </div>
 
           <div class="section">
@@ -201,6 +215,8 @@ Customer Information:
 Name: ${data.customerName}
 Email: ${data.customerEmail}
 Company: ${data.customerCompany}
+${data.customerPhone ? `Phone: ${data.customerPhone}` : ''}
+${data.customerBusinessLicense ? `Business License: ${data.customerBusinessLicense}` : ''}
 
 Order Items:
 ${data.items.map(item => `- ${item.productName} (${item.size}) x ${item.quantity} @ $${item.unitPrice.toFixed(2)} = $${(item.quantity * item.unitPrice).toFixed(2)}`).join('\n')}

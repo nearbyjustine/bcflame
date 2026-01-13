@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ProductCard } from './ProductCard';
 import type { Product } from '@/types/product';
@@ -177,5 +177,60 @@ describe('ProductCard', () => {
     render(<ProductCard product={sativaProduct} />);
     const categoryBadge = screen.getByText('Sativa');
     expect(categoryBadge).toHaveClass('bg-green-100');
+  });
+
+  it('displays per-gram pricing when pricing_model is per_gram', () => {
+    const perGramProduct: Product = {
+      ...mockProduct,
+      attributes: {
+        ...mockProduct.attributes,
+        base_price_per_gram: 7.14,
+        pricing_model: 'per_gram',
+      },
+    };
+    render(<ProductCard product={perGramProduct} />);
+    expect(screen.getByText(/Starting at/)).toBeInTheDocument();
+    expect(screen.getByText(/\$7\.14\/gram/)).toBeInTheDocument();
+  });
+
+  it('displays tiered pricing when pricing_model is tiered', () => {
+    const tieredProduct: Product = {
+      ...mockProduct,
+      attributes: {
+        ...mockProduct.attributes,
+        pricing_model: 'tiered',
+        pricing: [
+          {
+            id: 1,
+            weight: '7g',
+            amount: 50.0,
+            currency: 'USD',
+          },
+          {
+            id: 2,
+            weight: '14g',
+            amount: 90.0,
+            currency: 'USD',
+          },
+        ],
+      },
+    };
+    render(<ProductCard product={tieredProduct} />);
+    expect(screen.getByText('Select Size:')).toBeInTheDocument();
+    expect(screen.getByText('7g')).toBeInTheDocument();
+    expect(screen.getByText('14g')).toBeInTheDocument();
+  });
+
+  it('renders customize button when customization is enabled', () => {
+    const customizableProduct: Product = {
+      ...mockProduct,
+      attributes: {
+        ...mockProduct.attributes,
+        customization_enabled: true,
+      },
+    };
+    const onCustomizeMock = vi.fn();
+    render(<ProductCard product={customizableProduct} onCustomize={onCustomizeMock} />);
+    expect(screen.getByText('Customize & Order')).toBeInTheDocument();
   });
 });

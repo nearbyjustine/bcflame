@@ -163,8 +163,13 @@ export function ProductCard({ product, onCustomize }: ProductCardProps) {
           </div>
         )}
 
-        {/* Size selector and price display - only show if pricing is available */}
-        {selectedPricing && attributes.pricing?.length > 0 && (
+        {/* Price display - show per-gram pricing or tiered pricing */}
+        {attributes.base_price_per_gram && attributes.pricing_model === 'per_gram' ? (
+          <div className="flex items-center justify-between pt-2 border-t">
+            <p className="text-sm text-muted-foreground">Starting at</p>
+            <p className="text-xl font-bold">{formatPrice(attributes.base_price_per_gram)}/gram</p>
+          </div>
+        ) : selectedPricing && attributes.pricing?.length > 0 ? (
           <>
             {/* Size selector - button group/pills */}
             <div className="mb-4">
@@ -192,7 +197,7 @@ export function ProductCard({ product, onCustomize }: ProductCardProps) {
               <p className="text-xl font-bold">{formatPrice(selectedPricing.amount, selectedPricing.currency)}</p>
             </div>
           </>
-        )}
+        ) : null}
 
         {/* Customize button - only show if customization is enabled */}
         {attributes.customization_enabled && onCustomize && (
