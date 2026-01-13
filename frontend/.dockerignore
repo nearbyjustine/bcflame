@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+build/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+tests/
+coverage/
+
+# Documentation
+*.md
+
+# Development files
+docker-compose*.yml
+.claude/
+reports/
+tsconfig.tsbuildinfo

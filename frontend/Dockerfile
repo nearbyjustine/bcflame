@@ -1,6 +1,6 @@
 FROM node:18-alpine AS base
 WORKDIR /app
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat wget
 
 FROM base AS development
 COPY package*.json ./
@@ -17,7 +17,13 @@ FROM base AS builder
 COPY package*.json ./
 RUN npm ci
 COPY . .
+
+ARG NEXT_PUBLIC_STRAPI_URL
+ARG NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_STRAPI_URL=$NEXT_PUBLIC_STRAPI_URL
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN npm run build
 
 FROM base AS production
@@ -30,4 +36,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
 CMD ["node", "server.js"]
