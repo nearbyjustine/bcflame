@@ -1,0 +1,119 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bcflame_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-bcflame}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-bcflame_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bcflame} -d ${DB_NAME:-bcflame_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # No Traefik labels - internal service only
+
+  strapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        PUBLIC_URL: ${PUBLIC_URL:-https://api-bcflame.hows-tine.com}
+    image: bcflame-strapi-prod
+    container_name: bcflame_strapi
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: bcflame_postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DB_NAME:-bcflame_db}
+      DATABASE_USERNAME: ${DB_USER:-bcflame}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_SSL: false
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      APP_KEYS: ${APP_KEYS}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      PUBLIC_URL: ${PUBLIC_URL:-https://api-bcflame.hows-tine.com}
+      HOST: 0.0.0.0
+      PORT: 1337
+      # Email configuration
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-BC Flame}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
+      EMAIL_ADMIN_RECIPIENTS: ${EMAIL_ADMIN_RECIPIENTS}
+      # Set to 'true' to seed database on first startup
+      SEED_DATA: ${SEED_DATA:-false}
+    volumes:
+      - strapi_uploads:/app/public/uploads
+    networks:
+      - proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bcflame-api.rule=Host(`api-bcflame.localhost`) || Host(`api-bcflame.hows-tine.com`)"
+      - "traefik.http.routers.bcflame-api.entrypoints=web"
+      - "traefik.http.services.bcflame-api.loadbalancer.server.port=1337"
+      # Force HTTPS headers
+      - "traefik.http.middlewares.bcflame-api-https.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.bcflame-api-https.headers.customrequestheaders.X-Forwarded-Port=443"
+      - "traefik.http.routers.bcflame-api.middlewares=bcflame-api-https"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    image: bcflame-frontend-prod
+    container_name: bcflame_frontend
+    restart: always
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    networks:
+      - proxy
+    depends_on:
+      - strapi
+    healthcheck:
+      disable: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bcflame-web.rule=Host(`bcflame.localhost`) || Host(`bcflame.hows-tine.com`)"
+      - "traefik.http.routers.bcflame-web.entrypoints=web"
+      - "traefik.http.services.bcflame-web.loadbalancer.server.port=3000"
+      # Force HTTPS headers
+      - "traefik.http.middlewares.bcflame-web-https.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.bcflame-web-https.headers.customrequestheaders.X-Forwarded-Port=443"
+      - "traefik.http.routers.bcflame-web.middlewares=bcflame-web-https"
+
+volumes:
+  postgres_data:
+    driver: local
+  strapi_uploads:
+    driver: local
+
+networks:
+  proxy:
+    external: true

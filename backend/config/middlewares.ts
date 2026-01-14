@@ -8,13 +8,14 @@ export default [
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          'connect-src': ["'self'", 'https:'],
+          'connect-src': ["'self'", 'https:', 'http:'],
           'img-src': [
             "'self'",
             'data:',
             'blob:',
             'dl.airtable.com',
             'res.cloudinary.com',
+            'https:',
           ],
           'media-src': [
             "'self'",

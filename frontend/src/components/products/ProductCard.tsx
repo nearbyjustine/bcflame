@@ -5,6 +5,7 @@ import { Settings } from 'lucide-react';
 import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { getImageUrl, getImageAlt } from '@/lib/utils/image';
 
 interface ProductCardProps {
   product: Product;
@@ -48,9 +49,7 @@ export function ProductCard({ product, onCustomize }: ProductCardProps) {
   }, [images.length]);
 
   const currentImage = images[currentImageIndex];
-  const imageUrl = currentImage?.attributes?.url && process.env.NEXT_PUBLIC_STRAPI_URL
-    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${currentImage.attributes.url}`
-    : null;
+  const imageUrl = getImageUrl(currentImage);
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -59,7 +58,7 @@ export function ProductCard({ product, onCustomize }: ProductCardProps) {
           <>
             <img
               src={imageUrl}
-              alt={currentImage?.attributes?.alternativeText || attributes.name}
+              alt={getImageAlt(currentImage, attributes.name)}
               className="w-full h-full object-cover"
             />
 

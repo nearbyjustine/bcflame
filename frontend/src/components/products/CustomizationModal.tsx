@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, Loader2, ShoppingCart, Zap } from 'lucide-react'
 import { toast } from 'sonner'
+import { getImageUrl, getImageName } from '@/lib/utils/image'
 import {
   Dialog,
   DialogContent,
@@ -282,16 +283,11 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
     }
 
     return photos.map(photo => {
-      const photoUrl = photo.url || photo.attributes?.url || ''
-      const fullUrl = photoUrl.startsWith('http')
-        ? photoUrl
-        : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${photoUrl}`
-
       return {
         id: photo.id,
         attributes: {
-          url: fullUrl,
-          name: photo.name || photo.attributes?.name || `Photo ${photo.id}`,
+          url: getImageUrl(photo) || '',
+          name: getImageName(photo, `Photo ${photo.id}`),
         }
       }
     })

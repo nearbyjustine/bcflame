@@ -10,6 +10,8 @@ EXPOSE 1337
 CMD ["npm", "run", "develop"]
 
 FROM base AS builder
+ARG PUBLIC_URL=http://localhost:1337
+ENV PUBLIC_URL=${PUBLIC_URL}
 COPY package*.json ./
 RUN npm ci
 COPY . .
@@ -22,12 +24,14 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 strapi
 COPY --from=builder --chown=strapi:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=strapi:nodejs /app/dist ./dist
-COPY --from=builder --chown=strapi:nodejs /app/public ./public
 COPY --from=builder --chown=strapi:nodejs /app/package*.json ./
+COPY --from=builder --chown=strapi:nodejs /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=strapi:nodejs /app/config ./config
 COPY --from=builder --chown=strapi:nodejs /app/src ./src
 COPY --from=builder --chown=strapi:nodejs /app/database ./database
 COPY --from=builder --chown=strapi:nodejs /app/start-production.sh ./start-production.sh
+COPY --from=builder --chown=strapi:nodejs /app/bcflame-scrape.json ./bcflame-scrape.json
+RUN mkdir -p ./public/uploads && chown -R strapi:nodejs ./public
 RUN chmod +x ./start-production.sh
 USER strapi
 EXPOSE 1337

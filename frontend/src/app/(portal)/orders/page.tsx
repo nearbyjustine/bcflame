@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { OrderInquiry } from '@/types/customization'
+import { getImageUrl } from '@/lib/utils/image'
 
 // Status badge variant mapping
 const getStatusVariant = (
@@ -137,10 +138,7 @@ export default function OrdersPage() {
             const product = inquiry.attributes.product?.data
             const productName = product?.attributes?.name || 'Unknown Product'
             const productImage = product?.attributes?.images?.data?.[0]
-            const imageUrl =
-              productImage?.attributes?.url && process.env.NEXT_PUBLIC_STRAPI_URL
-                ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${productImage.attributes.url}`
-                : null
+            const imageUrl = getImageUrl(productImage)
 
             return (
               <Card
@@ -249,9 +247,7 @@ export default function OrdersPage() {
               <div className="flex gap-4 p-4 bg-muted/30 rounded-xl border">
                 {(() => {
                   const productImage = selectedInquiry.attributes.product?.data?.attributes?.images?.data?.[0];
-                  const imageUrl = productImage?.attributes?.url
-                    ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${productImage.attributes.url}`
-                    : null;
+                  const imageUrl = getImageUrl(productImage);
                   return imageUrl ? (
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                       <img
