@@ -172,12 +172,12 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
     const totalWeight = preBaggingSelections.reduce((sum, selection) => {
       return sum + (selection.quantity * selection.unitSize)
     }, 0)
-    const weightUnit = preBaggingSelections[0]?.unitSizeUnit || 'g'
+    const weightUnit = preBaggingSelections[0]?.unitSizeUnit || 'lb'
 
-    // Calculate price - use base_price_per_gram if available, otherwise first pricing tier
+    // Calculate price - use base_price_per_pound if available, otherwise first pricing tier
     let unitPrice = 0
-    if (product.attributes.base_price_per_gram) {
-      unitPrice = product.attributes.base_price_per_gram * totalWeight
+    if (product.attributes.base_price_per_pound) {
+      unitPrice = product.attributes.base_price_per_pound * totalWeight
     } else if (product.attributes.pricing && product.attributes.pricing.length > 0) {
       unitPrice = product.attributes.pricing[0].amount || 0
     }

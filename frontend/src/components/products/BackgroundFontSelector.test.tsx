@@ -14,18 +14,21 @@ const mockFonts = [
   { id: 3, attributes: { name: 'Bold Display', description: 'Eye-catching display' } },
 ];
 
+const mockBackgroundLimits = { min: 1, max: 3 };
+const mockFontLimits = { min: 1, max: 2 };
+
 describe('BackgroundFontSelector', () => {
   it('renders all background options', () => {
     render(
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
       />
     );
 
@@ -39,12 +42,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
       />
     );
 
@@ -54,17 +57,17 @@ describe('BackgroundFontSelector', () => {
   });
 
   it('allows background multi-selection when enabled', () => {
-    const onBackgroundChange = vi.fn();
+    const onToggleBackground = vi.fn();
     render(
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[1]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={onBackgroundChange}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[1]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={onBackgroundChange}
+        onToggleFont={vi.fn()}
       />
     );
 
@@ -79,12 +82,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[1]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={false}
-        allowMultipleFonts={true}
-        onBackgroundChange={onBackgroundChange}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[1]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={onBackgroundChange}
+        onToggleFont={vi.fn()}
       />
     );
 
@@ -99,12 +102,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[1]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={onFontChange}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[1]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={onFontChange}
       />
     );
 
@@ -119,12 +122,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[1]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={false}
-        onBackgroundChange={vi.fn()}
-        onFontChange={onFontChange}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[1]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={onFontChange}
       />
     );
 
@@ -141,12 +144,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
         onLogoUpload={onLogoUpload}
       />
     );
@@ -176,12 +179,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
         onLogoUpload={onLogoUpload}
       />
     );
@@ -210,12 +213,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
         onLogoUpload={onLogoUpload}
       />
     );
@@ -239,12 +242,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
         userLogo="https://example.com/logo.png"
         onLogoUpload={vi.fn()}  // Must be provided for logo section to render
       />
@@ -260,12 +263,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[1, 3]}
-        selectedFonts={[]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[1, 3]}
+        selectedFontIds={[]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
       />
     );
 
@@ -278,12 +281,12 @@ describe('BackgroundFontSelector', () => {
       <BackgroundFontSelector
         backgrounds={mockBackgrounds}
         fonts={mockFonts}
-        selectedBackgrounds={[]}
-        selectedFonts={[1, 2]}
-        allowMultipleBackgrounds={true}
-        allowMultipleFonts={true}
-        onBackgroundChange={vi.fn()}
-        onFontChange={vi.fn()}
+        selectedBackgroundIds={[]}
+        selectedFontIds={[1, 2]}
+        backgroundLimits={mockBackgroundLimits}
+        fontLimits={mockFontLimits}
+        onToggleBackground={vi.fn()}
+        onToggleFont={vi.fn()}
       />
     );
 

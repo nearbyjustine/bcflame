@@ -12,11 +12,10 @@ interface ProductCardProps {
   onCustomize?: () => void;
 }
 
-const getCategoryStyles = (category: 'Indica' | 'Hybrid' | 'Sativa') => {
+const getCategoryStyles = (category: 'Indica' | 'Hybrid') => {
   const styles = {
     Indica: 'bg-blue-100 text-blue-800',
     Hybrid: 'bg-purple-100 text-purple-800',
-    Sativa: 'bg-green-100 text-green-800',
   };
   return styles[category];
 };
@@ -162,11 +161,11 @@ export function ProductCard({ product, onCustomize }: ProductCardProps) {
           </div>
         )}
 
-        {/* Price display - show per-gram pricing or tiered pricing */}
-        {attributes.base_price_per_gram && attributes.pricing_model === 'per_gram' ? (
+        {/* Price display - show per-pound pricing or tiered pricing */}
+        {attributes.base_price_per_pound && attributes.pricing_model === 'per_pound' ? (
           <div className="flex items-center justify-between pt-2 border-t">
             <p className="text-sm text-muted-foreground">Starting at</p>
-            <p className="text-xl font-bold">{formatPrice(attributes.base_price_per_gram)}/gram</p>
+            <p className="text-xl font-bold">{formatPrice(attributes.base_price_per_pound)}/lb</p>
           </div>
         ) : selectedPricing && attributes.pricing?.length > 0 ? (
           <>

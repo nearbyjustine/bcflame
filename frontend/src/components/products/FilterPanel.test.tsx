@@ -27,7 +27,6 @@ describe('FilterPanel', () => {
     expect(screen.getByText(/all/i)).toBeInTheDocument();
     expect(screen.getByText(/indica/i)).toBeInTheDocument();
     expect(screen.getByText(/hybrid/i)).toBeInTheDocument();
-    expect(screen.getByText(/sativa/i)).toBeInTheDocument();
   });
 
   it('calls onFilterChange when search input changes', () => {

@@ -29,14 +29,16 @@ const mockBudStyles = [
   },
 ];
 
+const mockLimits = { min: 1, max: 3 };
+
 describe('BudStyleSelector', () => {
   it('renders all bud style options', () => {
     render(
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[]}
-        allowMultiple={true}
-        onChange={vi.fn()}
+        limits={mockLimits}
+        onToggle={vi.fn()}
       />
     );
 
@@ -46,13 +48,13 @@ describe('BudStyleSelector', () => {
   });
 
   it('allows multiple selections when allowMultiple is true', () => {
-    const onChange = vi.fn();
+    const onToggle = vi.fn();
     render(
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[1]}
-        allowMultiple={true}
-        onChange={onChange}
+        limits={mockLimits}
+        onToggle={onChange}
       />
     );
 
@@ -69,8 +71,8 @@ describe('BudStyleSelector', () => {
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[1]}
-        allowMultiple={false}
-        onChange={onChange}
+        limits={mockLimits}
+        onToggle={onChange}
       />
     );
 
@@ -87,8 +89,8 @@ describe('BudStyleSelector', () => {
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[1, 2]}
-        allowMultiple={true}
-        onChange={onChange}
+        limits={mockLimits}
+        onToggle={onChange}
       />
     );
 
@@ -104,8 +106,8 @@ describe('BudStyleSelector', () => {
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[1, 3]}
-        allowMultiple={true}
-        onChange={vi.fn()}
+        limits={mockLimits}
+        onToggle={vi.fn()}
       />
     );
 
@@ -119,8 +121,8 @@ describe('BudStyleSelector', () => {
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[]}
-        allowMultiple={true}
-        onChange={vi.fn()}
+        limits={mockLimits}
+        onToggle={vi.fn()}
         label="Choose Your Bud Style"
       />
     );
@@ -133,8 +135,8 @@ describe('BudStyleSelector', () => {
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[]}
-        allowMultiple={true}
-        onChange={vi.fn()}
+        limits={mockLimits}
+        onToggle={vi.fn()}
       />
     );
 

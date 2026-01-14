@@ -3,22 +3,24 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import PhotoSelectionGrid from './PhotoSelectionGrid';
 
 const mockPhotos = [
-  { id: 1, url: '/photo1.jpg', name: 'Photo 1' },
-  { id: 2, url: '/photo2.jpg', name: 'Photo 2' },
-  { id: 3, url: '/photo3.jpg', name: 'Photo 3' },
-  { id: 4, url: '/photo4.jpg', name: 'Photo 4' },
-  { id: 5, url: '/photo5.jpg', name: 'Photo 5' },
-  { id: 6, url: '/photo6.jpg', name: 'Photo 6' },
+  { id: 1, attributes: { url: '/photo1.jpg', name: 'Photo 1' } },
+  { id: 2, attributes: { url: '/photo2.jpg', name: 'Photo 2' } },
+  { id: 3, attributes: { url: '/photo3.jpg', name: 'Photo 3' } },
+  { id: 4, attributes: { url: '/photo4.jpg', name: 'Photo 4' } },
+  { id: 5, attributes: { url: '/photo5.jpg', name: 'Photo 5' } },
+  { id: 6, attributes: { url: '/photo6.jpg', name: 'Photo 6' } },
 ];
+
+const mockLimits = { min: 1, max: 5 };
 
 describe('PhotoSelectionGrid', () => {
   it('renders all photos', () => {
     const onToggle = vi.fn();
     render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[]}
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[]}
+        limits={mockLimits}
         onToggle={onToggle}
       />
     );
@@ -30,27 +32,27 @@ describe('PhotoSelectionGrid', () => {
     const onToggle = vi.fn();
     render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[0, 1, 2, 3]}
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[1, 2, 3, 4]}
+        limits={mockLimits}
         onToggle={onToggle}
       />
     );
 
-    // Click unselected photo (index 4) - should call onToggle
+    // Click unselected photo (id 5) - should call onToggle
     const photoContainers = screen.getAllByRole('img').map(img => img.parentElement);
     fireEvent.click(photoContainers[4]!);
 
-    expect(onToggle).toHaveBeenCalledWith(4);
+    expect(onToggle).toHaveBeenCalledWith(5);
   });
 
   it('prevents selection when max is reached', () => {
     const onToggle = vi.fn();
     const { container } = render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[0, 1, 2, 3, 4]} // Max 5 reached
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[0, 1, 2, 3, 4]} // Max 5 reached
+        limits={mockLimits}{5}
         onToggle={onToggle}
       />
     );
@@ -67,9 +69,9 @@ describe('PhotoSelectionGrid', () => {
     const onToggle = vi.fn();
     render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[0, 1, 2, 3, 4]}
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[0, 1, 2, 3, 4]}
+        limits={mockLimits}{5}
         onToggle={onToggle}
       />
     );
@@ -84,9 +86,9 @@ describe('PhotoSelectionGrid', () => {
   it('displays selection count badge', () => {
     render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[0, 1, 2]}
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[0, 1, 2]}
+        limits={mockLimits}{5}
         onToggle={vi.fn()}
       />
     );
@@ -97,9 +99,9 @@ describe('PhotoSelectionGrid', () => {
   it('shows checkmark icon on selected photos', () => {
     render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[0, 2]}
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[0, 2]}
+        limits={mockLimits}{5}
         onToggle={vi.fn()}
       />
     );
@@ -112,9 +114,9 @@ describe('PhotoSelectionGrid', () => {
   it('applies orange border to selected photos', () => {
     render(
       <PhotoSelectionGrid
-        photos={mockPhotos}
-        selectedPhotoIndices={[1, 3]}
-        maxSelections={5}
+        availablePhotos={mockPhotos}
+        selectedPhotoIds={[1, 3]}
+        limits={mockLimits}{5}
         onToggle={vi.fn()}
       />
     );

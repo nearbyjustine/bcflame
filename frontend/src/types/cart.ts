@@ -19,9 +19,9 @@ export interface CartItem {
   selections: CustomizationSelections;
   /** Calculated unit price (based on product pricing) */
   unitPrice: number;
-  /** Weight of this item in grams */
+  /** Weight of this item in pounds */
   weight: number;
-  /** Weight unit (typically 'g') */
+  /** Weight unit (typically 'lb') */
   weightUnit: string;
   /** Timestamp when item was added */
   addedAt: string;

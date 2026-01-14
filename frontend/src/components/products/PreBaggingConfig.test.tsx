@@ -34,10 +34,9 @@ describe('PreBaggingConfig', () => {
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={null}
-        totalWeight={0}
-        onOptionChange={vi.fn()}
-        onWeightChange={vi.fn()}
+        selections={[]}
+        onUpdate={vi.fn()}
+        onRemove={vi.fn()}
       />
     );
 
@@ -47,7 +46,7 @@ describe('PreBaggingConfig', () => {
   });
 
   it('allows selecting a bagging option', () => {
-    const onOptionChange = vi.fn();
+    const onUpdate = vi.fn();
     render(
       <PreBaggingConfig
         options={mockOptions}

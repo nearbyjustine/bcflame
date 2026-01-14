@@ -7,9 +7,16 @@ import {
   submitOrderInquiry,
   getMyOrderInquiries,
 } from './customization';
-import { strapi } from './strapi';
+import * as strapiModule from './strapi';
 
-vi.mock('./strapi');
+vi.mock('./strapi', () => ({
+  strapiApi: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
 
 describe('Customization API', () => {
   beforeEach(() => {
@@ -34,11 +41,11 @@ describe('Customization API', () => {
         meta: { pagination: { page: 1, pageSize: 25, pageCount: 1, total: 1 } },
       };
 
-      vi.mocked(strapi.get).mockResolvedValueOnce({ data: mockData });
+      vi.mocked(strapiModule.strapiApi.get).mockResolvedValueOnce({ data: mockData });
 
       const result = await getBudStyles();
 
-      expect(strapi.get).toHaveBeenCalledWith('/api/bud-styles', {
+      expect(strapiModule.strapiApi.get).toHaveBeenCalledWith('/api/bud-styles', {
         params: {
           sort: 'sort_order:asc',
           populate: '*',
@@ -67,11 +74,11 @@ describe('Customization API', () => {
         meta: { pagination: { page: 1, pageSize: 25, pageCount: 1, total: 1 } },
       };
 
-      vi.mocked(strapi.get).mockResolvedValueOnce({ data: mockData });
+      vi.mocked(strapiModule.strapiApi.get).mockResolvedValueOnce({ data: mockData });
 
       const result = await getBackgroundStyles();
 
-      expect(strapi.get).toHaveBeenCalledWith('/api/background-styles', {
+      expect(strapiModule.strapiApi.get).toHaveBeenCalledWith('/api/background-styles', {
         params: {
           sort: 'sort_order:asc',
           populate: '*',
@@ -100,11 +107,11 @@ describe('Customization API', () => {
         meta: { pagination: { page: 1, pageSize: 25, pageCount: 1, total: 1 } },
       };
 
-      vi.mocked(strapi.get).mockResolvedValueOnce({ data: mockData });
+      vi.mocked(strapiModule.strapiApi.get).mockResolvedValueOnce({ data: mockData });
 
       const result = await getFontStyles();
 
-      expect(strapi.get).toHaveBeenCalledWith('/api/font-styles', {
+      expect(strapiModule.strapiApi.get).toHaveBeenCalledWith('/api/font-styles', {
         params: {
           sort: 'sort_order:asc',
           populate: '*',
@@ -133,11 +140,11 @@ describe('Customization API', () => {
         meta: { pagination: { page: 1, pageSize: 25, pageCount: 1, total: 1 } },
       };
 
-      vi.mocked(strapi.get).mockResolvedValueOnce({ data: mockData });
+      vi.mocked(strapiModule.strapiApi.get).mockResolvedValueOnce({ data: mockData });
 
       const result = await getPreBaggingOptions();
 
-      expect(strapi.get).toHaveBeenCalledWith('/api/prebagging-options', {
+      expect(strapiModule.strapiApi.get).toHaveBeenCalledWith('/api/prebagging-options', {
         params: {
           sort: 'sort_order:asc',
           populate: '*',
@@ -162,7 +169,7 @@ describe('Customization API', () => {
         meta: {},
       };
 
-      vi.mocked(strapi.post).mockResolvedValueOnce({ data: mockResponse });
+      vi.mocked(strapiModule.strapiApi.post).mockResolvedValueOnce({ data: mockResponse });
 
       const selections = {
         photos: [1, 2, 3],
@@ -174,7 +181,7 @@ describe('Customization API', () => {
 
       const result = await submitOrderInquiry(1, selections, 'Test notes');
 
-      expect(strapi.post).toHaveBeenCalledWith('/api/order-inquiries', {
+      expect(strapiModule.strapiApi.post).toHaveBeenCalledWith('/api/order-inquiries', {
         data: {
           product: 1,
           selected_photos: [1, 2, 3],
@@ -203,7 +210,7 @@ describe('Customization API', () => {
         meta: {},
       };
 
-      vi.mocked(strapi.post).mockResolvedValueOnce({ data: mockResponse });
+      vi.mocked(strapiModule.strapiApi.post).mockResolvedValueOnce({ data: mockResponse });
 
       const selections = {
         photos: [1],
@@ -215,7 +222,7 @@ describe('Customization API', () => {
 
       const result = await submitOrderInquiry(1, selections);
 
-      expect(strapi.post).toHaveBeenCalledWith('/api/order-inquiries', {
+      expect(strapiModule.strapiApi.post).toHaveBeenCalledWith('/api/order-inquiries', {
         data: {
           product: 1,
           selected_photos: [1],
@@ -247,11 +254,11 @@ describe('Customization API', () => {
         meta: { pagination: { page: 1, pageSize: 25, pageCount: 1, total: 1 } },
       };
 
-      vi.mocked(strapi.get).mockResolvedValueOnce({ data: mockData });
+      vi.mocked(strapiModule.strapiApi.get).mockResolvedValueOnce({ data: mockData });
 
       const result = await getMyOrderInquiries();
 
-      expect(strapi.get).toHaveBeenCalledWith('/api/order-inquiries', {
+      expect(strapiModule.strapiApi.get).toHaveBeenCalledWith('/api/order-inquiries', {
         params: {
           populate: ['product', 'customer'],
           sort: 'createdAt:desc',

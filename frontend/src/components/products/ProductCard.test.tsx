@@ -166,31 +166,18 @@ describe('ProductCard', () => {
     expect(categoryBadge).toHaveClass('bg-blue-100');
   });
 
-  it('displays Sativa category styling', () => {
-    const sativaProduct: Product = {
+  it('displays per-pound pricing when pricing_model is per_pound', () => {
+    const perPoundProduct: Product = {
       ...mockProduct,
       attributes: {
         ...mockProduct.attributes,
-        category: 'Sativa',
+        base_price_per_pound: 3234.21,
+        pricing_model: 'per_pound',
       },
     };
-    render(<ProductCard product={sativaProduct} />);
-    const categoryBadge = screen.getByText('Sativa');
-    expect(categoryBadge).toHaveClass('bg-green-100');
-  });
-
-  it('displays per-gram pricing when pricing_model is per_gram', () => {
-    const perGramProduct: Product = {
-      ...mockProduct,
-      attributes: {
-        ...mockProduct.attributes,
-        base_price_per_gram: 7.14,
-        pricing_model: 'per_gram',
-      },
-    };
-    render(<ProductCard product={perGramProduct} />);
+    render(<ProductCard product={perPoundProduct} />);
     expect(screen.getByText(/Starting at/)).toBeInTheDocument();
-    expect(screen.getByText(/\$7\.14\/gram/)).toBeInTheDocument();
+    expect(screen.getByText(/\$3,234\.21\/lb/)).toBeInTheDocument();
   });
 
   it('displays tiered pricing when pricing_model is tiered', () => {

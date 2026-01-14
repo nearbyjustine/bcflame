@@ -64,7 +64,7 @@ export interface SelectionLimit {
 export interface ProductAttributes {
   name: string;
   sku: string;
-  category: 'Indica' | 'Hybrid' | 'Sativa';
+  category: 'Indica' | 'Hybrid';
   tagline?: string;
   description: string;
   full_description?: string;
@@ -77,8 +77,8 @@ export interface ProductAttributes {
   featured: boolean;
   sort_order: number;
   pricing: ProductPricing[];
-  base_price_per_gram?: number;
-  pricing_model?: 'per_gram' | 'tiered';
+  base_price_per_pound?: number;
+  pricing_model?: 'per_pound' | 'tiered';
   features?: ProductFeature[];
   images?: {
     data: ProductImage[];

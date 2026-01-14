@@ -4,7 +4,7 @@ import type { ProductsResponse, SingleProductResponse } from '@/types/product';
 export interface GetProductsParams {
   page?: number;
   pageSize?: number;
-  category?: 'Indica' | 'Hybrid' | 'Sativa';
+  category?: 'Indica' | 'Hybrid';
   featured?: boolean;
   onSale?: boolean;
   search?: string;
@@ -16,7 +16,7 @@ export interface GetProductsParams {
 
 interface ProductFilters {
   name?: { $containsi: string };
-  category?: { $eq: 'Indica' | 'Hybrid' | 'Sativa' };
+  category?: { $eq: 'Indica' | 'Hybrid' };
   featured?: { $eq: boolean };
   on_sale?: { $eq: boolean };
   pricing?: {

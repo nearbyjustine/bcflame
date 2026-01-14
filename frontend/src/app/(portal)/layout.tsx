@@ -57,6 +57,7 @@ export default function PortalLayout({
               <a href="/products" className="text-sm hover:text-primary">Products</a>
               <a href="/media-hub" className="text-sm hover:text-primary">Media Hub</a>
               <a href="/orders" className="text-sm hover:text-primary">Orders</a>
+              <a href="/inventory" className="text-sm hover:text-primary">Inventory</a>
             </div>
           </div>
           <div className="flex items-center space-x-4">

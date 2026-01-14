@@ -13,7 +13,7 @@ interface FilterPanelProps {
 }
 
 export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
-  const categories = ['Indica', 'Hybrid', 'Sativa'] as const;
+  const categories = ['Indica', 'Hybrid'] as const;
 
   const handleSearchChange = (value: string) => {
     onFilterChange({ ...filters, search: value || undefined });
@@ -109,7 +109,6 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
             const colorClasses = {
               Indica: isActive ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-blue-600 text-blue-600 hover:bg-blue-50',
               Hybrid: isActive ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-purple-600 text-purple-600 hover:bg-purple-50',
-              Sativa: isActive ? 'bg-green-600 text-white hover:bg-green-700' : 'border-green-600 text-green-600 hover:bg-green-50',
             };
 
             return (
@@ -162,7 +161,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
 
       {/* Price Range */}
       <div className="space-y-2">
-        <Label>Price Range ($/g)</Label>
+        <Label>Price Range ($/lb)</Label>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label htmlFor="minPrice" className="text-xs text-gray-500">

@@ -84,8 +84,8 @@ export async function submitOrderInquiry(
     return sum + (selection.quantity * selection.unitSize);
   }, 0);
 
-  // Determine weight unit from selections (use first selection's unit or default to 'g')
-  const weightUnit = selections.preBagging[0]?.unitSizeUnit || 'g';
+  // Determine weight unit from selections (use first selection's unit or default to 'lb')
+  const weightUnit = selections.preBagging[0]?.unitSizeUnit || 'lb';
 
   // DEBUG: Check if JWT cookie exists
   const Cookies = (await import('js-cookie')).default;
