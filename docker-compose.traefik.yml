@@ -10,9 +10,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - bcflame_internal
+      - proxy
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bcflame}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bcflame} -d ${DB_NAME:-bcflame_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,7 +29,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_CLIENT: postgres
-      DATABASE_HOST: postgres
+      DATABASE_HOST: bcflame_postgres
       DATABASE_PORT: 5432
       DATABASE_NAME: ${DB_NAME:-bcflame_db}
       DATABASE_USERNAME: ${DB_USER:-bcflame}
@@ -41,6 +41,7 @@ services:
       API_TOKEN_SALT: ${API_TOKEN_SALT}
       TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
       CORS_ORIGINS: ${CORS_ORIGINS}
+      PUBLIC_URL: ${PUBLIC_URL:-https://api-bcflame.hows-tine.com}
       HOST: 0.0.0.0
       PORT: 1337
       # Email configuration
@@ -57,21 +58,15 @@ services:
     volumes:
       - strapi_uploads:/app/public/uploads
     networks:
-      - bcflame_internal
       - proxy
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:1337/_health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      disable: true
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.bcflame-api.rule=Host(`api.bcflame.localhost`) || Host(`api.bcflame.hows-tine.com`)"
+      - "traefik.http.routers.bcflame-api.rule=Host(`api-bcflame.localhost`) || Host(`api-bcflame.hows-tine.com`)"
       - "traefik.http.routers.bcflame-api.entrypoints=web"
       - "traefik.http.services.bcflame-api.loadbalancer.server.port=1337"
       # Force HTTPS headers
@@ -96,19 +91,13 @@ services:
       NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
     networks:
-      - bcflame_internal
       - proxy
     depends_on:
       - strapi
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+      disable: true
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
       - "traefik.http.routers.bcflame-web.rule=Host(`bcflame.localhost`) || Host(`bcflame.hows-tine.com`)"
       - "traefik.http.routers.bcflame-web.entrypoints=web"
       - "traefik.http.services.bcflame-web.loadbalancer.server.port=3000"
@@ -124,7 +113,5 @@ volumes:
     driver: local
 
 networks:
-  bcflame_internal:
-    driver: bridge
   proxy:
     external: true

@@ -56,8 +56,8 @@ read -p "Frontend domain (default: bcflame.hows-tine.com): " FRONTEND_DOMAIN
 FRONTEND_DOMAIN=${FRONTEND_DOMAIN:-bcflame.hows-tine.com}
 
 # API domain
-read -p "API domain (default: api.bcflame.hows-tine.com): " API_DOMAIN
-API_DOMAIN=${API_DOMAIN:-api.bcflame.hows-tine.com}
+read -p "API domain (default: api-bcflame.hows-tine.com): " API_DOMAIN
+API_DOMAIN=${API_DOMAIN:-api-bcflame.hows-tine.com}
 
 # Email configuration
 echo ""

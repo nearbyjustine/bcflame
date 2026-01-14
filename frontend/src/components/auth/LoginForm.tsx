@@ -81,12 +81,13 @@ export function LoginForm() {
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
-          <div className="text-center text-sm text-muted-foreground">
+          {/* We don't need to have a regsiter for now. */}
+          {/* <div className="text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link href="/register" className="text-primary hover:underline font-medium">
               Register here
             </Link>
-          </div>
+          </div> */}
         </form>
       </CardContent>
     </Card>
