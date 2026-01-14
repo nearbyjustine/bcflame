@@ -25,7 +25,7 @@
     },
     "category": {
       "type": "enumeration",
-      "enum": ["Indica", "Hybrid", "Sativa"],
+      "enum": ["Indica", "Hybrid"],
       "required": true
     },
     "tagline": {
@@ -74,15 +74,15 @@
       "required": false,
       "component": "product.pricing"
     },
-    "base_price_per_gram": {
+    "base_price_per_pound": {
       "type": "decimal",
       "required": false,
       "min": 0
     },
     "pricing_model": {
       "type": "enumeration",
-      "enum": ["per_gram", "tiered"],
-      "default": "per_gram"
+      "enum": ["per_pound", "tiered"],
+      "default": "per_pound"
     },
     "features": {
       "type": "component",

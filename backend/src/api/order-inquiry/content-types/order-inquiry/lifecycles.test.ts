@@ -53,6 +53,19 @@ describe('Order Inquiry Lifecycles', () => {
           return null
         }),
       },
+      log: {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+      },
+      requestContext: {
+        get: vi.fn(() => ({
+          state: {
+            user: null,
+          },
+        })),
+      },
       db: {
         query: vi.fn(() => ({
           findOne: vi.fn().mockResolvedValue({
@@ -62,8 +75,8 @@ describe('Order Inquiry Lifecycles', () => {
             product: {
               id: 1,
               name: 'Test Product',
-              base_price_per_gram: 7.14,
-              pricing_model: 'per_gram',
+              base_price_per_pound: 3234.21,
+              pricing_model: 'per_pound',
               pricing: [
                 { weight: '7g', amount: 50.00, currency: 'USD' },
                 { weight: '14g', amount: 90.00, currency: 'USD' },
@@ -79,8 +92,8 @@ describe('Order Inquiry Lifecycles', () => {
               phone: '(555) 123-4567',
               businessLicense: 'CA-LIC-123456',
             },
-            total_weight: 100,
-            weight_unit: 'g',
+            total_weight: 0.22,
+            weight_unit: 'lb',
             notes: 'Test notes',
             createdAt: '2026-01-13T10:00:00.000Z',
           }),
@@ -90,12 +103,16 @@ describe('Order Inquiry Lifecycles', () => {
 
     // Mock event
     mockEvent = {
+      strapi: mockStrapi,
       result: {
         id: 1,
         inquiry_number: null,
         status: 'pending',
       },
       params: {
+        where: {
+          id: 1,
+        },
         data: {
           status: 'pending',
         },
@@ -112,15 +129,27 @@ describe('Order Inquiry Lifecycles', () => {
 
   describe('afterCreate', () => {
     it('generates inquiry number after creation', async () => {
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
-
-      expect(mockEvent.result.inquiry_number).toMatch(/^INQ-\d{8}-\d{4}$/)
+      // Call beforeCreate first to generate the inquiry number
+      const beforeCreateEvent = {
+        ...mockEvent,
+        params: {
+          ...mockEvent.params,
+          data: {
+            ...mockEvent.params.data,
+          },
+        },
+      }
+      
+      await lifecycles.beforeCreate(beforeCreateEvent)
+      
+      // The inquiry number should be in params.data after beforeCreate
+      expect(beforeCreateEvent.params.data.inquiry_number).toMatch(/^INQ-\\d{8}-\\d{4}$/)
     })
 
     it('sends email to admin after creation', async () => {
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterCreate(mockEvent)
 
       expect(generateNewOrderEmailForAdmin).toHaveBeenCalled()
       expect(emailService.sendEmail).toHaveBeenCalledWith(
@@ -134,7 +163,7 @@ describe('Order Inquiry Lifecycles', () => {
     it('sends confirmation email to customer after creation', async () => {
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterCreate(mockEvent)
 
       expect(generateNewOrderEmailForCustomer).toHaveBeenCalled()
       expect(emailService.sendEmail).toHaveBeenCalledWith(
@@ -150,7 +179,7 @@ describe('Order Inquiry Lifecycles', () => {
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
       // Should not throw
-      await expect(lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })).resolves.not.toThrow()
+      await expect(lifecycles.afterCreate(mockEvent)).resolves.not.toThrow()
     })
 
     it('handles missing customer email', async () => {
@@ -163,7 +192,7 @@ describe('Order Inquiry Lifecycles', () => {
       })
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterCreate(mockEvent)
 
       // Should only send admin email
       expect(emailService.sendEmail).toHaveBeenCalledTimes(1)
@@ -178,7 +207,7 @@ describe('Order Inquiry Lifecycles', () => {
     })
 
     it('sends status update email when status changes', async () => {
-      await lifecycles.afterUpdate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterUpdate(mockEvent)
 
       expect(generateOrderStatusUpdateEmail).toHaveBeenCalled()
       expect(emailService.sendEmail).toHaveBeenCalledWith(
@@ -193,7 +222,7 @@ describe('Order Inquiry Lifecycles', () => {
       mockEvent.params.data.status = 'pending'
       mockEvent.state.previousStatus = 'pending'
 
-      await lifecycles.afterUpdate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterUpdate(mockEvent)
 
       expect(emailService.sendEmail).not.toHaveBeenCalled()
     })
@@ -201,7 +230,7 @@ describe('Order Inquiry Lifecycles', () => {
     it('tracks previous status in state', async () => {
       mockEvent.state = {}
 
-      await lifecycles.beforeUpdate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.beforeUpdate(mockEvent)
 
       expect(mockEvent.state.previousStatus).toBe('pending')
     })
@@ -213,7 +242,7 @@ describe('Order Inquiry Lifecycles', () => {
         },
       })
 
-      await lifecycles.afterUpdate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterUpdate(mockEvent)
 
       expect(emailService.sendEmail).not.toHaveBeenCalled()
     })
@@ -224,29 +253,29 @@ describe('Order Inquiry Lifecycles', () => {
       mockEvent.result.status = 'pending'
       mockEvent.state = {}
 
-      await lifecycles.beforeUpdate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.beforeUpdate(mockEvent)
 
       expect(mockEvent.state.previousStatus).toBe('pending')
     })
 
     it('fetches current record to get previous status', async () => {
-      await lifecycles.beforeUpdate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.beforeUpdate(mockEvent)
 
       expect(mockStrapi.db.query).toHaveBeenCalledWith('api::order-inquiry.order-inquiry')
     })
   })
 
   describe('price calculation', () => {
-    it('calculates price using base_price_per_gram for custom weights', async () => {
-      // Set up mock for custom weight (10g) not in pricing tiers
+    it('calculates price using base_price_per_pound for custom weights', async () => {
+      // Set up mock for custom weight (0.022 lb = ~10g) not in pricing tiers
       mockStrapi.db.query().findOne.mockResolvedValueOnce({
         id: 1,
         inquiry_number: 'INQ-20260113-1234',
         product: {
           id: 1,
           name: 'Test Product',
-          base_price_per_gram: 7.14,
-          pricing_model: 'per_gram',
+          base_price_per_pound: 3234.21,
+          pricing_model: 'per_pound',
         },
         customer: {
           id: 1,
@@ -257,14 +286,14 @@ describe('Order Inquiry Lifecycles', () => {
           phone: '(555) 123-4567',
           businessLicense: 'CA-LIC-123456',
         },
-        total_weight: 10,
-        weight_unit: 'g',
+        total_weight: 0.022,
+        weight_unit: 'lb',
         createdAt: '2026-01-13T10:00:00.000Z',
       })
 
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterCreate(mockEvent)
 
       // Verify email was called with correct data including calculated price
       expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
@@ -278,8 +307,8 @@ describe('Order Inquiry Lifecycles', () => {
       )
     })
 
-    it('falls back to tiered pricing when base_price_per_gram not available', async () => {
-      // Set up mock without base_price_per_gram
+    it('falls back to tiered pricing when base_price_per_pound not available', async () => {
+      // Set up mock without base_price_per_pound
       mockStrapi.db.query().findOne.mockResolvedValueOnce({
         id: 1,
         inquiry_number: 'INQ-20260113-1234',
@@ -300,14 +329,14 @@ describe('Order Inquiry Lifecycles', () => {
           phone: '(555) 123-4567',
           businessLicense: 'CA-LIC-123456',
         },
-        total_weight: 7,
-        weight_unit: 'g',
+        total_weight: 0.015,
+        weight_unit: 'lb',
         createdAt: '2026-01-13T10:00:00.000Z',
       })
 
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
+      await lifecycles.afterCreate(mockEvent)
 
       // Verify email was called with correct tiered pricing
       expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
@@ -315,48 +344,6 @@ describe('Order Inquiry Lifecycles', () => {
           items: expect.arrayContaining([
             expect.objectContaining({
               unitPrice: 50.00, // Matched 7g tier
-            }),
-          ]),
-        })
-      )
-    })
-
-    it('converts weight units correctly for price calculation', async () => {
-      // Set up mock for oz weight
-      mockStrapi.db.query().findOne.mockResolvedValueOnce({
-        id: 1,
-        inquiry_number: 'INQ-20260113-1234',
-        product: {
-          id: 1,
-          name: 'Test Product',
-          base_price_per_gram: 7.14,
-          pricing_model: 'per_gram',
-        },
-        customer: {
-          id: 1,
-          email: 'customer@test.com',
-          firstName: 'John',
-          lastName: 'Doe',
-          company: 'Test Company',
-          phone: '(555) 123-4567',
-          businessLicense: 'CA-LIC-123456',
-        },
-        total_weight: 1,
-        weight_unit: 'oz',
-        createdAt: '2026-01-13T10:00:00.000Z',
-      })
-
-      mockEvent.result.inquiry_number = 'INQ-20260113-1234'
-
-      await lifecycles.afterCreate({ strapi: mockStrapi, event: mockEvent })
-
-      // Verify email was called with correct converted price
-      // 1 oz = 28.35 grams, so 7.14 * 28.35 = 202.419
-      expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
-        expect.objectContaining({
-          items: expect.arrayContaining([
-            expect.objectContaining({
-              unitPrice: expect.closeTo(202.42, 0.1),
             }),
           ]),
         })

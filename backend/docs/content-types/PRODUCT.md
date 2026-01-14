@@ -17,7 +17,7 @@ Content type for cannabis product catalog. Supports multiple pricing tiers, prod
 |------------|------|----------|--------|---------|-------|
 | name | Text (Short) | Yes | No | - | Product name (e.g., "9 Pound Hammer") |
 | sku | Text (Short) | Yes | Yes | - | Product SKU (e.g., "302") |
-| category | Enumeration | Yes | No | - | Values: Indica, Hybrid, Sativa |
+| category | Enumeration | Yes | No | - | Values: Indica, Hybrid |
 | tagline | Text (Short) | No | No | - | Short marketing tagline |
 | description | Text (Long) | Yes | No | - | Product description (paragraph) |
 | full_description | Rich Text | No | No | - | Detailed product description with formatting |

@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "inventories",
+  "info": {
+    "singularName": "inventory",
+    "pluralName": "inventories",
+    "displayName": "Inventory",
+    "description": "Product inventory management for admin users"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "required": true
+    },
+    "quantity_in_stock": {
+      "type": "decimal",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "unit": {
+      "type": "enumeration",
+      "enum": ["lb"],
+      "default": "lb",
+      "required": true
+    },
+    "reorder_point": {
+      "type": "decimal",
+      "default": 10,
+      "min": 0
+    },
+    "reorder_quantity": {
+      "type": "decimal",
+      "default": 50,
+      "min": 0
+    },
+    "location": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "batch_number": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "expiration_date": {
+      "type": "date"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "last_restocked_at": {
+      "type": "datetime"
+    },
+    "last_restocked_by": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "admin::user"
+    }
+  }
+}

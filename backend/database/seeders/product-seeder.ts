@@ -228,19 +228,21 @@ export async function seedProducts(strapi: Strapi) {
         currency: p.currency,
       }));
 
-      // Calculate base_price_per_gram from the smallest weight tier
-      // This provides a reasonable per-gram price for any weight
-      let basePricePerGram = 0;
+      // Calculate base_price_per_pound from the smallest weight tier
+      // This provides a reasonable per-pound price for any weight
+      let basePricePerPound = 0;
       if (pricingComponents.length > 0) {
-        // Find the 7g pricing (smallest tier) to calculate per-gram price
+        // Find the 7g pricing (smallest tier) to calculate per-pound price
         const smallestTier = pricingComponents.find(p => p.weight === '7g');
         if (smallestTier) {
-          basePricePerGram = parseFloat((smallestTier.amount / 7).toFixed(2));
+          // 7g = 0.015432 lb, so price per pound = price per 7g / 0.015432
+          basePricePerPound = parseFloat((smallestTier.amount / 0.015432).toFixed(2));
         } else {
           // Fallback: use first available tier
           const firstTier = pricingComponents[0];
           const grams = parseInt(firstTier.weight.replace('g', ''));
-          basePricePerGram = parseFloat((firstTier.amount / grams).toFixed(2));
+          const pounds = grams / 453.592; // Convert grams to pounds
+          basePricePerPound = parseFloat((firstTier.amount / pounds).toFixed(2));
         }
       }
 
@@ -257,7 +259,7 @@ export async function seedProducts(strapi: Strapi) {
             name: product.name,
             sku: sanitizedSKU,
             // Category is validated above with isValidCategory(), safe to assert
-            category: product.category as 'Indica' | 'Hybrid' | 'Sativa',
+            category: product.category as 'Indica' | 'Hybrid',
             tagline: product.tagline || null,
             description: product.description || '',
             full_description: product.full_description || null,
@@ -270,8 +272,8 @@ export async function seedProducts(strapi: Strapi) {
             featured: false,
             sort_order: 0,
             pricing: pricingComponents as any,
-            base_price_per_gram: basePricePerGram,
-            pricing_model: 'per_gram',
+            base_price_per_pound: basePricePerPound,
+            pricing_model: 'per_pound',
             features,
             images: imageIds.length > 0 ? imageIds : undefined,
             customization_enabled: true,

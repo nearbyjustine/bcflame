@@ -17,22 +17,15 @@ function formatOrderDataForEmail(inquiry: any) {
   const customer = inquiry.customer || {}
   const product = inquiry.product || {}
 
-  // Calculate unit price from base_price_per_gram
+  // Calculate unit price from base_price_per_pound
   let unitPrice = 0
-  if (product.base_price_per_gram) {
-    // Convert weight to grams if needed
-    let weightInGrams = inquiry.total_weight
-    if (inquiry.weight_unit === 'oz') {
-      weightInGrams = inquiry.total_weight * 28.35
-    } else if (inquiry.weight_unit === 'lb') {
-      weightInGrams = inquiry.total_weight * 453.592
-    }
-    // Note: assuming weight_unit is 'g' if not oz or lb
-
-    unitPrice = product.base_price_per_gram * weightInGrams
+  if (product.base_price_per_pound) {
+    // Weight is always in pounds now
+    const weightInPounds = inquiry.total_weight
+    unitPrice = product.base_price_per_pound * weightInPounds
   }
 
-  // Fallback to tiered pricing if base_price_per_gram not set (backward compatibility)
+  // Fallback to tiered pricing if base_price_per_pound not set (backward compatibility)
   if (unitPrice === 0 && product.pricing && Array.isArray(product.pricing)) {
     const orderWeight = `${inquiry.total_weight}${inquiry.weight_unit}`
     const matchingPrice = product.pricing.find(
@@ -92,29 +85,29 @@ export default {
     // In Strapi 4 lifecycles, use requestContext to access HTTP context
     if (!data.customer) {
       // Try getting user from Strapi's request context (populated by middleware)
-      const requestContext = strapi.requestContext?.get?.()
+      const requestContext = event.strapi.requestContext?.get?.()
       const user = requestContext?.state?.user
       
       if (user?.id) {
         data.customer = user.id
-        strapi.log.info(`beforeCreate - Customer set from requestContext: ${user.id}`)
+        event.strapi.log.info(`beforeCreate - Customer set from requestContext: ${user.id}`)
       } else {
-        strapi.log.warn('beforeCreate - No user found in requestContext')
+        event.strapi.log.warn('beforeCreate - No user found in requestContext')
       }
     }
 
-    strapi.log.debug(`beforeCreate - Final customer ID: ${data.customer || 'NOT SET'}`)
+    event.strapi.log.debug(`beforeCreate - Final customer ID: ${data.customer || 'NOT SET'}`)
   },
 
   /**
    * Before update - store previous status for comparison
    */
   async beforeUpdate(event: any) {
-    const { id } = event.params.where || {}
+    const { id } = event.params?.where || {}
 
     if (id) {
       // Fetch current record to get previous status
-      const currentRecord = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+      const currentRecord = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id },
         select: ['status'],
       })
@@ -133,16 +126,16 @@ export default {
     const { result } = event
 
     try {
-      strapi.log.debug('afterCreate - result object:', JSON.stringify(result, null, 2))
+      event.strapi.log.debug('afterCreate - result object:', JSON.stringify(result, null, 2))
 
       // First fetch without populate to see the raw customer ID
-      const rawInquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+      const rawInquiry = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id: result.id },
       })
-      strapi.log.debug('Raw inquiry (no populate):', JSON.stringify(rawInquiry, null, 2))
+      event.strapi.log.debug('Raw inquiry (no populate):', JSON.stringify(rawInquiry, null, 2))
 
       // Fetch full inquiry data with relations using db.query for better control
-      const inquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+      const inquiry = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id: result.id },
         populate: {
           customer: true,
@@ -153,29 +146,29 @@ export default {
       })
 
       if (!inquiry) {
-        strapi.log.warn('Order inquiry not found after creation:', result.id)
+        event.strapi.log.warn('Order inquiry not found after creation:', result.id)
         return
       }
 
       // If customer wasn't populated, fetch it separately using the raw customer ID
       if (!inquiry.customer && rawInquiry.customer) {
         const customerId = typeof rawInquiry.customer === 'object' ? rawInquiry.customer.id : rawInquiry.customer
-        strapi.log.debug('Fetching customer separately with ID:', customerId)
-        inquiry.customer = await strapi.db.query('plugin::users-permissions.user').findOne({
+        event.strapi.log.debug('Fetching customer separately with ID:', customerId)
+        inquiry.customer = await event.strapi.db.query('plugin::users-permissions.user').findOne({
           where: { id: customerId },
         })
       }
 
-      strapi.log.info(`Order inquiry created: ${inquiry.inquiry_number}`)
-      strapi.log.debug('Full inquiry object:', JSON.stringify(inquiry, null, 2))
-      strapi.log.debug('Customer data:', JSON.stringify(inquiry.customer, null, 2))
+      event.strapi.log.info(`Order inquiry created: ${inquiry.inquiry_number}`)
+      event.strapi.log.debug('Full inquiry object:', JSON.stringify(inquiry, null, 2))
+      event.strapi.log.debug('Customer data:', JSON.stringify(inquiry.customer, null, 2))
 
       // Get email service - with defensive check for configuration
       let emailService
       try {
         emailService = getEmailService()
       } catch (emailConfigError) {
-        strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
+        event.strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
         return
       }
 
@@ -183,7 +176,7 @@ export default {
       const orderData = formatOrderDataForEmail(inquiry)
 
       // Send email to admin
-      const adminRecipients = strapi.config.get('email.adminRecipients', ['admin@bcflame.com'])
+      const adminRecipients = event.strapi.config.get('email.adminRecipients', ['admin@bcflame.com'])
       const adminEmail = generateNewOrderEmailForAdmin(orderData)
 
       const adminResult = await emailService.sendEmail({
@@ -194,9 +187,9 @@ export default {
       })
 
       if (!adminResult.success) {
-        strapi.log.error('Failed to send admin notification email:', adminResult.error)
+        event.strapi.log.error('Failed to send admin notification email:', adminResult.error)
       } else {
-        strapi.log.info('Admin notification email sent successfully:', adminResult.messageId)
+        event.strapi.log.info('Admin notification email sent successfully:', adminResult.messageId)
       }
 
       // Send confirmation email to customer
@@ -211,13 +204,13 @@ export default {
         })
 
         if (!customerResult.success) {
-          strapi.log.error('Failed to send customer confirmation email:', customerResult.error)
+          event.strapi.log.error('Failed to send customer confirmation email:', customerResult.error)
         } else {
-          strapi.log.info('Customer confirmation email sent successfully:', customerResult.messageId)
+          event.strapi.log.info('Customer confirmation email sent successfully:', customerResult.messageId)
         }
       }
     } catch (error) {
-      strapi.log.error('Error in afterCreate lifecycle:', error)
+      event.strapi.log.error('Error in afterCreate lifecycle:', error)
       // Don't throw - we don't want to fail the creation if email fails
     }
   },
@@ -235,7 +228,7 @@ export default {
       // Only send email if status changed
       if (previousStatus && newStatus && previousStatus !== newStatus) {
         // Fetch full inquiry data with relations using db.query for better control
-        const inquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+        const inquiry = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
           where: { id: result.id },
           populate: {
             customer: true,
@@ -246,20 +239,20 @@ export default {
         })
 
         if (!inquiry) {
-          strapi.log.warn('Order inquiry not found:', result.id)
+          event.strapi.log.warn('Order inquiry not found:', result.id)
           return
         }
 
         // If customer wasn't populated, fetch it separately
         if (!inquiry.customer && result.customer) {
           const customerId = typeof result.customer === 'object' ? result.customer.id : result.customer
-          inquiry.customer = await strapi.db.query('plugin::users-permissions.user').findOne({
+          inquiry.customer = await event.strapi.db.query('plugin::users-permissions.user').findOne({
             where: { id: customerId },
           })
         }
 
         if (!inquiry.customer?.email) {
-          strapi.log.warn('Cannot send status update email - customer email not found')
+          event.strapi.log.warn('Cannot send status update email - customer email not found')
           return
         }
 
@@ -268,7 +261,7 @@ export default {
         try {
           emailService = getEmailService()
         } catch (emailConfigError) {
-          strapi.log.warn('Email service not configured, skipping status update email:', emailConfigError)
+          event.strapi.log.warn('Email service not configured, skipping status update email:', emailConfigError)
           return
         }
 
@@ -291,13 +284,13 @@ export default {
         })
 
         if (!emailResult.success) {
-          strapi.log.error('Failed to send status update email:', emailResult.error)
+          event.strapi.log.error('Failed to send status update email:', emailResult.error)
         } else {
-          strapi.log.info('Status update email sent successfully:', emailResult.messageId)
+          event.strapi.log.info('Status update email sent successfully:', emailResult.messageId)
         }
       }
     } catch (error) {
-      strapi.log.error('Error in afterUpdate lifecycle:', error)
+      event.strapi.log.error('Error in afterUpdate lifecycle:', error)
       // Don't throw - we don't want to fail the update if email fails
     }
   },
