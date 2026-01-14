@@ -2,22 +2,7 @@
 
 import React from 'react';
 import { Palette, Type, Upload } from 'lucide-react';
-
-interface BackgroundStyle {
-  id: number;
-  attributes: {
-    name: string;
-    description?: string;
-  };
-}
-
-interface FontStyle {
-  id: number;
-  attributes: {
-    name: string;
-    description?: string;
-  };
-}
+import type { BackgroundStyle, FontStyle } from '@/types/customization';
 
 interface BackgroundFontSelectorProps {
   backgrounds: BackgroundStyle[];
@@ -115,9 +100,6 @@ export default function BackgroundFontSelector({
               }`}
             >
               <div className="font-semibold">{bg.attributes.name}</div>
-              {bg.attributes.description && (
-                <div className="text-sm text-neutral-600 mt-1">{bg.attributes.description}</div>
-              )}
             </button>
           ))}
         </div>
@@ -145,9 +127,6 @@ export default function BackgroundFontSelector({
               }`}
             >
               <div className="font-semibold">{font.attributes.name}</div>
-              {font.attributes.description && (
-                <div className="text-sm text-neutral-600 mt-1">{font.attributes.description}</div>
-              )}
             </button>
           ))}
         </div>

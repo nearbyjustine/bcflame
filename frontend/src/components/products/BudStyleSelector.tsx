@@ -1,16 +1,7 @@
 'use client';
 
 import React from 'react';
-
-interface BudStyle {
-  id: number;
-  attributes: {
-    name: string;
-    category: string;
-    description?: string;
-    image?: { data: { attributes: { url: string } } };
-  };
-}
+import type { BudStyle } from '@/types/customization';
 
 interface BudStyleSelectorProps {
   budStyles: BudStyle[];

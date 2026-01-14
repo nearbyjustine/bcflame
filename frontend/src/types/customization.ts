@@ -1,4 +1,4 @@
-import type { StrapiImage } from './product';
+import type { ProductImage } from './product';
 
 export interface BudStyle {
   id: number;
@@ -6,7 +6,7 @@ export interface BudStyle {
     name: string;
     category: 'trim_quality' | 'flower_grade' | 'visual_style';
     description?: string;
-    image?: { data: StrapiImage | null };
+    image?: { data: ProductImage | null };
     sort_order: number;
     createdAt: string;
     updatedAt: string;
@@ -20,7 +20,7 @@ export interface BackgroundStyle {
     name: string;
     type: 'solid_color' | 'gradient' | 'texture' | 'image';
     color_hex?: string;
-    preview_image?: { data: StrapiImage | null };
+    preview_image?: { data: ProductImage | null };
     sort_order: number;
     createdAt: string;
     updatedAt: string;
@@ -34,7 +34,7 @@ export interface FontStyle {
     name: string;
     font_family: string;
     category: 'sans_serif' | 'serif' | 'display' | 'script';
-    preview_image?: { data: StrapiImage | null };
+    preview_image?: { data: ProductImage | null };
     sort_order: number;
     createdAt: string;
     updatedAt: string;
@@ -51,7 +51,7 @@ export interface PreBaggingOption {
     available_weights: string[];
     unit_size: number;
     unit_size_unit: string;
-    image?: { data: StrapiImage | null };
+    image?: { data: ProductImage | null };
     sort_order: number;
     createdAt: string;
     updatedAt: string;
