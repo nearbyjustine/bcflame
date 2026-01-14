@@ -26,8 +26,11 @@ COPY --from=builder --chown=strapi:nodejs /app/public ./public
 COPY --from=builder --chown=strapi:nodejs /app/package*.json ./
 COPY --from=builder --chown=strapi:nodejs /app/config ./config
 COPY --from=builder --chown=strapi:nodejs /app/src ./src
+COPY --from=builder --chown=strapi:nodejs /app/database ./database
+COPY --from=builder --chown=strapi:nodejs /app/start-production.sh ./start-production.sh
+RUN chmod +x ./start-production.sh
 USER strapi
 EXPOSE 1337
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:1337/_health || exit 1
-CMD ["npm", "run", "start"]
+CMD ["./start-production.sh"]
