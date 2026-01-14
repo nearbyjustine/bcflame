@@ -6,21 +6,21 @@ export default (config, { strapi }) => {
   return async (ctx, next) => {
     strapi.log.debug('🔥 REQUIRE-AUTH MIDDLEWARE - START');
     
+    // Use ctx.request.header (singular) - Koa's preferred accessor
+    // Also try ctx.headers as fallback
+    const authHeader = ctx.request.header.authorization || ctx.headers?.authorization;
+    
+    strapi.log.debug(`🔥 Authorization header present: ${!!authHeader}`);
+    
+    if (!authHeader) {
+      strapi.log.warn('🔥 No Authorization header found in request');
+      return ctx.unauthorized('No authorization token was found');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    strapi.log.debug(`🔥 Token extracted (first 30 chars): ${token.substring(0, 30)}...`);
+
     try {
-      // Use ctx.request.header (singular) - Koa's preferred accessor
-      // Also try ctx.headers as fallback
-      const authHeader = ctx.request.header.authorization || ctx.headers?.authorization;
-      
-      strapi.log.debug(`🔥 Authorization header present: ${!!authHeader}`);
-      
-      if (!authHeader) {
-        strapi.log.warn('🔥 No Authorization header found in request');
-        return ctx.unauthorized('No authorization token was found');
-      }
-
-      const token = authHeader.replace('Bearer ', '');
-      strapi.log.debug(`🔥 Token extracted (first 30 chars): ${token.substring(0, 30)}...`);
-
       // If user is not already populated by Strapi's built-in auth, verify manually
       if (!ctx.state.user) {
         strapi.log.debug('🔥 ctx.state.user not set, verifying JWT manually...');
@@ -46,11 +46,12 @@ export default (config, { strapi }) => {
       } else {
         strapi.log.debug(`🔥 ctx.state.user already set: ID=${ctx.state.user.id}`);
       }
-
-      await next();
     } catch (error) {
-      strapi.log.error('🔥 Authentication middleware error:', error.message);
+      strapi.log.error('🔥 JWT verification error:', error.message);
       return ctx.unauthorized('Invalid token');
     }
+
+    // Call next middleware/controller - errors here should propagate naturally
+    await next();
   };
 };

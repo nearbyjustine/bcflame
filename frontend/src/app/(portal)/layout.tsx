@@ -1,13 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Menu } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { CartDrawer } from '@/components/layout/CartDrawer';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 export default function PortalLayout({
   children,
@@ -17,6 +24,7 @@ export default function PortalLayout({
   const router = useRouter();
   const { user, logout, checkAuth, isLoading } = useAuthStore();
   const { setOpen, getItemCount } = useCartStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const itemCount = getItemCount();
 
@@ -51,6 +59,78 @@ export default function PortalLayout({
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">
+            {/* Mobile Hamburger Menu */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+                  aria-label="Open menu"
+                >
+                  <Menu className="w-6 h-6" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px]">
+                <SheetHeader>
+                  <SheetTitle className="text-left">BC Flame</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col space-y-4 mt-6">
+                  <a 
+                    href="/dashboard" 
+                    className="text-sm hover:text-primary py-2 border-b border-border"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </a>
+                  <a 
+                    href="/products" 
+                    className="text-sm hover:text-primary py-2 border-b border-border"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Products
+                  </a>
+                  <a 
+                    href="/media-hub" 
+                    className="text-sm hover:text-primary py-2 border-b border-border"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Media Hub
+                  </a>
+                  <a 
+                    href="/orders" 
+                    className="text-sm hover:text-primary py-2 border-b border-border"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Orders
+                  </a>
+                  <a 
+                    href="/inventory" 
+                    className="text-sm hover:text-primary py-2 border-b border-border"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Inventory
+                  </a>
+                </nav>
+                {/* Mobile User Info */}
+                <div className="mt-8 pt-4 border-t">
+                  <div className="text-sm mb-4">
+                    <p className="font-medium">{user?.companyName || user?.username}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full"
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+            
             <h1 className="text-2xl font-bold">BC Flame</h1>
             <div className="hidden md:flex space-x-4">
               <a href="/dashboard" className="text-sm hover:text-primary">Dashboard</a>
@@ -74,11 +154,11 @@ export default function PortalLayout({
                 </span>
               )}
             </button>
-            <div className="text-sm">
+            <div className="hidden md:block text-sm">
               <p className="font-medium">{user?.companyName || user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
+            <Button variant="outline" size="sm" onClick={handleLogout} className="hidden md:inline-flex">
               Sign Out
             </Button>
           </div>

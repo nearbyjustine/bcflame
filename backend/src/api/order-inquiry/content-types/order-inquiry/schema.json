@@ -66,8 +66,8 @@
     },
     "weight_unit": {
       "type": "enumeration",
-      "enum": ["lb"],
-      "default": "lb",
+      "enum": ["g", "oz", "lb"],
+      "default": "g",
       "required": true
     }
   }
