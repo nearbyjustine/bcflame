@@ -161,8 +161,28 @@ export async function seedProducts(strapi: Strapi) {
   console.log('🌱 Starting product seeder...');
 
   try {
-    // Read scraped data
-    const scrapedDataPath = path.join(strapi.dirs.app.root, '..', 'bcflame-scrape.json');
+    // Read scraped data - check multiple possible locations
+    const possiblePaths = [
+      path.join(strapi.dirs.app.root, 'bcflame-scrape.json'),
+      path.join(strapi.dirs.app.root, '..', 'bcflame-scrape.json'),
+      path.join(__dirname, '..', '..', '..', 'bcflame-scrape.json'),
+      '/app/bcflame-scrape.json',
+    ];
+    
+    let scrapedDataPath = '';
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        scrapedDataPath = p;
+        break;
+      }
+    }
+    
+    if (!scrapedDataPath) {
+      console.log('⚠️  bcflame-scrape.json not found. Skipping product seeding.');
+      console.log('Searched paths:', possiblePaths);
+      return;
+    }
+    
     const scrapedData: ScrapedData = JSON.parse(
       fs.readFileSync(scrapedDataPath, 'utf-8')
     );

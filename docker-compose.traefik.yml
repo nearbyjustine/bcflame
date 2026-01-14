@@ -23,6 +23,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       target: production
+      args:
+        PUBLIC_URL: ${PUBLIC_URL:-https://api-bcflame.hows-tine.com}
     image: bcflame-strapi-prod
     container_name: bcflame_strapi
     restart: always
