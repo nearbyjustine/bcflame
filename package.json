@@ -22,5 +22,8 @@
     "nextjs",
     "client-portal"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
 }

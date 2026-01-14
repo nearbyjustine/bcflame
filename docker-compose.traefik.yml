@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -72,8 +70,8 @@ services:
       start_period: 60s
     labels:
       - "traefik.enable=true"
-      # Router for API/Admin
-      - "traefik.http.routers.bcflame-api.rule=Host(`api.bcflame.localhost`) || Host(`${API_DOMAIN:-api.bcflame.hows-tine.com}`)"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.bcflame-api.rule=Host(`api.bcflame.localhost`) || Host(`api.bcflame.hows-tine.com`)"
       - "traefik.http.routers.bcflame-api.entrypoints=web"
       - "traefik.http.services.bcflame-api.loadbalancer.server.port=1337"
       # Force HTTPS headers
@@ -110,8 +108,8 @@ services:
       start_period: 30s
     labels:
       - "traefik.enable=true"
-      # Router for Frontend
-      - "traefik.http.routers.bcflame-web.rule=Host(`bcflame.localhost`) || Host(`www.bcflame.localhost`) || Host(`${FRONTEND_DOMAIN:-bcflame.hows-tine.com}`) || Host(`www.${FRONTEND_DOMAIN:-bcflame.hows-tine.com}`)"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.bcflame-web.rule=Host(`bcflame.localhost`) || Host(`bcflame.hows-tine.com`)"
       - "traefik.http.routers.bcflame-web.entrypoints=web"
       - "traefik.http.services.bcflame-web.loadbalancer.server.port=3000"
       # Force HTTPS headers
