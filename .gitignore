@@ -67,3 +67,4 @@ nginx/ssl/*.crt
 backups/
 *.backup
 *.bak
+.env.traefik
