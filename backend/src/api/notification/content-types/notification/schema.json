@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notifications",
+  "info": {
+    "singularName": "notification",
+    "pluralName": "notifications",
+    "displayName": "Notification",
+    "description": "Admin notifications for orders, stock alerts, and system events"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": ["new_order", "low_stock", "payment_received", "order_status_changed", "system"],
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "message": {
+      "type": "text"
+    },
+    "isRead": {
+      "type": "boolean",
+      "default": false
+    },
+    "relatedOrder": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::order-inquiry.order-inquiry"
+    },
+    "relatedProduct": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product"
+    },
+    "adminUser": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "link": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "metadata": {
+      "type": "json"
+    }
+  }
+}

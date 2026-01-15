@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "campaign_kits",
+  "info": {
+    "singularName": "campaign-kit",
+    "pluralName": "campaign-kits",
+    "displayName": "Campaign Kit",
+    "description": "Curated bundles of media assets for marketing campaigns"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text"
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "assets": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::media-asset.media-asset"
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

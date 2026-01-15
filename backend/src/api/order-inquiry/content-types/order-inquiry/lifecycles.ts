@@ -198,6 +198,23 @@ export default {
         strapi.log.info('Admin notification email sent successfully:', adminResult.messageId)
       }
 
+      // Create admin notification for new order
+      try {
+        await strapi.entityService.create('api::notification.notification', {
+          data: {
+            type: 'new_order',
+            title: `New Order: ${inquiry.inquiry_number || `#${result.id}`}`,
+            message: `${orderData.customerCompany || orderData.customerName} placed a new order`,
+            isRead: false,
+            relatedOrder: result.id,
+            link: `/admin-portal/orders/${result.id}`,
+          },
+        });
+        strapi.log.info(`Created admin notification for order ${inquiry.inquiry_number}`);
+      } catch (notifError) {
+        strapi.log.warn('Failed to create admin notification:', notifError);
+      }
+
       // Send confirmation email to customer
       if (inquiry.customer?.email) {
         const customerEmail = generateNewOrderEmailForCustomer(orderData)

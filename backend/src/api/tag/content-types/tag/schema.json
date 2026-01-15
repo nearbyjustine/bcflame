@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tags",
+  "info": {
+    "singularName": "tag",
+    "pluralName": "tags",
+    "displayName": "Tag",
+    "description": "Tags for organizing media assets"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 100
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name"
+    },
+    "mediaAssets": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::media-asset.media-asset",
+      "mappedBy": "tags"
+    }
+  }
+}

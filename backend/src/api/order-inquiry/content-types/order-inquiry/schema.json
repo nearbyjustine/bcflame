@@ -69,6 +69,24 @@
       "enum": ["g", "oz", "lb"],
       "default": "g",
       "required": true
+    },
+    "invoice": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::invoice.invoice",
+      "mappedBy": "order"
+    },
+    "paymentStatus": {
+      "type": "enumeration",
+      "enum": ["unpaid", "partial", "paid"],
+      "default": "unpaid"
+    },
+    "adminNotes": {
+      "type": "text"
+    },
+    "shippingTrackingNumber": {
+      "type": "string",
+      "maxLength": 100
     }
   }
 }

@@ -104,6 +104,12 @@
       "required": false,
       "minLength": 1,
       "maxLength": 100
+    },
+    "userType": {
+      "type": "enumeration",
+      "enum": ["reseller", "admin"],
+      "default": "reseller",
+      "required": false
     }
   }
 }

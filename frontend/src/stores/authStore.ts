@@ -11,6 +11,7 @@ interface User {
   companyName?: string;
   partnerStatus?: 'pending' | 'active' | 'suspended';
   partnerTier?: 'standard' | 'premium' | 'elite';
+  userType?: 'reseller' | 'admin';
 }
 
 interface AuthState {

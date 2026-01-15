@@ -103,6 +103,7 @@ export default function PortalLayout({
                   >
                     Orders
                   </a>
+                  {/* Inventory hidden - will be admin-only feature
                   <a 
                     href="/inventory" 
                     className="text-sm hover:text-primary py-2 border-b border-border"
@@ -110,6 +111,7 @@ export default function PortalLayout({
                   >
                     Inventory
                   </a>
+                  */}
                 </nav>
                 {/* Mobile User Info */}
                 <div className="mt-8 pt-4 border-t">
@@ -138,7 +140,8 @@ export default function PortalLayout({
               <a href="/products" className="text-sm hover:text-primary">Products</a>
               <a href="/media-hub" className="text-sm hover:text-primary">Media Hub</a>
               <a href="/orders" className="text-sm hover:text-primary">Orders</a>
-              <a href="/inventory" className="text-sm hover:text-primary">Inventory</a>
+              {/* Inventory hidden - will be admin-only feature */}
+              {/* <a href="/inventory" className="text-sm hover:text-primary">Inventory</a> */}
             </div>
           </div>
           <div className="flex items-center space-x-4">

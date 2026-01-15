@@ -1,0 +1,76 @@
+{
+  "kind": "collectionType",
+  "collectionName": "media_assets",
+  "info": {
+    "singularName": "media-asset",
+    "pluralName": "media-assets",
+    "displayName": "Media Asset",
+    "description": "Marketing assets, product photos, and brand materials for resellers"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "product_photos",
+        "marketing_materials",
+        "packaging_templates",
+        "brand_guidelines"
+      ],
+      "required": true,
+      "default": "product_photos"
+    },
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ]
+    },
+    "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag",
+      "inversedBy": "mediaAssets"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product.product"
+    },
+    "downloadCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "fileSize": {
+      "type": "biginteger"
+    },
+    "fileType": {
+      "type": "string",
+      "maxLength": 50
+    }
+  }
+}

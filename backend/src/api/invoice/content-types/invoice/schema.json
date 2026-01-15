@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "invoices",
+  "info": {
+    "singularName": "invoice",
+    "pluralName": "invoices",
+    "displayName": "Invoice",
+    "description": "Invoices for order inquiries"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "invoiceNumber": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 50
+    },
+    "order": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::order-inquiry.order-inquiry",
+      "inversedBy": "invoice"
+    },
+    "subtotal": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "tax": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    },
+    "total": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "dueDate": {
+      "type": "date"
+    },
+    "paidDate": {
+      "type": "date"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["draft", "sent", "paid", "overdue"],
+      "default": "draft"
+    },
+    "lineItems": {
+      "type": "json"
+    },
+    "pdfUrl": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "billingAddress": {
+      "type": "json"
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}
