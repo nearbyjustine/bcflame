@@ -2,13 +2,28 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getProducts, type GetProductsParams } from '@/lib/api/products';
-import { ProductCard } from '@/components/products/ProductCard';
+import { getInventory } from '@/lib/api/inventory';
+import { ProductCard, type StockStatus } from '@/components/products/ProductCard';
 import { CustomizationModal } from '@/components/products/CustomizationModal';
 import { FilterPanel } from '@/components/products/FilterPanel';
 import type { Product } from '@/types/product';
+import type { Inventory } from '@/types/inventory';
+
+function getStockStatus(productId: number, inventory: Inventory[]): StockStatus {
+  const items = inventory.filter((i) => i.attributes.product?.data?.id === productId);
+  if (items.length === 0) return 'out_of_stock';
+
+  const totalStock = items.reduce((sum, i) => sum + i.attributes.quantity_in_stock, 0);
+  const maxReorderPoint = Math.max(...items.map((i) => i.attributes.reorder_point));
+
+  if (totalStock <= 0) return 'out_of_stock';
+  if (totalStock <= maxReorderPoint) return 'low_stock';
+  return 'in_stock';
+}
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [inventory, setInventory] = useState<Inventory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [customizingProductId, setCustomizingProductId] = useState<number | null>(null);
@@ -27,8 +42,12 @@ export default function ProductsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await getProducts(filters);
-      setProducts(response.data);
+      const [productsResponse, inventoryResponse] = await Promise.all([
+        getProducts(filters),
+        getInventory(),
+      ]);
+      setProducts(productsResponse.data);
+      setInventory(inventoryResponse.data);
     } catch (err) {
       setError('Failed to load products. Please try again later.');
       console.error('Error fetching products:', err);
@@ -110,6 +129,7 @@ export default function ProductsPage() {
                   <ProductCard
                     key={product.id}
                     product={product}
+                    stockStatus={getStockStatus(product.id, inventory)}
                     onCustomize={() => handleCustomize(product.id)}
                   />
                 ))}

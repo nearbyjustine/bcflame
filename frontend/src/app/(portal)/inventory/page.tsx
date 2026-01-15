@@ -4,35 +4,13 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Package, Plus, Search, AlertTriangle } from 'lucide-react';
-
-interface InventoryItem {
-  id: number;
-  attributes: {
-    product: {
-      data: {
-        id: number;
-        attributes: {
-          name: string;
-          sku: string;
-        };
-      };
-    };
-    quantity_in_stock: number;
-    unit: string;
-    reorder_point: number;
-    location?: string;
-    batch_number?: string;
-    expiration_date?: string;
-    notes?: string;
-    last_restocked_at?: string;
-  };
-}
+import { getInventory } from '@/lib/api/inventory';
+import type { Inventory } from '@/types/inventory';
 
 export default function InventoryPage() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [inventory, setInventory] = useState<Inventory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -43,14 +21,8 @@ export default function InventoryPage() {
   const fetchInventory = async () => {
     try {
       setIsLoading(true);
-      // TODO: Implement actual API call when inventory endpoint is ready
-      // const response = await fetch('/api/inventories?populate=product');
-      // const data = await response.json();
-      // setInventory(data.data);
-      
-      // Mock data for now
-      setInventory([]);
-      toast.info('Connect to backend API to load inventory data');
+      const response = await getInventory();
+      setInventory(response.data);
     } catch (error) {
       console.error('Error fetching inventory:', error);
       toast.error('Failed to load inventory data');

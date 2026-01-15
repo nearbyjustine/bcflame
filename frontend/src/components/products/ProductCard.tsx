@@ -7,9 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getImageUrl, getImageAlt } from '@/lib/utils/image';
 
+export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+
 interface ProductCardProps {
   product: Product;
   onCustomize?: () => void;
+  stockStatus?: StockStatus;
 }
 
 const getCategoryStyles = (category: 'Indica' | 'Hybrid') => {
@@ -27,7 +30,29 @@ const formatPrice = (price: number, currency = 'USD'): string => {
   }).format(price);
 };
 
-export function ProductCard({ product, onCustomize }: ProductCardProps) {
+const getStockBadge = (status?: StockStatus) => {
+  if (!status) return null;
+
+  const styles = {
+    in_stock: 'bg-green-500 text-white',
+    low_stock: 'bg-orange-500 text-white',
+    out_of_stock: 'bg-red-500 text-white',
+  };
+
+  const labels = {
+    in_stock: 'In Stock',
+    low_stock: 'Low Stock',
+    out_of_stock: 'Out of Stock',
+  };
+
+  return (
+    <span className={`text-xs font-bold px-2 py-1 rounded ${styles[status]}`}>
+      {labels[status]}
+    </span>
+  );
+};
+
+export function ProductCard({ product, onCustomize, stockStatus }: ProductCardProps) {
   const { attributes } = product;
   const images = attributes.images?.data || [];
 
@@ -126,6 +151,7 @@ export function ProductCard({ product, onCustomize }: ProductCardProps) {
 
         {/* Badges */}
         <div className="absolute top-2 right-2 flex flex-col gap-2">
+          {getStockBadge(stockStatus)}
           {attributes.on_sale && (
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
               On Sale
