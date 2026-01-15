@@ -55,7 +55,8 @@ export default function PortalLayout({
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-right" />
-      <CartDrawer />
+      {/* CartDrawer hidden - code preserved for future use */}
+      {/* <CartDrawer /> */}
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">
@@ -141,19 +142,7 @@ export default function PortalLayout({
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Cart Icon */}
-            <button
-              onClick={handleOpenCart}
-              className="relative p-2 rounded-full hover:bg-muted transition-colors"
-              aria-label="Open cart"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
-                  {itemCount > 99 ? '99+' : itemCount}
-                </span>
-              )}
-            </button>
+            {/* Cart Icon - hidden, code preserved for future use */}
             <div className="hidden md:block text-sm">
               <p className="font-medium">{user?.companyName || user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>

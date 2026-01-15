@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getImageUrl, getImageAlt } from '@/lib/utils/image';
 
-export type StockStatus = 'in_stock' | 'low_stock' | 'out_of_stock';
+export type StockStatus = 'available' | 'unavailable';
 
 interface ProductCardProps {
   product: Product;
@@ -34,15 +34,13 @@ const getStockBadge = (status?: StockStatus) => {
   if (!status) return null;
 
   const styles = {
-    in_stock: 'bg-green-500 text-white',
-    low_stock: 'bg-orange-500 text-white',
-    out_of_stock: 'bg-red-500 text-white',
+    available: 'bg-green-500 text-white',
+    unavailable: 'bg-neutral-500 text-white',
   };
 
   const labels = {
-    in_stock: 'In Stock',
-    low_stock: 'Low Stock',
-    out_of_stock: 'Out of Stock',
+    available: 'Available',
+    unavailable: 'Currently Unavailable',
   };
 
   return (
@@ -231,7 +229,7 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
               className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:opacity-90 transition-opacity"
             >
               <Settings className="mr-2 h-4 w-4" />
-              Customize & Order
+              Customize
             </Button>
           </div>
         )}

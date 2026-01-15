@@ -9,6 +9,9 @@ import {
 // Access global strapi instance (Strapi 4 doesn't pass it in lifecycle events)
 declare const strapi: any
 
+/** Number of grams in one pound */
+const GRAMS_PER_POUND = 453.592
+
 /**
  * Format order data for email templates
  */
@@ -20,8 +23,11 @@ function formatOrderDataForEmail(inquiry: any) {
   // Calculate unit price from base_price_per_pound
   let unitPrice = 0
   if (product.base_price_per_pound) {
-    // Weight is always in pounds now
-    const weightInPounds = inquiry.total_weight
+    // Convert weight to pounds if needed (prebagging options are in grams)
+    let weightInPounds = inquiry.total_weight
+    if (inquiry.weight_unit === 'g') {
+      weightInPounds = inquiry.total_weight / GRAMS_PER_POUND
+    }
     unitPrice = product.base_price_per_pound * weightInPounds
   }
 

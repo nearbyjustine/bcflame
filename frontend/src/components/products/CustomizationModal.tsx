@@ -36,6 +36,7 @@ import type {
   PreBaggingOption,
 } from '@/types/customization'
 import { useCartStore } from '@/stores/cartStore'
+import { gramsToLbs } from '@/lib/utils/units'
 
 interface CustomizationModalProps {
   isOpen: boolean
@@ -168,16 +169,23 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
 
   // Calculate price and weight from selections
   const calculatePriceAndWeight = () => {
-    // Calculate total weight from pre-bagging selections
+    // Calculate total weight from pre-bagging selections (in the unit specified by unitSizeUnit)
     const totalWeight = preBaggingSelections.reduce((sum, selection) => {
       return sum + (selection.quantity * selection.unitSize)
     }, 0)
-    const weightUnit = preBaggingSelections[0]?.unitSizeUnit || 'lb'
+    const weightUnit = preBaggingSelections[0]?.unitSizeUnit || 'g'
 
     // Calculate price - use base_price_per_pound if available, otherwise first pricing tier
     let unitPrice = 0
     if (product.attributes.base_price_per_pound) {
-      unitPrice = product.attributes.base_price_per_pound * totalWeight
+      // Convert weight to pounds for price calculation if weight is in grams
+      if (weightUnit === 'g') {
+        const weightInPounds = gramsToLbs(totalWeight)
+        unitPrice = product.attributes.base_price_per_pound * weightInPounds
+      } else {
+        // Weight is already in pounds
+        unitPrice = product.attributes.base_price_per_pound * totalWeight
+      }
     } else if (product.attributes.pricing && product.attributes.pricing.length > 0) {
       unitPrice = product.attributes.pricing[0].amount || 0
     }
@@ -396,32 +404,22 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <>
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={isSubmitting}
-                  variant="outline"
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Add to Cart
-                </Button>
-                <Button
-                  onClick={handleOrderNow}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="mr-2 h-4 w-4" />
-                      Order Now
-                    </>
-                  )}
-                </Button>
-              </>
+              <Button
+                onClick={handleOrderNow}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="mr-2 h-4 w-4" />
+                    Submit Inquiry
+                  </>
+                )}
+              </Button>
             )}
           </div>
         </DialogFooter>

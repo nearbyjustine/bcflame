@@ -56,10 +56,10 @@ export function OrderConfirmationModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="w-5 h-5 text-primary" />
-            Confirm Your Order
+            Submit Inquiry
           </DialogTitle>
           <DialogDescription>
-            Please review your order details before confirming
+            Please review your customization selections before submitting
           </DialogDescription>
         </DialogHeader>
 
@@ -196,7 +196,7 @@ export function OrderConfirmationModal({
             ) : (
               <>
                 <Check className="w-4 h-4 mr-2" />
-                Confirm Order
+                Submit Inquiry
               </>
             )}
           </Button>

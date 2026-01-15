@@ -11,14 +11,10 @@ import type { Inventory } from '@/types/inventory';
 
 function getStockStatus(productId: number, inventory: Inventory[]): StockStatus {
   const items = inventory.filter((i) => i.attributes.product?.data?.id === productId);
-  if (items.length === 0) return 'out_of_stock';
+  if (items.length === 0) return 'unavailable';
 
   const totalStock = items.reduce((sum, i) => sum + i.attributes.quantity_in_stock, 0);
-  const maxReorderPoint = Math.max(...items.map((i) => i.attributes.reorder_point));
-
-  if (totalStock <= 0) return 'out_of_stock';
-  if (totalStock <= maxReorderPoint) return 'low_stock';
-  return 'in_stock';
+  return totalStock > 0 ? 'available' : 'unavailable';
 }
 
 export default function ProductsPage() {

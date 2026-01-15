@@ -62,8 +62,10 @@ const sampleUsers: SeedUser[] = [
 
 /**
  * Seed users into the database
+ * @param strapi - Strapi instance
+ * @param force - If true, delete existing seed users and recreate them
  */
-export async function seedUsers(strapi: Strapi): Promise<void> {
+export async function seedUsers(strapi: Strapi, force = false): Promise<void> {
   console.log('\n📋 Seeding Users...');
 
   try {
@@ -87,7 +89,18 @@ export async function seedUsers(strapi: Strapi): Promise<void> {
       },
     });
 
-    const existingUsernames = new Set(existingUsers.map((u: any) => u.username));
+    // If force mode, delete existing seed users first
+    if (force && existingUsers.length > 0) {
+      console.log('  🗑️  Force mode: Deleting existing seed users...');
+      for (const user of existingUsers) {
+        await strapi.query('plugin::users-permissions.user').delete({
+          where: { id: user.id },
+        });
+        console.log(`  🗑️  Deleted user: ${user.username}`);
+      }
+    }
+
+    const existingUsernames = force ? new Set<string>() : new Set(existingUsers.map((u: any) => u.username));
 
     let createdCount = 0;
     let skippedCount = 0;
@@ -101,16 +114,12 @@ export async function seedUsers(strapi: Strapi): Promise<void> {
       }
 
       try {
-        // Hash password using bcrypt directly
-        const bcrypt = require('bcryptjs');
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-        // Create user with profile fields
-        await strapi.query('plugin::users-permissions.user').create({
+        // Use entityService with plain password - Strapi auto-hashes 'password' type fields
+        await strapi.entityService.create('plugin::users-permissions.user', {
           data: {
             username: userData.username,
             email: userData.email,
-            password: hashedPassword,
+            password: userData.password,
             firstName: userData.firstName,
             lastName: userData.lastName,
             company: userData.company,
@@ -119,6 +128,7 @@ export async function seedUsers(strapi: Strapi): Promise<void> {
             confirmed: userData.confirmed,
             blocked: userData.blocked,
             role: authenticatedRole.id,
+            provider: 'local',
           },
         });
 
