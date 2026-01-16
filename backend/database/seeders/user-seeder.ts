@@ -120,6 +120,7 @@ export async function seedUsers(strapi: Strapi, force = false): Promise<void> {
             blocked: userData.blocked,
             role: authenticatedRole.id,
             provider: 'local',
+            userType: userData.userType,
           },
         });
 
