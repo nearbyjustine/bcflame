@@ -45,6 +45,7 @@ import {
   unpublishProduct,
   type ProductWithInventory,
 } from '@/lib/api/admin-products';
+import { getImageUrl } from '@/lib/utils/image';
 
 const categoryColors: Record<string, string> = {
   Indica: 'bg-purple-100 text-purple-800',
@@ -183,16 +184,15 @@ export default function AdminProductsPage() {
       header: 'Product',
       cell: ({ row }) => {
         const product = row.original;
-        const imageUrl = product.attributes.images?.data?.[0]?.attributes?.formats?.thumbnail?.url
-          || product.attributes.images?.data?.[0]?.attributes?.url;
-        const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+        const productImage = product.attributes.images?.data?.[0];
+        const imageUrl = getImageUrl(productImage);
 
         return (
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0">
               {imageUrl ? (
                 <img
-                  src={`${strapiUrl}${imageUrl}`}
+                  src={imageUrl}
                   alt={product.attributes.name}
                   className="h-full w-full object-cover"
                 />

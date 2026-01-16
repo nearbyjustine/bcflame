@@ -28,7 +28,7 @@ interface MediaAsset {
   downloadCount: number;
   fileSize?: number;
   fileType?: string;
-  createdAt?: string;
+  createdAt: string;
 }
 
 interface Tag {

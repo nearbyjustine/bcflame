@@ -4,7 +4,7 @@ interface MediaAsset {
   id: number;
   title: string;
   description?: string;
-  category: string;
+  category: 'product_photos' | 'marketing_materials' | 'packaging_templates' | 'brand_guidelines';
   file: {
     url: string;
     mime: string;
@@ -19,7 +19,7 @@ interface MediaAsset {
   downloadCount: number;
   fileSize?: number;
   fileType?: string;
-  createdAt?: string;
+  createdAt: string;
 }
 
 interface Tag {
