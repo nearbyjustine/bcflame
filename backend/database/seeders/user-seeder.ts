@@ -16,6 +16,7 @@ interface SeedUser {
   businessLicense: string;
   confirmed: boolean;
   blocked: boolean;
+  userType: 'reseller' | 'admin';
 }
 
 /**
@@ -26,37 +27,27 @@ const sampleUsers: SeedUser[] = [
     username: 'testuser',
     email: 'test@bcflame.com',
     password: 'Test1234!',
-    firstName: 'John',
-    lastName: 'Doe',
+    firstName: 'Reseller',
+    lastName: 'BCFlame',
     company: 'Green Valley Cannabis Co',
     phone: '(555) 123-4567',
     businessLicense: 'CA-LIC-123456',
     confirmed: true,
     blocked: false,
+    userType: 'reseller',
   },
   {
-    username: 'janesmith',
-    email: 'jane.smith@cannahealth.com',
+    username: 'testadmin',
+    email: 'admin@bcflame.com',
     password: 'Test1234!',
-    firstName: 'Jane',
-    lastName: 'Smith',
+    firstName: 'Admin',
+    lastName: 'BCFlame',
     company: 'CannaHealth Dispensary',
     phone: '(555) 234-5678',
     businessLicense: 'CA-LIC-234567',
     confirmed: true,
     blocked: false,
-  },
-  {
-    username: 'bobwilson',
-    email: 'bob@highlanddispensary.com',
-    password: 'Test1234!',
-    firstName: 'Bob',
-    lastName: 'Wilson',
-    company: 'Highland Dispensary',
-    phone: '(555) 345-6789',
-    businessLicense: 'CA-LIC-345678',
-    confirmed: true,
-    blocked: false,
+    userType: 'admin',
   },
 ];
 
