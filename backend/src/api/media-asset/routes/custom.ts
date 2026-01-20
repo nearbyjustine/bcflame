@@ -12,5 +12,13 @@ export default {
         policies: [],
       },
     },
+    {
+      method: 'GET',
+      path: '/media-assets/access-status',
+      handler: 'media-asset.accessStatus',
+      config: {
+        policies: [],
+      },
+    },
   ],
 };

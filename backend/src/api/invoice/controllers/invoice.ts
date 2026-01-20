@@ -32,7 +32,7 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
       });
 
       if (existingInvoice) {
-        return ctx.badRequest('Invoice already exists for this order');
+        return ctx.badRequest('Invoice already exists for this order. Use the regenerate endpoint to create a new version.');
       }
 
       // Generate invoice number
@@ -55,6 +55,7 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
           status: 'draft',
           lineItems: lineItems || [],
           notes,
+          version: 1,
           billingAddress: {
             company: order.customer?.company,
             name: `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim(),
@@ -81,6 +82,118 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
       };
     } catch (error) {
       console.error('Invoice generation error:', error);
+      ctx.throw(500, error);
+    }
+  },
+
+  /**
+   * Regenerate an existing invoice (creates new version)
+   */
+  async regenerate(ctx) {
+    const { invoiceId, reason, reasonNotes, lineItems, dueDate, notes } = ctx.request.body;
+
+    if (!invoiceId) {
+      return ctx.badRequest('Invoice ID is required');
+    }
+
+    if (!reason) {
+      return ctx.badRequest('Regeneration reason is required');
+    }
+
+    try {
+      // Find the current invoice
+      const currentInvoice: any = await strapi.entityService.findOne('api::invoice.invoice' as any, invoiceId, {
+        populate: ['order', 'order.customer', 'order.product'],
+      });
+
+      if (!currentInvoice) {
+        return ctx.notFound('Invoice not found');
+      }
+
+      // Mark current invoice as superseded
+      await strapi.entityService.update('api::invoice.invoice' as any, invoiceId, {
+        data: { status: 'superseded' } as any,
+      });
+
+      // Generate new invoice number
+      const invoiceNumber = await invoiceService.generateInvoiceNumber(strapi);
+
+      // Calculate totals (use new line items if provided, otherwise use current)
+      const items = lineItems || currentInvoice.lineItems;
+      const subtotal = items?.reduce((sum: number, item: any) => sum + (item.total || 0), 0) || 0;
+      const tax = 0;
+      const total = subtotal + tax;
+
+      // Create new invoice version
+      const newInvoice: any = await strapi.entityService.create('api::invoice.invoice' as any, {
+        data: {
+          invoiceNumber,
+          order: currentInvoice.order.id,
+          subtotal,
+          tax,
+          total,
+          dueDate: dueDate || currentInvoice.dueDate,
+          status: 'draft',
+          lineItems: items,
+          notes: notes || currentInvoice.notes,
+          version: (currentInvoice.version || 1) + 1,
+          previousInvoice: invoiceId,
+          regenerationReason: reason,
+          regenerationNotes: reasonNotes,
+          billingAddress: currentInvoice.billingAddress,
+        },
+        populate: ['order', 'previousInvoice'],
+      });
+
+      // Generate PDF for new invoice
+      const pdfUrl = await invoiceService.generatePdf(strapi, newInvoice);
+
+      // Update new invoice with PDF URL
+      await strapi.entityService.update('api::invoice.invoice' as any, newInvoice.id, {
+        data: { pdfUrl } as any,
+      });
+
+      // Update the order to point to the new invoice
+      await strapi.entityService.update('api::order-inquiry.order-inquiry' as any, currentInvoice.order.id, {
+        data: { invoice: newInvoice.id } as any,
+      });
+
+      return {
+        data: {
+          ...newInvoice,
+          pdfUrl,
+          message: `Invoice regenerated successfully. New version: ${newInvoice.version}`,
+        },
+      };
+    } catch (error) {
+      console.error('Invoice regeneration error:', error);
+      ctx.throw(500, error);
+    }
+  },
+
+  /**
+   * Get invoice history for an order
+   */
+  async getHistory(ctx) {
+    const { orderId } = ctx.params;
+
+    if (!orderId) {
+      return ctx.badRequest('Order ID is required');
+    }
+
+    try {
+      // Find all invoices for this order
+      const invoices = await strapi.db.query('api::invoice.invoice').findMany({
+        where: { order: orderId },
+        orderBy: { version: 'DESC' },
+        populate: ['previousInvoice'],
+      });
+
+      return {
+        data: invoices,
+      };
+    } catch (error) {
+      console.error('Invoice history error:', error);
       ctx.throw(500, error);
     }
   },

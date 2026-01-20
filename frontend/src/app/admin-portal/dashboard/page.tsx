@@ -2,21 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { 
-  ShoppingCart, 
-  DollarSign, 
-  Clock, 
+import {
+  ShoppingCart,
+  DollarSign,
+  Clock,
   AlertTriangle,
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
   Package,
   Users,
-  TrendingUp
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { getAdminDashboardStats, type AdminDashboardStats } from '@/lib/api/dashboard';
 
 interface StatCard {
   title: string;
@@ -46,90 +49,111 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState<StatCard[]>([
+  const [dashboardData, setDashboardData] = useState<AdminDashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchDashboardStats = async (isManualRefresh = false) => {
+    if (isManualRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
+
+    try {
+      const data = await getAdminDashboardStats();
+      setDashboardData(data);
+      if (isManualRefresh) {
+        toast.success('Dashboard refreshed');
+      }
+    } catch (error) {
+      console.error('Failed to fetch dashboard stats:', error);
+      toast.error('Failed to load dashboard data');
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) {
+      return `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-muted-foreground">Failed to load dashboard data</p>
+      </div>
+    );
+  }
+
+  const stats: StatCard[] = [
     {
       title: 'Total Orders Today',
-      value: '12',
-      change: '+20%',
-      changeType: 'positive',
+      value: dashboardData.todayOrders.toString(),
+      change: '',
+      changeType: 'neutral',
       icon: <ShoppingCart className="h-5 w-5" />,
       href: '/admin-portal/orders',
     },
     {
       title: 'Revenue Today',
-      value: '$4,250',
-      change: '+15%',
-      changeType: 'positive',
+      value: formatCurrency(dashboardData.todayRevenue),
+      change: '',
+      changeType: 'neutral',
       icon: <DollarSign className="h-5 w-5" />,
     },
     {
       title: 'Pending Orders',
-      value: '5',
-      change: '',
-      changeType: 'neutral',
+      value: dashboardData.pendingOrders.toString(),
+      change: dashboardData.pendingOrders > 0 ? 'Needs attention' : '',
+      changeType: dashboardData.pendingOrders > 0 ? 'negative' : 'neutral',
       icon: <Clock className="h-5 w-5" />,
       href: '/admin-portal/orders?status=pending',
     },
     {
       title: 'Low Stock Items',
-      value: '3',
-      change: 'Needs attention',
-      changeType: 'negative',
+      value: dashboardData.lowStockItems.toString(),
+      change: dashboardData.lowStockItems > 0 ? 'Needs attention' : '',
+      changeType: dashboardData.lowStockItems > 0 ? 'negative' : 'neutral',
       icon: <AlertTriangle className="h-5 w-5" />,
       href: '/admin-portal/products?filter=low-stock',
     },
-  ]);
-
-  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([
-    {
-      id: 1,
-      inquiryNumber: 'INQ-20260115-0001',
-      customerName: 'John Doe',
-      companyName: 'ABC Cannabis Co.',
-      status: 'pending',
-      total: 450,
-      createdAt: '10 minutes ago',
-    },
-    {
-      id: 2,
-      inquiryNumber: 'INQ-20260115-0002',
-      customerName: 'Jane Smith',
-      companyName: 'Green Valley Dispensary',
-      status: 'approved',
-      total: 820,
-      createdAt: '1 hour ago',
-    },
-    {
-      id: 3,
-      inquiryNumber: 'INQ-20260114-0015',
-      customerName: 'Mike Johnson',
-      companyName: 'Pacific Herbs LLC',
-      status: 'reviewing',
-      total: 1200,
-      createdAt: '3 hours ago',
-    },
-    {
-      id: 4,
-      inquiryNumber: 'INQ-20260114-0014',
-      customerName: 'Sarah Williams',
-      companyName: 'Mountain High Supply',
-      status: 'fulfilled',
-      total: 650,
-      createdAt: 'Yesterday',
-    },
-  ]);
-
-  const [quickStats, setQuickStats] = useState({
-    totalProducts: 45,
-    activeResellers: 128,
-    weeklyRevenue: '$24,500',
-  });
-
-  // TODO: Fetch real data from API
-  // useEffect(() => {
-  //   fetchDashboardStats();
-  //   fetchRecentOrders();
-  // }, []);
+  ];
 
   return (
     <div className="space-y-6">
@@ -142,13 +166,21 @@ export default function AdminDashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            Download Report
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchDashboardStats(true)}
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
           </Button>
-          <Button size="sm">
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            View All Orders
-          </Button>
+          <Link href="/admin-portal/orders">
+            <Button size="sm">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              View All Orders
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -216,35 +248,40 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-slate-50 transition-colors"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-                      <Package className="h-5 w-5 text-slate-600" />
+              {dashboardData.recentOrders.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No recent orders
+                </p>
+              ) : (
+                dashboardData.recentOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between rounded-lg border p-4 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+                        <Package className="h-5 w-5 text-slate-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{order.inquiry_number}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {order.customer.company || order.customer.name} • {formatRelativeTime(order.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{order.inquiryNumber}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {order.companyName} • {order.createdAt}
-                      </p>
+                    <div className="flex items-center space-x-4">
+                      <Badge className={statusColors[order.status]}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </Badge>
+                      <Link href={`/admin-portal/orders/${order.id}`}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <Badge className={statusColors[order.status]}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </Badge>
-                    <span className="text-sm font-medium">${order.total}</span>
-                    <Link href={`/admin-portal/orders/${order.id}`}>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -262,21 +299,21 @@ export default function AdminDashboardPage() {
                   <Package className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Total Products</span>
                 </div>
-                <span className="font-medium">{quickStats.totalProducts}</span>
+                <span className="font-medium">{dashboardData.totalProducts}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Active Resellers</span>
                 </div>
-                <span className="font-medium">{quickStats.activeResellers}</span>
+                <span className="font-medium">{dashboardData.activeResellers}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Weekly Revenue</span>
                 </div>
-                <span className="font-medium">{quickStats.weeklyRevenue}</span>
+                <span className="font-medium">{formatCurrency(dashboardData.weeklyRevenue)}</span>
               </div>
             </CardContent>
           </Card>

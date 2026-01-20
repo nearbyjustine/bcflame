@@ -15,6 +15,7 @@ import {
   Building2,
   Mail,
   Phone,
+  UserPlus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -37,6 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 
 import {
   getAdminUsers,
@@ -65,6 +67,9 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [actionType, setActionType] = useState<'block' | 'unblock'>('block');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Create user dialog
+  const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -302,6 +307,10 @@ export default function AdminUsersPage() {
             Manage reseller accounts and access
           </p>
         </div>
+        <Button onClick={() => setCreateUserDialogOpen(true)} className="gap-2">
+          <UserPlus className="h-4 w-4" />
+          Create User
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -404,6 +413,13 @@ export default function AdminUsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Create User Dialog */}
+      <CreateUserDialog
+        open={createUserDialogOpen}
+        onClose={() => setCreateUserDialogOpen(false)}
+        onSuccess={fetchUsers}
+      />
     </div>
   );
 }

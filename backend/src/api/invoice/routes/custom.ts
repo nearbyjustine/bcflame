@@ -14,6 +14,22 @@ export default {
     },
     {
       method: 'POST',
+      path: '/invoices/regenerate',
+      handler: 'invoice.regenerate',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/invoices/order/:orderId/history',
+      handler: 'invoice.getHistory',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'POST',
       path: '/invoices/:id/send',
       handler: 'invoice.sendEmail',
       config: {

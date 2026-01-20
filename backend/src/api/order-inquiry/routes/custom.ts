@@ -13,5 +13,13 @@ export default {
         middlewares: ['api::order-inquiry.require-auth'],
       },
     },
+    {
+      method: 'GET',
+      path: '/order-inquiries/statistics',
+      handler: 'order-inquiry.statistics',
+      config: {
+        policies: [],
+      },
+    },
   ],
 };

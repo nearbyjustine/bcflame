@@ -1,0 +1,24 @@
+/**
+ * Dashboard routes
+ */
+
+export default {
+  routes: [
+    {
+      method: 'GET',
+      path: '/dashboard/admin',
+      handler: 'dashboard.getAdminStats',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/dashboard/reseller',
+      handler: 'dashboard.getResellerStats',
+      config: {
+        policies: [],
+      },
+    },
+  ],
+};

@@ -6,23 +6,15 @@ export default {
   routes: [
     {
       method: 'GET',
-      path: '/notifications/unread',
-      handler: 'notification.getUnread',
-      config: {
-        policies: [],
-      },
-    },
-    {
-      method: 'PUT',
-      path: '/notifications/:id/read',
-      handler: 'notification.markAsRead',
+      path: '/notifications/unread/count',
+      handler: 'notification.getUnreadCount',
       config: {
         policies: [],
       },
     },
     {
       method: 'POST',
-      path: '/notifications/read-all',
+      path: '/notifications/mark-all-read',
       handler: 'notification.markAllAsRead',
       config: {
         policies: [],

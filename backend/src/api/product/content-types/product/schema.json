@@ -93,17 +93,12 @@
       "type": "media",
       "multiple": true,
       "required": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": ["images"],
+      "description": "Product images used for both display and customization selection"
     },
     "customization_enabled": {
       "type": "boolean",
       "default": false
-    },
-    "available_photos": {
-      "type": "media",
-      "multiple": true,
-      "required": false,
-      "allowedTypes": ["images"]
     },
     "selection_limits": {
       "type": "component",

@@ -84,9 +84,6 @@ export interface ProductAttributes {
     data: ProductImage[];
   };
   customization_enabled?: boolean;
-  available_photos?: {
-    data: ProductImage[];
-  };
   selection_limits?: SelectionLimit[];
   createdAt: string;
   updatedAt: string;

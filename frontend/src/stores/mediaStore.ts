@@ -7,6 +7,7 @@ import {
   getTags,
   getCampaignKits,
   downloadCampaignKit as downloadCampaignKitApi,
+  getMediaAccessStatus,
 } from '@/lib/api/media';
 
 interface MediaAsset {
@@ -58,6 +59,12 @@ interface MediaFilters {
   sortBy: SortBy;
 }
 
+interface MediaAccessStatus {
+  hasAccess: boolean;
+  reason?: string;
+  paidOrdersCount?: number;
+}
+
 interface MediaState {
   assets: MediaAsset[];
   tags: Tag[];
@@ -68,11 +75,14 @@ interface MediaState {
   sortBy: SortBy;
   isLoading: boolean;
   error: string | null;
+  accessStatus: MediaAccessStatus | null;
+  isCheckingAccess: boolean;
 
   // Actions
   fetchAssets: () => Promise<void>;
   fetchTags: () => Promise<void>;
   fetchCampaignKits: () => Promise<void>;
+  checkAccess: () => Promise<void>;
   downloadAsset: (id: number) => Promise<void>;
   downloadCampaignKit: (kitId: number, assetIds: number[]) => Promise<void>;
   setFilters: (filters: Partial<MediaFilters>) => void;
@@ -89,6 +99,19 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   sortBy: 'newest',
   isLoading: false,
   error: null,
+  accessStatus: null,
+  isCheckingAccess: false,
+
+  checkAccess: async () => {
+    set({ isCheckingAccess: true });
+    try {
+      const status = await getMediaAccessStatus();
+      set({ accessStatus: status, isCheckingAccess: false });
+    } catch (error) {
+      console.error('Failed to check media access:', error);
+      set({ accessStatus: { hasAccess: false }, isCheckingAccess: false });
+    }
+  },
 
   fetchAssets: async () => {
     set({ isLoading: true, error: null });

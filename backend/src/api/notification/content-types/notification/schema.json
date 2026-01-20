@@ -14,8 +14,13 @@
   "attributes": {
     "type": {
       "type": "enumeration",
-      "enum": ["new_order", "low_stock", "payment_received", "order_status_changed", "system"],
+      "enum": ["new_order", "low_stock", "payment_received", "order_status_changed", "payment_reminder", "new_product", "system"],
       "required": true
+    },
+    "recipient": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
     },
     "title": {
       "type": "string",

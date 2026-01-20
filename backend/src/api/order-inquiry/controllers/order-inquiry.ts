@@ -111,4 +111,70 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
       return ctx.internalServerError('Failed to create order inquiries');
     }
   },
+
+  /**
+   * Get order statistics for filter counts
+   * GET /api/order-inquiries/statistics
+   */
+  async statistics(ctx) {
+    try {
+      // Total orders
+      const total = await strapi.db.query('api::order-inquiry.order-inquiry').count();
+
+      // Orders by status
+      const pending = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { status: 'pending' },
+      });
+
+      const reviewing = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { status: 'reviewing' },
+      });
+
+      const approved = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { status: 'approved' },
+      });
+
+      const fulfilled = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { status: 'fulfilled' },
+      });
+
+      const rejected = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { status: 'rejected' },
+      });
+
+      // Orders by payment status
+      const unpaid = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { payment_status: 'unpaid' },
+      });
+
+      const partial = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { payment_status: 'partial' },
+      });
+
+      const paid = await strapi.db.query('api::order-inquiry.order-inquiry').count({
+        where: { payment_status: 'paid' },
+      });
+
+      return {
+        data: {
+          total,
+          byStatus: {
+            pending,
+            reviewing,
+            approved,
+            fulfilled,
+            rejected,
+          },
+          byPaymentStatus: {
+            unpaid,
+            partial,
+            paid,
+          },
+        },
+      };
+    } catch (error) {
+      console.error('Order statistics error:', error);
+      ctx.throw(500, error);
+    }
+  },
 }));

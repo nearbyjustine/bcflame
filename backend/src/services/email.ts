@@ -28,7 +28,7 @@ export interface EmailResult {
   error?: string
 }
 
-export interface EmailService {
+export interface IEmailService {
   sendEmail: (params: SendEmailParams) => Promise<EmailResult>
   verifyConnection: () => Promise<boolean>
 }
@@ -36,7 +36,7 @@ export interface EmailService {
 /**
  * Creates an email service instance with nodemailer
  */
-export function createEmailService(config: EmailConfig): EmailService {
+export function createEmailService(config: EmailConfig): IEmailService {
   // Validate configuration
   if (!config.host || !config.port || !config.auth || !config.from) {
     throw new Error('Invalid email configuration')
@@ -123,12 +123,12 @@ export function createEmailService(config: EmailConfig): EmailService {
 }
 
 // Singleton instance
-let emailServiceInstance: EmailService | null = null
+let emailServiceInstance: IEmailService | null = null
 
 /**
  * Get or create email service singleton
  */
-export function getEmailService(): EmailService {
+export function getEmailService(): IEmailService {
   if (!emailServiceInstance) {
     // Get configuration from environment variables
     const config: EmailConfig = {
@@ -149,4 +149,32 @@ export function getEmailService(): EmailService {
   }
 
   return emailServiceInstance
+}
+
+/**
+ * EmailService class for easier singleton access
+ */
+export class EmailService {
+  private static instance: EmailService | null = null
+
+  private service: IEmailService
+
+  private constructor() {
+    this.service = getEmailService()
+  }
+
+  public static getInstance(): EmailService {
+    if (!EmailService.instance) {
+      EmailService.instance = new EmailService()
+    }
+    return EmailService.instance
+  }
+
+  public async sendEmail(params: SendEmailParams): Promise<EmailResult> {
+    return this.service.sendEmail(params)
+  }
+
+  public async verifyConnection(): Promise<boolean> {
+    return this.service.verifyConnection()
+  }
 }

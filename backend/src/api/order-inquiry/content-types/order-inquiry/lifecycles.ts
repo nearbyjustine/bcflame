@@ -311,6 +311,25 @@ export default {
         } else {
           strapi.log.info('Status update email sent successfully:', emailResult.messageId)
         }
+
+        // Create reseller notification for status change
+        try {
+          const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer
+          await strapi.entityService.create('api::notification.notification', {
+            data: {
+              type: 'order_status_changed',
+              title: `Order ${inquiry.inquiry_number} - Status Updated`,
+              message: `Your order status has been updated to: ${newStatus}`,
+              isRead: false,
+              relatedOrder: result.id,
+              recipient: customerId,
+              link: `/orders/${result.id}`,
+            },
+          });
+          strapi.log.info(`Created reseller notification for order ${inquiry.inquiry_number} status change`);
+        } catch (notifError) {
+          strapi.log.warn('Failed to create reseller notification:', notifError);
+        }
       }
     } catch (error) {
       strapi.log.error('Error in afterUpdate lifecycle:', error)

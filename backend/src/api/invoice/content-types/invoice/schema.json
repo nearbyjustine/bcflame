@@ -47,7 +47,7 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["draft", "sent", "paid", "overdue"],
+      "enum": ["draft", "sent", "paid", "overdue", "superseded"],
       "default": "draft"
     },
     "lineItems": {
@@ -61,6 +61,23 @@
       "type": "json"
     },
     "notes": {
+      "type": "text"
+    },
+    "version": {
+      "type": "integer",
+      "default": 1,
+      "min": 1
+    },
+    "previousInvoice": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::invoice.invoice"
+    },
+    "regenerationReason": {
+      "type": "enumeration",
+      "enum": ["pricing_error", "customer_info_changed", "admin_correction", "other"]
+    },
+    "regenerationNotes": {
       "type": "text"
     }
   }

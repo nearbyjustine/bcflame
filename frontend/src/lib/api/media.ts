@@ -194,3 +194,20 @@ export async function downloadCampaignKit(
     throw error;
   }
 }
+
+/**
+ * Check if current user has access to media assets
+ */
+export async function getMediaAccessStatus(): Promise<{
+  hasAccess: boolean;
+  reason?: string;
+  paidOrdersCount?: number;
+}> {
+  try {
+    const response = await strapiApi.get('/api/media-assets/access-status');
+    return response.data.data;
+  } catch (error) {
+    console.error('Error checking media access:', error);
+    throw error;
+  }
+}

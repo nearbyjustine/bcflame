@@ -247,3 +247,47 @@ export async function getUserOrders(userId: number, limit: number = 5): Promise<
     return [];
   }
 }
+
+export interface CreateUserData {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  phone?: string;
+  businessLicense?: string;
+  userType: 'reseller' | 'admin';
+}
+
+/**
+ * Create a new user
+ */
+export async function createUser(data: CreateUserData): Promise<AdminUser> {
+  const response = await strapiApi.post('/api/users', {
+    ...data,
+    confirmed: true, // Auto-confirm users created by admin
+    blocked: false,
+  });
+  return response.data;
+}
+
+/**
+ * Upload reseller logo for a user
+ */
+export async function uploadResellerLogo(userId: number, file: File): Promise<AdminUser> {
+  const formData = new FormData();
+  formData.append('files', file);
+  formData.append('ref', 'plugin::users-permissions.user');
+  formData.append('refId', userId.toString());
+  formData.append('field', 'reseller_logo');
+
+  await strapiApi.post('/api/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  // Fetch and return updated user
+  return getAdminUser(userId);
+}

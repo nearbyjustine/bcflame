@@ -18,6 +18,7 @@ import { MediaAssetCard } from '@/components/media/MediaAssetCard';
 import { AssetDetailModal } from '@/components/media/AssetDetailModal';
 import { CampaignKitCard } from '@/components/media/CampaignKitCard';
 import { CampaignKitBuilder } from '@/components/media/CampaignKitBuilder';
+import { MediaAccessLocked } from '@/components/media/MediaAccessLocked';
 import { useMediaStore } from '@/stores/mediaStore';
 import { cn } from '@/lib/utils';
 
@@ -43,6 +44,8 @@ export default function MediaHubPage() {
     tags,
     campaignKits,
     isLoading,
+    accessStatus,
+    isCheckingAccess,
     selectedCategory,
     searchQuery,
     selectedTags,
@@ -50,6 +53,7 @@ export default function MediaHubPage() {
     fetchAssets,
     fetchTags,
     fetchCampaignKits,
+    checkAccess,
     setFilters,
   } = useMediaStore();
 
@@ -59,10 +63,16 @@ export default function MediaHubPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
-    fetchAssets();
-    fetchTags();
-    fetchCampaignKits();
-  }, [fetchAssets, fetchTags, fetchCampaignKits]);
+    checkAccess();
+  }, [checkAccess]);
+
+  useEffect(() => {
+    if (accessStatus?.hasAccess) {
+      fetchAssets();
+      fetchTags();
+      fetchCampaignKits();
+    }
+  }, [accessStatus?.hasAccess, fetchAssets, fetchTags, fetchCampaignKits]);
 
   // Filter and sort assets
   const filteredAssets = useMemo(() => {
@@ -118,6 +128,20 @@ export default function MediaHubPage() {
     if (category === 'all') return assets.length;
     return assets.filter((a) => a.category === category).length;
   };
+
+  // Show loading state while checking access
+  if (isCheckingAccess) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  // Show locked state if user doesn't have access
+  if (accessStatus && !accessStatus.hasAccess) {
+    return <MediaAccessLocked paidOrdersCount={accessStatus.paidOrdersCount} />;
+  }
 
   return (
     <div className="space-y-6">

@@ -282,8 +282,9 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
   }
 
   // Transform available photos to the expected format
+  // Using images field for both display and customization
   const availablePhotos = React.useMemo(() => {
-    const photos = product.attributes.available_photos?.data || []
+    const photos = product.attributes.images?.data || []
 
     // Debug: Log the raw photo data structure
     if (photos.length > 0) {
@@ -299,7 +300,7 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
         }
       }
     })
-  }, [product.attributes.available_photos])
+  }, [product.attributes.images])
 
   const isStepValid = validateStep(currentStep)
 
