@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getProducts, getProductById } from './products';
+import { getProducts, getProductById, getRelatedProducts } from './products';
 import { strapiApi } from './strapi';
 import type { ProductsResponse, SingleProductResponse } from '@/types/product';
 
@@ -401,6 +401,216 @@ describe('Product API Service', () => {
       vi.mocked(strapiApi.get).mockRejectedValue(error);
 
       await expect(getProductById(999)).rejects.toThrow('Not found');
+    });
+  });
+
+  describe('getRelatedProducts', () => {
+    it('should fetch related products with same category', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [
+          {
+            id: 2,
+            attributes: {
+              name: 'Related Product 1',
+              sku: 'IND-002',
+              category: 'Indica',
+              description: 'Related product',
+              on_sale: false,
+              featured: false,
+              sort_order: 0,
+              pricing: [],
+              createdAt: '2024-01-01T00:00:00.000Z',
+              updatedAt: '2024-01-01T00:00:00.000Z',
+            },
+          },
+          {
+            id: 3,
+            attributes: {
+              name: 'Related Product 2',
+              sku: 'IND-003',
+              category: 'Indica',
+              description: 'Related product',
+              on_sale: false,
+              featured: false,
+              sort_order: 0,
+              pricing: [],
+              createdAt: '2024-01-01T00:00:00.000Z',
+              updatedAt: '2024-01-01T00:00:00.000Z',
+            },
+          },
+        ],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 5,
+            pageCount: 1,
+            total: 2,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      const result = await getRelatedProducts(1, 'Indica', 4);
+
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 5, // limit + 1 for filtering
+          },
+          filters: {
+            category: {
+              $eq: 'Indica',
+            },
+          },
+        },
+      });
+      expect(result.data).toHaveLength(2);
+    });
+
+    it('should exclude current product from results', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [
+          {
+            id: 1, // Current product
+            attributes: {
+              name: 'Current Product',
+              sku: 'IND-001',
+              category: 'Indica',
+              description: 'Current product',
+              on_sale: false,
+              featured: false,
+              sort_order: 0,
+              pricing: [],
+              createdAt: '2024-01-01T00:00:00.000Z',
+              updatedAt: '2024-01-01T00:00:00.000Z',
+            },
+          },
+          {
+            id: 2,
+            attributes: {
+              name: 'Related Product',
+              sku: 'IND-002',
+              category: 'Indica',
+              description: 'Related product',
+              on_sale: false,
+              featured: false,
+              sort_order: 0,
+              pricing: [],
+              createdAt: '2024-01-01T00:00:00.000Z',
+              updatedAt: '2024-01-01T00:00:00.000Z',
+            },
+          },
+        ],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 5,
+            pageCount: 1,
+            total: 2,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      const result = await getRelatedProducts(1, 'Indica', 4);
+
+      // Should exclude product with id 1
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].id).toBe(2);
+    });
+
+    it('should respect limit parameter', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [
+          { id: 2, attributes: {} as any },
+          { id: 3, attributes: {} as any },
+          { id: 4, attributes: {} as any },
+          { id: 5, attributes: {} as any },
+          { id: 6, attributes: {} as any },
+        ],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 3,
+            pageCount: 1,
+            total: 5,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      const result = await getRelatedProducts(1, 'Hybrid', 2);
+
+      // Should return only 2 products (respecting limit)
+      expect(result.data).toHaveLength(2);
+    });
+
+    it('should use default limit of 4 when not specified', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [
+          { id: 2, attributes: {} as any },
+          { id: 3, attributes: {} as any },
+          { id: 4, attributes: {} as any },
+          { id: 5, attributes: {} as any },
+          { id: 6, attributes: {} as any },
+        ],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 5,
+            pageCount: 1,
+            total: 5,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      const result = await getRelatedProducts(1, 'Indica');
+
+      // Should call with default limit + 1
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
+        params: {
+          populate: '*',
+          pagination: {
+            page: 1,
+            pageSize: 5, // default 4 + 1
+          },
+          filters: {
+            category: {
+              $eq: 'Indica',
+            },
+          },
+        },
+      });
+
+      // Should return max 4 products
+      expect(result.data).toHaveLength(4);
+    });
+
+    it('should handle empty results gracefully', async () => {
+      const mockResponse: ProductsResponse = {
+        data: [],
+        meta: {
+          pagination: {
+            page: 1,
+            pageSize: 5,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+      };
+
+      vi.mocked(strapiApi.get).mockResolvedValue({ data: mockResponse });
+
+      const result = await getRelatedProducts(1, 'Indica', 4);
+
+      expect(result.data).toHaveLength(0);
     });
   });
 });

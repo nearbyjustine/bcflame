@@ -43,7 +43,7 @@ export default factories.createCoreController('api::notification.notification' a
       };
     } catch (error) {
       console.error('Get unread count error:', error);
-      ctx.throw(500, error);
+      return ctx.internalServerError('Failed to retrieve unread notifications');
     }
   },
 
@@ -85,7 +85,7 @@ export default factories.createCoreController('api::notification.notification' a
       };
     } catch (error) {
       console.error('Mark all notifications as read error:', error);
-      ctx.throw(500, error);
+      return ctx.internalServerError('Failed to mark notifications as read');
     }
   },
 
@@ -121,7 +121,7 @@ export default factories.createCoreController('api::notification.notification' a
       return notifications;
     } catch (error) {
       console.error('Find notifications error:', error);
-      ctx.throw(500, error);
+      return ctx.internalServerError('Failed to retrieve notifications');
     }
   },
 
@@ -165,7 +165,7 @@ export default factories.createCoreController('api::notification.notification' a
       return updated;
     } catch (error) {
       console.error('Update notification error:', error);
-      ctx.throw(500, error);
+      return ctx.internalServerError('Failed to update notification');
     }
   },
 }));

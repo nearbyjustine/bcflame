@@ -9,7 +9,7 @@ import path from 'path';
 
 interface LineItem {
   description: string;
-  quantity: number;
+  quantity: number | string;  // Allow both number and formatted string (e.g., "1000 g (2.2 lb)")
   unitPrice: number;
   total: number;
 }
@@ -36,28 +36,93 @@ interface Invoice {
 const invoiceService = {
   /**
    * Generate a unique invoice number in format INV-YYYYMMDD-XXXX
+   * Uses advisory lock to prevent race conditions
    */
   async generateInvoiceNumber(strapi: any): Promise<string> {
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-    
-    // Find the last invoice number for today
-    const lastInvoice = await strapi.db.query('api::invoice.invoice').findOne({
-      where: {
-        invoiceNumber: {
-          $startsWith: `INV-${dateStr}`,
+    const lockKey = parseInt(dateStr); // Use date as lock key (e.g., 20260120 becomes an integer)
+
+    // Use PostgreSQL advisory lock to prevent race conditions
+    const connection = strapi.db.connection;
+
+    try {
+      // Acquire advisory lock (blocks until lock is available)
+      await connection.raw('SELECT pg_advisory_lock(?)', [lockKey]);
+
+      // Find the last invoice number for today
+      const lastInvoice = await strapi.db.query('api::invoice.invoice').findOne({
+        where: {
+          invoiceNumber: {
+            $startsWith: `INV-${dateStr}`,
+          },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      });
 
-    let sequence = 1;
-    if (lastInvoice) {
-      const lastSeq = parseInt(lastInvoice.invoiceNumber.split('-')[2], 10);
-      sequence = lastSeq + 1;
+      let sequence = 1;
+      if (lastInvoice) {
+        const lastSeq = parseInt(lastInvoice.invoiceNumber.split('-')[2], 10);
+        sequence = lastSeq + 1;
+      }
+
+      return `INV-${dateStr}-${sequence.toString().padStart(4, '0')}`;
+    } finally {
+      // Always release the advisory lock
+      await connection.raw('SELECT pg_advisory_unlock(?)', [lockKey]);
     }
+  },
 
-    return `INV-${dateStr}-${sequence.toString().padStart(4, '0')}`;
+  /**
+   * Create an invoice with a generated invoice number atomically
+   * This holds the advisory lock through the entire creation process to prevent race conditions
+   */
+  async createInvoiceWithNumber(strapi: any, invoiceData: any): Promise<any> {
+    const today = new Date();
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+    const lockKey = parseInt(dateStr); // Use date as lock key (e.g., 20260120 becomes an integer)
+
+    // Use PostgreSQL advisory lock to prevent race conditions
+    const connection = strapi.db.connection;
+
+    try {
+      // Acquire advisory lock (blocks until lock is available)
+      await connection.raw('SELECT pg_advisory_lock(?)', [lockKey]);
+
+      // Find the last invoice number for today
+      const lastInvoice = await strapi.db.query('api::invoice.invoice').findOne({
+        where: {
+          invoiceNumber: {
+            $startsWith: `INV-${dateStr}`,
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      let sequence = 1;
+      if (lastInvoice) {
+        const lastSeq = parseInt(lastInvoice.invoiceNumber.split('-')[2], 10);
+        sequence = lastSeq + 1;
+      }
+
+      const invoiceNumber = `INV-${dateStr}-${sequence.toString().padStart(4, '0')}`;
+
+      console.log('Generated invoice number:', invoiceNumber);
+
+      // Create invoice with the generated number (still under lock)
+      const invoice = await strapi.entityService.create('api::invoice.invoice' as any, {
+        data: {
+          invoiceNumber,
+          ...invoiceData,
+        },
+        populate: ['order'],
+      });
+
+      return invoice;
+    } finally {
+      // Always release the advisory lock
+      await connection.raw('SELECT pg_advisory_unlock(?)', [lockKey]);
+    }
   },
 
   /**
@@ -65,7 +130,7 @@ const invoiceService = {
    */
   async generatePdf(strapi: any, invoice: Invoice): Promise<string> {
     const uploadDir = path.join(strapi.dirs.static.public, 'uploads', 'invoices');
-    
+
     // Ensure directory exists
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -78,6 +143,44 @@ const invoiceService = {
       try {
         const doc = new PDFDocument({ margin: 50 });
         const writeStream = fs.createWriteStream(filePath);
+
+        let streamFinished = false;
+        let docEnded = false;
+
+        // Error handling and cleanup
+        const cleanup = (error?: Error) => {
+          if (error && !streamFinished) {
+            try {
+              writeStream.destroy();
+              if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+              }
+            } catch (cleanupError) {
+              console.error('Error during cleanup:', cleanupError);
+            }
+            reject(error);
+          }
+        };
+
+        // Error handlers
+        writeStream.on('error', cleanup);
+        doc.on('error', cleanup);
+
+        // Proper completion handling with fsync
+        writeStream.on('finish', () => {
+          streamFinished = true;
+          if (docEnded) {
+            // Ensure file is fully written to disk using close callback
+            writeStream.close((err) => {
+              if (err) {
+                cleanup(err);
+              } else {
+                // File is now fully written and closed
+                resolve(`/uploads/invoices/${fileName}`);
+              }
+            });
+          }
+        });
 
         doc.pipe(writeStream);
 
@@ -161,6 +264,7 @@ const invoiceService = {
           xPos = 50;
           doc.text(item.description || '', xPos + 5, yPos, { width: columnWidths[0] - 10 });
           xPos += columnWidths[0];
+          // Handle both string (e.g., "1000 g (2.2 lb)") and number quantities
           doc.text(String(item.quantity || 0), xPos + 5, yPos, { width: columnWidths[1] - 10 });
           xPos += columnWidths[1];
           doc.text(`$${(item.unitPrice || 0).toFixed(2)}`, xPos + 5, yPos, { width: columnWidths[2] - 10 });
@@ -205,12 +309,7 @@ const invoiceService = {
           );
 
         doc.end();
-
-        writeStream.on('finish', () => {
-          resolve(`/uploads/invoices/${fileName}`);
-        });
-
-        writeStream.on('error', reject);
+        docEnded = true;
       } catch (error) {
         reject(error);
       }

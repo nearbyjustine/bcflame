@@ -3,10 +3,9 @@
  * Provides health check and test endpoints for email service
  */
 
-import { factories } from '@strapi/strapi';
 import { EmailService } from '../../../services/email';
 
-export default factories.createCoreController('api::email.email', () => ({
+export default {
   /**
    * Health check endpoint - tests SMTP connection
    * GET /api/email/health
@@ -50,6 +49,13 @@ export default factories.createCoreController('api::email.email', () => ({
    * Body: { to: string, subject?: string }
    */
   async test(ctx) {
+    const user = ctx.state.user;
+
+    // Only admins can send test emails
+    if (!user || user.userType !== 'admin') {
+      return ctx.forbidden('Admin access required');
+    }
+
     try {
       const { to, subject } = ctx.request.body;
 
@@ -98,4 +104,4 @@ export default factories.createCoreController('api::email.email', () => ({
       });
     }
   },
-}));
+};

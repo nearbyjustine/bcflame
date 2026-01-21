@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import { Settings } from 'lucide-react';
 import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,8 +75,9 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
   const imageUrl = getImageUrl(currentImage);
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-square relative bg-muted group">
+    <Link href={`/products/${product.id}`} className="block">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+        <div className="aspect-square relative bg-muted group">
         {imageUrl ? (
           <>
             <img
@@ -225,7 +227,11 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
         {attributes.customization_enabled && onCustomize && (
           <div className="mt-4 pt-4 border-t">
             <Button
-              onClick={onCustomize}
+              onClick={(e) => {
+                e.preventDefault(); // Prevent Link navigation
+                e.stopPropagation(); // Stop event bubbling
+                onCustomize();
+              }}
               className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:opacity-90 transition-opacity"
             >
               <Settings className="mr-2 h-4 w-4" />
@@ -235,5 +241,6 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
         )}
       </CardContent>
     </Card>
+    </Link>
   );
 }

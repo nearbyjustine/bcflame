@@ -277,7 +277,6 @@ export async function seedProducts(strapi: Strapi) {
             features,
             images: imageIds.length > 0 ? imageIds : undefined,
             customization_enabled: true,
-            available_photos: imageIds.length > 0 ? imageIds : undefined,
             publishedAt: new Date(),
           },
         }

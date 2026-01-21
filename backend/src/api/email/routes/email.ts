@@ -18,8 +18,9 @@ export default {
       path: '/email/test',
       handler: 'email.test',
       config: {
-        policies: ['admin::isAuthenticatedAdmin'], // Only admins can send test emails
-        middlewares: [],
+        policies: [],
+        middlewares: ['global::require-auth'], // Only authenticated users can send test emails
+        auth: false,
       },
     },
   ],

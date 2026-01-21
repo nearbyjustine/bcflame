@@ -3,15 +3,12 @@
  * Provides statistics for admin and reseller dashboards
  */
 
-import type { Core } from '@strapi/strapi';
-
-export default {
+export default ({ strapi }) => ({
   /**
    * Get admin dashboard statistics
    * GET /api/dashboard/admin
    */
   async getAdminStats(ctx) {
-    const strapi = ctx.state.strapi as Core.Strapi;
     const user = ctx.state.user;
 
     // Verify user is admin
@@ -30,15 +27,16 @@ export default {
       // Get total products count
       const totalProducts = await strapi.db.query('api::product.product').count({
         where: {
-          publishedAt: { $notNull: true },
+          $not: {
+            publishedAt: null,
+          },
         },
       });
 
-      // Get low stock items count (assuming inventory threshold of 10)
-      const lowStockItems = await strapi.db.query('api::product.product').count({
+      // Get low stock items count (items with quantity below 10 pounds)
+      const lowStockItems = await strapi.db.query('api::inventory.inventory').count({
         where: {
-          publishedAt: { $notNull: true },
-          inventory: { $lt: 10 },
+          quantity_in_stock: { $lt: 10 },
         },
       });
 
@@ -91,7 +89,7 @@ export default {
 
       // Get recent orders (last 5)
       const recentOrders = await strapi.entityService.findMany('api::order-inquiry.order-inquiry' as any, {
-        sort: { createdAt: 'DESC' },
+        sort: { createdAt: 'desc' },
         limit: 5,
         populate: {
           customer: {
@@ -143,11 +141,11 @@ export default {
    * GET /api/dashboard/reseller
    */
   async getResellerStats(ctx) {
-    const strapi = ctx.state.strapi as Core.Strapi;
     const user = ctx.state.user;
 
-    if (!user) {
-      return ctx.unauthorized('Authentication required');
+    // Verify user is reseller (strict - admins should use admin dashboard)
+    if (!user || user.userType !== 'reseller') {
+      return ctx.forbidden('Reseller access required');
     }
 
     try {
@@ -169,7 +167,9 @@ export default {
       // Get available products count
       const availableProducts = await strapi.db.query('api::product.product').count({
         where: {
-          publishedAt: { $notNull: true },
+          $not: {
+            publishedAt: null,
+          },
         },
       });
 
@@ -178,7 +178,7 @@ export default {
         filters: {
           customer: { id: user.id },
         },
-        sort: { createdAt: 'DESC' },
+        sort: { createdAt: 'desc' },
         limit: 5,
         populate: {
           product: {
@@ -191,7 +191,9 @@ export default {
       const ordersWithInvoices = await strapi.entityService.findMany('api::order-inquiry.order-inquiry' as any, {
         filters: {
           customer: { id: user.id },
-          invoice: { $notNull: true },
+          $not: {
+            invoice: null,
+          },
         },
         populate: ['invoice'],
       });
@@ -226,4 +228,4 @@ export default {
       ctx.throw(500, 'Failed to fetch dashboard statistics');
     }
   },
-};
+});

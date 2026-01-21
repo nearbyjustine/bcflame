@@ -10,6 +10,8 @@ export default {
       handler: 'dashboard.getAdminStats',
       config: {
         policies: [],
+        middlewares: ['global::require-auth'],
+        auth: false,
       },
     },
     {
@@ -18,6 +20,8 @@ export default {
       handler: 'dashboard.getResellerStats',
       config: {
         policies: [],
+        middlewares: ['global::require-auth'],
+        auth: false,
       },
     },
   ],

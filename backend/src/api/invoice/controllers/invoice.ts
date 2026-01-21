@@ -10,7 +10,13 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
    * Generate a new invoice for an order
    */
   async generate(ctx) {
-    const { orderId, lineItems, dueDate, notes } = ctx.request.body;
+    // Extract data from request body - handle both direct body and data wrapper
+    const bodyData = ctx.request.body?.data || ctx.request.body;
+    const { orderId, lineItems, dueDate, notes } = bodyData;
+
+    // Log for debugging
+    console.log('Invoice generate - Request body:', ctx.request.body);
+    console.log('Invoice generate - Extracted orderId:', orderId);
 
     if (!orderId) {
       return ctx.badRequest('Order ID is required');
@@ -26,6 +32,23 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         return ctx.notFound('Order not found');
       }
 
+      // Validate required data before calculating line items
+      if (!order.product) {
+        return ctx.badRequest('Cannot generate invoice: Order has no product assigned. Please assign a product to the order first.');
+      }
+
+      if (!order.total_weight || order.total_weight <= 0) {
+        return ctx.badRequest('Cannot generate invoice: Order has no weight specified. Please enter the total weight for the order.');
+      }
+
+      if (!order.product.base_price_per_pound || order.product.base_price_per_pound <= 0) {
+        return ctx.badRequest(`Cannot generate invoice: Product "${order.product.name}" has no price configured. Please set the base price per pound.`);
+      }
+
+      if (!order.customer) {
+        return ctx.badRequest('Cannot generate invoice: Order has no customer assigned. Please assign a customer to the order.');
+      }
+
       // Check if invoice already exists
       const existingInvoice = await strapi.db.query('api::invoice.invoice').findOne({
         where: { order: orderId },
@@ -35,39 +58,124 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         return ctx.badRequest('Invoice already exists for this order. Use the regenerate endpoint to create a new version.');
       }
 
-      // Generate invoice number
-      const invoiceNumber = await invoiceService.generateInvoiceNumber(strapi);
+      // Helper function to format weight display
+      const formatWeightDisplay = (weight: number, unit: string, weightInPounds: number): string => {
+        return `${weight} ${unit} (${weightInPounds.toFixed(2)} lb)`;
+      };
+
+      // Calculate line items from order data
+      const calculatedLineItems: any[] = [];
+
+      // Main product line item
+      if (order.product && order.total_weight) {
+        // Convert weight to pounds for price calculation
+        let weightInPounds = order.total_weight;
+        if (order.weight_unit === 'g') {
+          weightInPounds = order.total_weight / 453.592;
+        } else if (order.weight_unit === 'oz') {
+          weightInPounds = order.total_weight / 16;
+        }
+        // If already in pounds, no conversion needed
+
+        const unitPrice = order.product.base_price_per_pound || 0;
+        const lineTotal = weightInPounds * unitPrice;
+
+        calculatedLineItems.push({
+          description: `${order.product.name} - ${order.product.category}`,
+          quantity: formatWeightDisplay(order.total_weight, order.weight_unit, weightInPounds),
+          unitPrice: unitPrice,
+          total: lineTotal,
+        });
+      }
+
+      // Add customization line items (with $0.00 - included in base price)
+      const customizations: string[] = [];
+      if (order.selected_photos && Array.isArray(order.selected_photos) && order.selected_photos.length > 0) {
+        customizations.push(`Photos: ${order.selected_photos.length} selected`);
+      }
+      if (order.selected_bud_styles && Array.isArray(order.selected_bud_styles) && order.selected_bud_styles.length > 0) {
+        customizations.push(`Bud Styles: ${order.selected_bud_styles.length} selected`);
+      }
+      if (order.selected_backgrounds && Array.isArray(order.selected_backgrounds) && order.selected_backgrounds.length > 0) {
+        customizations.push(`Backgrounds: ${order.selected_backgrounds.length} selected`);
+      }
+      if (order.selected_fonts && Array.isArray(order.selected_fonts) && order.selected_fonts.length > 0) {
+        customizations.push(`Fonts: ${order.selected_fonts.length} selected`);
+      }
+      if (order.selected_prebagging) {
+        customizations.push('Pre-bagging options selected');
+      }
+
+      if (customizations.length > 0) {
+        calculatedLineItems.push({
+          description: `Smart Packaging Customizations\n${customizations.join(', ')}`,
+          quantity: '1',
+          unitPrice: 0,
+          total: 0,
+        });
+      }
+
+      // Use provided line items OR calculated ones
+      const finalLineItems = lineItems && lineItems.length > 0 ? lineItems : calculatedLineItems;
+
+      // Validate line items were calculated successfully
+      if (!finalLineItems || finalLineItems.length === 0) {
+        return ctx.badRequest('Cannot generate invoice: Failed to calculate line items. This should not happen - please contact support.');
+      }
 
       // Calculate totals
-      const subtotal = lineItems?.reduce((sum: number, item: any) => sum + (item.total || 0), 0) || 0;
+      const subtotal = finalLineItems.reduce((sum: number, item: any) => sum + (item.total || 0), 0);
       const tax = 0; // Can be calculated based on rules
       const total = subtotal + tax;
 
-      // Create invoice
-      const invoice: any = await strapi.entityService.create('api::invoice.invoice' as any, {
-        data: {
-          invoiceNumber,
-          order: orderId,
-          subtotal,
-          tax,
-          total,
-          dueDate: dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
-          status: 'draft',
-          lineItems: lineItems || [],
-          notes,
-          version: 1,
-          billingAddress: {
-            company: order.customer?.company,
-            name: `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim(),
-            email: order.customer?.email,
-            phone: order.customer?.phone,
-          },
+      // Log invoice generation details
+      console.log('Invoice generation started:', {
+        orderId,
+        productName: order.product?.name,
+        totalWeight: order.total_weight,
+        weightUnit: order.weight_unit,
+        basePrice: order.product?.base_price_per_pound,
+        calculatedLineItems: finalLineItems.length,
+        subtotal,
+        total,
+      });
+
+      // Generate invoice number and create invoice atomically
+      const invoice: any = await invoiceService.createInvoiceWithNumber(strapi, {
+        order: orderId,
+        subtotal,
+        tax,
+        total,
+        dueDate: dueDate || new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
+        status: 'draft',
+        lineItems: finalLineItems,
+        notes,
+        version: 1,
+        billingAddress: {
+          company: order.customer?.company,
+          name: `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim(),
+          email: order.customer?.email,
+          phone: order.customer?.phone,
         },
-        populate: ['order'],
+      });
+
+      // Log invoice creation
+      console.log('Invoice created in database:', {
+        invoiceId: invoice.id,
+        invoiceNumber: invoice.invoiceNumber,
+        subtotal: invoice.subtotal,
+        total: invoice.total,
+        lineItemsStored: invoice.lineItems?.length || 0,
       });
 
       // Generate PDF
       const pdfUrl = await invoiceService.generatePdf(strapi, invoice);
+
+      // Log PDF generation
+      console.log('PDF generation completed:', {
+        invoiceNumber: invoice.invoiceNumber,
+        pdfUrl,
+      });
 
       // Update invoice with PDF URL
       await strapi.entityService.update('api::invoice.invoice' as any, invoice.id, {
@@ -90,7 +198,9 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
    * Regenerate an existing invoice (creates new version)
    */
   async regenerate(ctx) {
-    const { invoiceId, reason, reasonNotes, lineItems, dueDate, notes } = ctx.request.body;
+    // Extract data from request body - handle both direct body and data wrapper
+    const bodyData = ctx.request.body?.data || ctx.request.body;
+    const { invoiceId, reason, reasonNotes, lineItems, dueDate, notes } = bodyData;
 
     if (!invoiceId) {
       return ctx.badRequest('Invoice ID is required');
@@ -115,34 +225,27 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         data: { status: 'superseded' } as any,
       });
 
-      // Generate new invoice number
-      const invoiceNumber = await invoiceService.generateInvoiceNumber(strapi);
-
       // Calculate totals (use new line items if provided, otherwise use current)
       const items = lineItems || currentInvoice.lineItems;
       const subtotal = items?.reduce((sum: number, item: any) => sum + (item.total || 0), 0) || 0;
       const tax = 0;
       const total = subtotal + tax;
 
-      // Create new invoice version
-      const newInvoice: any = await strapi.entityService.create('api::invoice.invoice' as any, {
-        data: {
-          invoiceNumber,
-          order: currentInvoice.order.id,
-          subtotal,
-          tax,
-          total,
-          dueDate: dueDate || currentInvoice.dueDate,
-          status: 'draft',
-          lineItems: items,
-          notes: notes || currentInvoice.notes,
-          version: (currentInvoice.version || 1) + 1,
-          previousInvoice: invoiceId,
-          regenerationReason: reason,
-          regenerationNotes: reasonNotes,
-          billingAddress: currentInvoice.billingAddress,
-        },
-        populate: ['order', 'previousInvoice'],
+      // Generate new invoice number and create atomically
+      const newInvoice: any = await invoiceService.createInvoiceWithNumber(strapi, {
+        order: currentInvoice.order.id,
+        subtotal,
+        tax,
+        total,
+        dueDate: dueDate || currentInvoice.dueDate,
+        status: 'draft',
+        lineItems: items,
+        notes: notes || currentInvoice.notes,
+        version: (currentInvoice.version || 1) + 1,
+        previousInvoice: invoiceId,
+        regenerationReason: reason,
+        regenerationNotes: reasonNotes,
+        billingAddress: currentInvoice.billingAddress,
       });
 
       // Generate PDF for new invoice

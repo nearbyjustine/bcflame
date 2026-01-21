@@ -121,3 +121,26 @@ export async function getProductById(id: number): Promise<SingleProductResponse>
 
   return response.data;
 }
+
+/**
+ * Fetch related products from the same category, excluding the current product
+ */
+export async function getRelatedProducts(
+  productId: number,
+  category: 'Indica' | 'Hybrid',
+  limit: number = 4
+): Promise<ProductsResponse> {
+  const response = await getProducts({
+    category,
+    pageSize: limit + 1, // Fetch extra to account for filtering
+  });
+
+  // Filter out the current product client-side
+  // (Strapi $ne filter would require adjusting the filters type)
+  const filtered = response.data.filter(product => product.id !== productId);
+
+  return {
+    ...response,
+    data: filtered.slice(0, limit),
+  };
+}

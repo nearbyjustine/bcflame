@@ -3,14 +3,12 @@
  * Determines if a user has access to media assets based on payment status
  */
 
-import type { Core } from '@strapi/strapi';
-
 /**
  * Check if a user has any paid orders
  * Resellers must have at least one paid order to access media
  * Admins always have access
  */
-export async function canAccessMedia(strapi: Core.Strapi, userId: number, userRole: string): Promise<boolean> {
+export async function canAccessMedia(strapi: any, userId: number, userRole: string): Promise<boolean> {
   // Admin users always have access
   if (userRole === 'admin') {
     return true;
@@ -39,7 +37,7 @@ export async function canAccessMedia(strapi: Core.Strapi, userId: number, userRo
  * Get media access status for a user
  * Returns detailed information about access status
  */
-export async function getMediaAccessStatus(strapi: Core.Strapi, userId: number, userRole: string): Promise<{
+export async function getMediaAccessStatus(strapi: any, userId: number, userRole: string): Promise<{
   hasAccess: boolean;
   reason?: string;
   paidOrdersCount?: number;

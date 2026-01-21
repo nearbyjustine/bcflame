@@ -10,6 +10,8 @@ export default {
       handler: 'media-asset.download',
       config: {
         policies: [],
+        middlewares: ['global::require-auth'],
+        auth: false,
       },
     },
     {
@@ -18,6 +20,8 @@ export default {
       handler: 'media-asset.accessStatus',
       config: {
         policies: [],
+        middlewares: ['global::require-auth'],
+        auth: false,
       },
     },
   ],
