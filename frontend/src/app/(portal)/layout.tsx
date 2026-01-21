@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ShoppingCart, Menu } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { CartDrawer } from '@/components/layout/CartDrawer';
+import { ThemeToggle } from '@/components/theme-toggle';
 import {
   Sheet,
   SheetContent,
@@ -72,7 +74,9 @@ export default function PortalLayout({
               </SheetTrigger>
               <SheetContent side="left" className="w-[280px]">
                 <SheetHeader>
-                  <SheetTitle className="text-left">BC Flame</SheetTitle>
+                  <SheetTitle className="text-left">
+                    <Image src="/header_logo.svg" alt="BC Flame" width={120} height={40} className="h-10 w-auto" />
+                  </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col space-y-4 mt-6">
                   <a 
@@ -134,7 +138,7 @@ export default function PortalLayout({
               </SheetContent>
             </Sheet>
             
-            <h1 className="text-2xl font-bold">BC Flame</h1>
+            <Image src="/header_logo.svg" alt="BC Flame" width={120} height={40} className="h-10 w-auto" />
             <div className="hidden md:flex space-x-4">
               <a href="/dashboard" className="text-sm hover:text-primary">Dashboard</a>
               <a href="/products" className="text-sm hover:text-primary">Products</a>
@@ -146,6 +150,7 @@ export default function PortalLayout({
           </div>
           <div className="flex items-center space-x-4">
             {/* Cart Icon - hidden, code preserved for future use */}
+            <ThemeToggle />
             <div className="hidden md:block text-sm">
               <p className="font-medium">{user?.companyName || user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>

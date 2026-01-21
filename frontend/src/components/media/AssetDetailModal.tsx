@@ -90,7 +90,7 @@ export function AssetDetailModal({ asset, open, onClose }: AssetDetailModalProps
         <div className="flex-1 overflow-auto">
           <div className="grid md:grid-cols-2 gap-6">
             {/* Preview */}
-            <div className="bg-slate-100 rounded-lg overflow-hidden min-h-[300px] flex items-center justify-center">
+            <div className="bg-muted/50 rounded-lg overflow-hidden min-h-[300px] flex items-center justify-center">
               {isImage && (
                 <img
                   src={fileUrl}

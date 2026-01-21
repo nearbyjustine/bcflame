@@ -4,7 +4,7 @@ export interface BudStyle {
   id: number;
   attributes: {
     name: string;
-    category: 'trim_quality' | 'flower_grade' | 'visual_style';
+    category: 'trim_quality' | 'flower_grade' | 'visual_style' | 'bud_count';
     description?: string;
     image?: { data: ProductImage | null };
     sort_order: number;

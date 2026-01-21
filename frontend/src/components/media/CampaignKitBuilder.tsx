@@ -148,7 +148,7 @@ export function CampaignKitBuilder({ kit, open, onClose }: CampaignKitBuilderPro
                   key={asset.id}
                   className={`
                     flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors
-                    ${isSelected ? 'border-primary bg-primary/5' : 'hover:bg-slate-50'}
+                    ${isSelected ? 'border-primary bg-primary/5' : 'hover:bg-muted/30'}
                   `}
                 >
                   <Checkbox
@@ -157,7 +157,7 @@ export function CampaignKitBuilder({ kit, open, onClose }: CampaignKitBuilderPro
                   />
 
                   {/* Thumbnail */}
-                  <div className="w-12 h-12 rounded bg-slate-100 overflow-hidden flex-shrink-0">
+                  <div className="w-12 h-12 rounded bg-muted/50 overflow-hidden flex-shrink-0">
                     {isImage && thumbnailUrl ? (
                       <img
                         src={thumbnailUrl.startsWith('http') ? thumbnailUrl : `${strapiUrl}${thumbnailUrl}`}

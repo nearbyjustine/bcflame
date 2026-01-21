@@ -19,7 +19,7 @@
     },
     "category": {
       "type": "enumeration",
-      "enum": ["trim_quality", "flower_grade", "visual_style"],
+      "enum": ["trim_quality", "flower_grade", "visual_style", "bud_count"],
       "required": true
     },
     "description": {

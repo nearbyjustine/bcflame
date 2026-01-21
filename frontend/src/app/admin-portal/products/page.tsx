@@ -19,6 +19,7 @@ import {
 import { toast } from 'sonner';
 
 import { DataTable } from '@/components/admin/DataTable';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,30 +48,21 @@ import {
 } from '@/lib/api/admin-products';
 import { getImageUrl } from '@/lib/utils/image';
 
-const categoryColors: Record<string, string> = {
-  Indica: 'bg-purple-100 text-purple-800',
-  Hybrid: 'bg-green-100 text-green-800',
-};
-
-function getStockStatus(product: ProductWithInventory): {
-  status: 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown';
-  label: string;
-  className: string;
-} {
+function getStockStatus(product: ProductWithInventory): 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown' {
   if (!product.inventory) {
-    return { status: 'unknown', label: 'No inventory', className: 'bg-slate-100 text-slate-600' };
+    return 'unknown';
   }
 
   const stock = product.inventory.attributes.quantity_in_stock;
   const reorderPoint = product.inventory.attributes.reorder_point;
 
   if (stock <= 0) {
-    return { status: 'out_of_stock', label: 'Out of stock', className: 'bg-red-100 text-red-800' };
+    return 'out_of_stock';
   }
   if (stock <= reorderPoint) {
-    return { status: 'low_stock', label: 'Low stock', className: 'bg-yellow-100 text-yellow-800' };
+    return 'low_stock';
   }
-  return { status: 'in_stock', label: 'In stock', className: 'bg-green-100 text-green-800' };
+  return 'in_stock';
 }
 
 export default function AdminProductsPage() {
@@ -203,7 +195,7 @@ export default function AdminProductsPage() {
               )}
             </div>
             <div>
-              <p className="font-medium text-slate-900">{product.attributes.name}</p>
+              <p className="font-medium ">{product.attributes.name}</p>
               <p className="text-xs text-muted-foreground">{product.attributes.sku}</p>
             </div>
           </div>
@@ -215,11 +207,7 @@ export default function AdminProductsPage() {
       header: 'Category',
       cell: ({ row }) => {
         const category = row.original.attributes.category;
-        return (
-          <Badge className={categoryColors[category] || 'bg-slate-100'}>
-            {category}
-          </Badge>
-        );
+        return <StatusBadge status={category} variant="category" showDot={false} />;
       },
     },
     {
@@ -240,9 +228,7 @@ export default function AdminProductsPage() {
 
         return (
           <div className="flex items-center gap-2">
-            <Badge className={stockStatus.className}>
-              {stockStatus.label}
-            </Badge>
+            <StatusBadge status={stockStatus} variant="stock" showDot={false} />
             {stock !== undefined && (
               <span className="text-sm text-muted-foreground">
                 {stock.toFixed(1)} lbs
@@ -258,9 +244,11 @@ export default function AdminProductsPage() {
       cell: ({ row }) => {
         const isPublished = !!row.original.attributes.publishedAt;
         return (
-          <Badge className={isPublished ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'}>
-            {isPublished ? 'Published' : 'Draft'}
-          </Badge>
+          <StatusBadge
+            status={isPublished ? 'published' : 'draft'}
+            variant="published"
+            showDot={false}
+          />
         );
       },
     },
@@ -343,7 +331,7 @@ export default function AdminProductsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Products</h1>
+          <h1 className="text-2xl font-bold ">Products</h1>
           <p className="text-sm text-muted-foreground">
             Manage your product catalog and inventory
           </p>
@@ -359,7 +347,7 @@ export default function AdminProductsPage() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card
-          className={`cursor-pointer transition-colors ${!filterParam ? 'ring-2 ring-primary' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${!filterParam ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/products')}
         >
           <CardHeader className="pb-2">
@@ -373,7 +361,7 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
 
-        <Card className="hover:bg-slate-50 cursor-pointer transition-colors">
+        <Card className="hover:bg-muted/30 cursor-pointer transition-colors">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Published</CardTitle>
           </CardHeader>
@@ -385,7 +373,7 @@ export default function AdminProductsPage() {
           </CardContent>
         </Card>
 
-        <Card className="hover:bg-slate-50 cursor-pointer transition-colors">
+        <Card className="hover:bg-muted/30 cursor-pointer transition-colors">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Drafts</CardTitle>
           </CardHeader>
@@ -398,7 +386,7 @@ export default function AdminProductsPage() {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-colors ${filterParam === 'low-stock' ? 'ring-2 ring-primary' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${filterParam === 'low-stock' ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/products?filter=low-stock')}
         >
           <CardHeader className="pb-2">

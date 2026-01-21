@@ -46,6 +46,9 @@ export interface CreateProductData {
   sort_order?: number;
   base_price_per_pound?: number;
   pricing_model?: 'per_pound' | 'tiered';
+  pricing_unit?: 'per_pound' | 'per_half_pound';
+  grade_category?: 'High-end' | 'Mid-end' | 'Low-end';
+  sizes_available?: 'Large' | 'Medium' | 'Small';
   customization_enabled?: boolean;
 }
 

@@ -143,7 +143,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
             {/* Close Button */}
             <button
               onClick={() => setIsLightboxOpen(false)}
-              className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+              className="absolute top-4 right-4 z-50 bg-background/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
               aria-label="Close lightbox"
             >
               <X className="w-6 h-6" />
@@ -161,7 +161,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
               <>
                 <button
                   onClick={handlePreviousImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition-colors"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/10 hover:bg-white/20 text-white rounded-full p-3 transition-colors"
                   aria-label="Previous image"
                 >
                   <ChevronLeft className="w-8 h-8" />
@@ -169,14 +169,14 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
                 <button
                   onClick={handleNextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/10 hover:bg-white/20 text-white rounded-full p-3 transition-colors"
                   aria-label="Next image"
                 >
                   <ChevronRight className="w-8 h-8" />
                 </button>
 
                 {/* Lightbox Image Counter */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/10 text-white px-4 py-2 rounded-lg">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/10 text-white px-4 py-2 rounded-lg">
                   {currentImageIndex + 1} / {images.length}
                 </div>
               </>

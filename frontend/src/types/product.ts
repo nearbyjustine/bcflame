@@ -72,6 +72,8 @@ export interface ProductAttributes {
   warning?: string;
   thc_content?: string;
   flavor_profile?: string;
+  grade_category?: 'High-end' | 'Mid-end' | 'Low-end';
+  sizes_available?: 'Large' | 'Medium' | 'Small';
   product_url?: string;
   on_sale: boolean;
   featured: boolean;
@@ -79,6 +81,7 @@ export interface ProductAttributes {
   pricing: ProductPricing[];
   base_price_per_pound?: number;
   pricing_model?: 'per_pound' | 'tiered';
+  pricing_unit?: 'per_pound' | 'per_half_pound';
   features?: ProductFeature[];
   images?: {
     data: ProductImage[];

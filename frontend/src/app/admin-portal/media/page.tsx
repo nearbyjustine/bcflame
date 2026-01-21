@@ -100,10 +100,10 @@ const categoryLabels: Record<MediaCategory, string> = {
 };
 
 const categoryColors: Record<MediaCategory, string> = {
-  product_photos: 'bg-blue-100 text-blue-700',
-  marketing_materials: 'bg-purple-100 text-purple-700',
-  packaging_templates: 'bg-amber-100 text-amber-700',
-  brand_guidelines: 'bg-green-100 text-green-700',
+  product_photos: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300',
+  marketing_materials: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300',
+  packaging_templates: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300',
+  brand_guidelines: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300',
 };
 
 function formatFileSize(bytes?: number): string {
@@ -244,7 +244,7 @@ export default function MediaManagementPage() {
           description: uploadDescription,
           category: uploadCategory,
           file: uploadedFile.id,
-          fileSize: uploadedFile.size,
+          fileSize: parseInt(uploadedFile.size),
           fileType: uploadedFile.mime,
           tags: selectedTags,
           publishedAt: new Date().toISOString(),
@@ -317,7 +317,7 @@ export default function MediaManagementPage() {
                 )}
               </div>
               <div>
-                <p className="font-medium text-slate-900">{asset.title}</p>
+                <p className="font-medium">{asset.title}</p>
                 <p className="text-xs text-muted-foreground">
                   {asset.file?.name || 'No file'}
                 </p>
@@ -456,7 +456,7 @@ export default function MediaManagementPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Media Management</h1>
+          <h1 className="text-2xl font-bold">Media Management</h1>
           <p className="text-sm text-muted-foreground">
             Upload and manage marketing assets for resellers
           </p>
@@ -481,7 +481,7 @@ export default function MediaManagementPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Card
-          className={`cursor-pointer transition-colors ${selectedCategory === 'all' ? 'border-primary bg-primary/5' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedCategory === 'all' ? 'border-primary bg-primary/5' : 'hover:bg-muted/30'}`}
           onClick={() => handleCategoryChange('all')}
         >
           <CardContent className="p-4">
@@ -490,38 +490,38 @@ export default function MediaManagementPage() {
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedCategory === 'product_photos' ? 'border-blue-500 bg-blue-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedCategory === 'product_photos' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleCategoryChange('product_photos')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-blue-600">{stats.product_photos}</p>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.product_photos}</p>
             <p className="text-xs text-muted-foreground">Photos</p>
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedCategory === 'marketing_materials' ? 'border-purple-500 bg-purple-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedCategory === 'marketing_materials' ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleCategoryChange('marketing_materials')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-purple-600">{stats.marketing_materials}</p>
+            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.marketing_materials}</p>
             <p className="text-xs text-muted-foreground">Marketing</p>
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedCategory === 'packaging_templates' ? 'border-amber-500 bg-amber-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedCategory === 'packaging_templates' ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleCategoryChange('packaging_templates')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-amber-600">{stats.packaging_templates}</p>
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.packaging_templates}</p>
             <p className="text-xs text-muted-foreground">Packaging</p>
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedCategory === 'brand_guidelines' ? 'border-green-500 bg-green-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedCategory === 'brand_guidelines' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleCategoryChange('brand_guidelines')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-green-600">{stats.brand_guidelines}</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.brand_guidelines}</p>
             <p className="text-xs text-muted-foreground">Guidelines</p>
           </CardContent>
         </Card>

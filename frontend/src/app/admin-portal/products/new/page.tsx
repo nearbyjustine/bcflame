@@ -48,6 +48,9 @@ export default function NewProductPage() {
     sort_order: 0,
     base_price_per_pound: 0,
     pricing_model: 'per_pound',
+    pricing_unit: 'per_pound',
+    grade_category: undefined,
+    sizes_available: undefined,
     customization_enabled: false,
   });
 
@@ -113,7 +116,7 @@ export default function NewProductPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">New Product</h1>
+            <h1 className="text-2xl font-bold">New Product</h1>
             <p className="text-sm text-muted-foreground">Add a new product to your catalog</p>
           </div>
         </div>
@@ -193,6 +196,41 @@ export default function NewProductPage() {
                 </div>
               </div>
 
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="grade_category">Grade Category</Label>
+                  <Select
+                    value={formData.grade_category || ''}
+                    onValueChange={(value) => handleFormChange('grade_category', value || undefined)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="High-end">High-end</SelectItem>
+                      <SelectItem value="Mid-end">Mid-end</SelectItem>
+                      <SelectItem value="Low-end">Low-end</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sizes_available">Sizes Available</Label>
+                  <Select
+                    value={formData.sizes_available || ''}
+                    onValueChange={(value) => handleFormChange('sizes_available', value || undefined)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Large">Large</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Small">Small</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
                 <Input
@@ -264,7 +302,9 @@ export default function NewProductPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Price per Pound ($)</Label>
+                <Label htmlFor="price">
+                  Base Price ($) {formData.pricing_unit === 'per_half_pound' ? 'per ½ lb' : 'per lb'}
+                </Label>
                 <Input
                   id="price"
                   type="number"
@@ -273,6 +313,22 @@ export default function NewProductPage() {
                   onChange={(e) => handleFormChange('base_price_per_pound', parseFloat(e.target.value) || 0)}
                   placeholder="0.00"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pricing_unit">Pricing Unit</Label>
+                <Select
+                  value={formData.pricing_unit}
+                  onValueChange={(value: 'per_pound' | 'per_half_pound') => handleFormChange('pricing_unit', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="per_pound">Per Pound (1 lb)</SelectItem>
+                    <SelectItem value="per_half_pound">Per Half Pound (½ lb)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

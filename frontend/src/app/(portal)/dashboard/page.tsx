@@ -15,16 +15,8 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { getResellerDashboardStats, type ResellerDashboardStats } from '@/lib/api/dashboard';
-
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  reviewing: 'bg-blue-100 text-blue-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  fulfilled: 'bg-purple-100 text-purple-800',
-};
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -211,7 +203,7 @@ export default function DashboardPage() {
                 dashboardData.recentActivity.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between rounded-lg border p-4 hover:bg-slate-50 transition-colors"
+                    className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
@@ -225,9 +217,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <Badge className={statusColors[order.status]}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </Badge>
+                      <StatusBadge status={order.status} variant="order" size="sm" />
                       <Link href={`/orders/${order.id}`}>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <ChevronRight className="h-4 w-4" />

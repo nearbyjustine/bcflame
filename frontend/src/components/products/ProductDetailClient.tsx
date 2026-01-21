@@ -20,8 +20,8 @@ interface ProductDetailClientProps {
 
 const getCategoryStyles = (category: 'Indica' | 'Hybrid') => {
   const styles = {
-    Indica: 'bg-blue-100 text-blue-800',
-    Hybrid: 'bg-purple-100 text-purple-800',
+    Indica: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    Hybrid: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
   };
   return styles[category];
 };
@@ -108,7 +108,7 @@ export function ProductDetailClient({
                 <Badge variant="destructive">On Sale</Badge>
               )}
               {attributes.featured && (
-                <Badge className="bg-yellow-500 hover:bg-yellow-600">
+                <Badge className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
                   Featured
                 </Badge>
               )}
@@ -151,9 +151,12 @@ export function ProductDetailClient({
           <div className="border-t border-b py-4">
             {attributes.base_price_per_pound && attributes.pricing_model === 'per_pound' ? (
               <div className="flex items-center justify-between">
-                <p className="text-muted-foreground">Price per pound</p>
+                <p className="text-muted-foreground">
+                  Price {attributes.pricing_unit === 'per_half_pound' ? 'per half pound' : 'per pound'}
+                </p>
                 <p className="text-3xl font-bold">
-                  {formatPrice(attributes.base_price_per_pound)}/lb
+                  {formatPrice(attributes.base_price_per_pound)}
+                  {attributes.pricing_unit === 'per_half_pound' ? '/½lb' : '/lb'}
                 </p>
               </div>
             ) : attributes.pricing && attributes.pricing.length > 0 ? (
@@ -182,7 +185,7 @@ export function ProductDetailClient({
           {showCustomizeButton ? (
             <Button
               onClick={() => setCustomizingProductId(product.id)}
-              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:opacity-90 transition-opacity"
+              className="w-full bg-gradient-to-r from-primary to-destructive hover:opacity-90 transition-opacity"
               size="lg"
             >
               <Settings className="mr-2 h-5 w-5" />
@@ -195,8 +198,8 @@ export function ProductDetailClient({
               </p>
             </div>
           ) : !attributes.customization_enabled ? (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-blue-800 dark:text-blue-300">
                 This product doesn't support customization. Please contact us for bulk orders.
               </p>
             </div>
@@ -304,13 +307,29 @@ export function ProductDetailClient({
                     <p className="font-semibold">{attributes.flavor_profile}</p>
                   </div>
                 )}
+                {attributes.grade_category && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Grade Category
+                    </p>
+                    <p className="font-semibold">{attributes.grade_category}</p>
+                  </div>
+                )}
+                {attributes.sizes_available && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Sizes Available
+                    </p>
+                    <p className="font-semibold">{attributes.sizes_available}</p>
+                  </div>
+                )}
               </div>
               {attributes.warning && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <h4 className="text-sm font-semibold text-yellow-800 mb-1">
+                <div className="mt-4 p-4 bg-accent border border-accent rounded-lg">
+                  <h4 className="text-sm font-semibold text-accent-foreground mb-1">
                     Warning
                   </h4>
-                  <p className="text-sm text-yellow-700">{attributes.warning}</p>
+                  <p className="text-sm text-accent-foreground">{attributes.warning}</p>
                 </div>
               )}
             </div>

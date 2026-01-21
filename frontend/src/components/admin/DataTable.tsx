@@ -141,18 +141,18 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Table */}
-      <div className="rounded-md border bg-white overflow-hidden">
+      <div className="rounded-md border bg-background overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b">
+            <thead className="bg-muted/50 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
                       className={cn(
-                        'px-4 py-3 text-left text-sm font-medium text-slate-600',
-                        header.column.getCanSort() && 'cursor-pointer select-none hover:bg-slate-100'
+                        'px-4 py-3 text-left text-sm font-medium text-muted-foreground',
+                        header.column.getCanSort() && 'cursor-pointer select-none hover:bg-muted/70'
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
@@ -190,7 +190,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     className={cn(
                       'border-b last:border-0 transition-colors',
-                      row.getIsSelected() ? 'bg-primary/5' : 'hover:bg-slate-50'
+                      row.getIsSelected() ? 'bg-primary/5' : 'hover:bg-muted/30'
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (

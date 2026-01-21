@@ -19,8 +19,8 @@ export default function StepIndicator({ currentStep, totalSteps, stepLabels }: S
               <div
                 className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors duration-500 ${
                   i <= currentStep
-                    ? 'bg-orange-500 border-orange-500 text-white'
-                    : 'border-neutral-300 text-neutral-400 bg-white'
+                    ? 'bg-primary border-primary text-primary-foreground'
+                    : 'border-neutral-300 text-neutral-400 bg-background'
                 }`}
               >
                 {i < currentStep ? <Check size={16} /> : i + 1}
@@ -28,7 +28,7 @@ export default function StepIndicator({ currentStep, totalSteps, stepLabels }: S
               {stepLabels && stepLabels[i] && (
                 <span
                   className={`text-xs font-medium transition-colors duration-500 ${
-                    i <= currentStep ? 'text-orange-600' : 'text-neutral-500'
+                    i <= currentStep ? 'text-primary' : 'text-neutral-500'
                   }`}
                 >
                   {stepLabels[i]}
@@ -38,7 +38,7 @@ export default function StepIndicator({ currentStep, totalSteps, stepLabels }: S
             {i < totalSteps - 1 && (
               <div
                 className={`flex-1 h-0.5 mx-4 transition-colors duration-500 ${
-                  i < currentStep ? 'bg-orange-500' : 'bg-neutral-200'
+                  i < currentStep ? 'bg-primary' : 'bg-neutral-200'
                 }`}
               />
             )}

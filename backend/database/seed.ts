@@ -10,6 +10,7 @@ import { seedProducts } from './seeders/product-seeder';
 import { seedCustomization } from './seeders/customization-seeder';
 import { seedUsers } from './seeders/user-seeder';
 import { seedInventory } from './seeders/inventory-seeder';
+import { seedPermissions } from './seeders/permissions-seeder';
 
 // Load environment variables from .env file
 config({ path: path.resolve(__dirname, '..', '.env') });
@@ -27,6 +28,9 @@ async function runSeeders() {
 
   let exitCode = 0;
   try {
+    // Seed permissions first (enable public access to all APIs)
+    await seedPermissions(app);
+
     // Seed users first (required for order inquiries)
     // Pass true to force recreate users with proper password hashing
     await seedUsers(app, true);

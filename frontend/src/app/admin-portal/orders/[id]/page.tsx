@@ -303,7 +303,7 @@ export default function OrderDetailPage() {
           </Link>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-slate-900">
+              <h1 className="text-2xl font-bold ">
                 {order.inquiry_number || `Order #${order.id}`}
               </h1>
               <StatusBadge status={order.status} variant="order" />
@@ -408,9 +408,9 @@ export default function OrderDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {/* Product Info */}
-                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white border">
-                    <Package className="h-6 w-6 text-slate-600" />
+                <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-background border">
+                    <Package className="h-6 w-6 text-muted-foreground" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">{order.product?.name || 'Unknown Product'}</p>
@@ -474,7 +474,7 @@ export default function OrderDetailPage() {
                     <Separator />
                     <div>
                       <h4 className="font-medium mb-2">Customer Notes</h4>
-                      <p className="text-sm text-muted-foreground bg-slate-50 p-3 rounded-lg">
+                      <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
                         {order.notes}
                       </p>
                     </div>
@@ -658,7 +658,7 @@ export default function OrderDetailPage() {
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                     </div>
-                    <div className="w-px h-full bg-slate-200" />
+                    <div className="w-px h-full bg-muted" />
                   </div>
                   <div className="pb-4">
                     <p className="font-medium text-sm">Order Created</p>
@@ -673,7 +673,7 @@ export default function OrderDetailPage() {
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
                         <Eye className="h-4 w-4 text-blue-600" />
                       </div>
-                      <div className="w-px h-full bg-slate-200" />
+                      <div className="w-px h-full bg-muted" />
                     </div>
                     <div className="pb-4">
                       <p className="font-medium text-sm">Under Review</p>
@@ -686,8 +686,8 @@ export default function OrderDetailPage() {
                 {order.updatedAt !== order.createdAt && (
                   <div className="flex gap-3">
                     <div className="flex flex-col items-center">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
-                        <Calendar className="h-4 w-4 text-slate-600" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                       </div>
                     </div>
                     <div>

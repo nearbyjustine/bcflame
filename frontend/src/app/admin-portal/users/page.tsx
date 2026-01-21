@@ -20,8 +20,8 @@ import {
 import { toast } from 'sonner';
 
 import { DataTable } from '@/components/admin/DataTable';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -158,7 +158,7 @@ export default function AdminUsersPage() {
               )}
             </div>
             <div>
-              <p className="font-medium text-slate-900">
+              <p className="font-medium ">
                 {fullName || user.username}
               </p>
               <p className="text-xs text-muted-foreground">{user.email}</p>
@@ -226,24 +226,12 @@ export default function AdminUsersPage() {
       cell: ({ row }) => {
         const user = row.original;
         if (user.blocked) {
-          return (
-            <Badge className="bg-red-100 text-red-800">
-              Blocked
-            </Badge>
-          );
+          return <StatusBadge status="blocked" variant="user-account" showDot={false} />;
         }
         if (!user.confirmed) {
-          return (
-            <Badge className="bg-yellow-100 text-yellow-800">
-              Pending
-            </Badge>
-          );
+          return <StatusBadge status="pending" variant="user-account" showDot={false} />;
         }
-        return (
-          <Badge className="bg-green-100 text-green-800">
-            Active
-          </Badge>
-        );
+        return <StatusBadge status="active" variant="user-account" showDot={false} />;
       },
     },
     {
@@ -302,7 +290,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Users</h1>
+          <h1 className="text-2xl font-bold ">Users</h1>
           <p className="text-sm text-muted-foreground">
             Manage reseller accounts and access
           </p>
@@ -316,7 +304,7 @@ export default function AdminUsersPage() {
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card
-          className={`cursor-pointer transition-colors ${!filterParam ? 'ring-2 ring-primary' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${!filterParam ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/users')}
         >
           <CardHeader className="pb-2">
@@ -331,7 +319,7 @@ export default function AdminUsersPage() {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-colors ${filterParam === 'active' ? 'ring-2 ring-primary' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${filterParam === 'active' ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/users?filter=active')}
         >
           <CardHeader className="pb-2">
@@ -346,7 +334,7 @@ export default function AdminUsersPage() {
         </Card>
 
         <Card
-          className={`cursor-pointer transition-colors ${filterParam === 'blocked' ? 'ring-2 ring-primary' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${filterParam === 'blocked' ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/users?filter=blocked')}
         >
           <CardHeader className="pb-2">

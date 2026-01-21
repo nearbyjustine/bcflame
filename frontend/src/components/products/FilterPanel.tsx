@@ -76,12 +76,12 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
     filters.maxTHC !== undefined;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-6">
+    <div className="bg-card rounded-lg shadow-md p-6 space-y-6">
       {/* Search */}
       <div className="space-y-2">
         <Label htmlFor="search">Search Products</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             id="search"
             type="text"
@@ -107,8 +107,8 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
           {categories.map((category) => {
             const isActive = filters.category === category;
             const colorClasses = {
-              Indica: isActive ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-blue-600 text-blue-600 hover:bg-blue-50',
-              Hybrid: isActive ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-purple-600 text-purple-600 hover:bg-purple-50',
+              Indica: isActive ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-blue-600 text-blue-600 hover:bg-blue-50 hover:dark:bg-blue-700',
+              Hybrid: isActive ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-purple-600 text-purple-600 hover:bg-purple-50 hover:dark:bg-purple-700',
             };
 
             return (
@@ -164,7 +164,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
         <Label>Price Range ($/lb)</Label>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="minPrice" className="text-xs text-gray-500">
+            <Label htmlFor="minPrice" className="text-xs text-muted-foreground">
               Min Price
             </Label>
             <Input
@@ -178,7 +178,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
             />
           </div>
           <div>
-            <Label htmlFor="maxPrice" className="text-xs text-gray-500">
+            <Label htmlFor="maxPrice" className="text-xs text-muted-foreground">
               Max Price
             </Label>
             <Input
@@ -199,7 +199,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
         <Label>THC Content (%)</Label>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="minTHC" className="text-xs text-gray-500">
+            <Label htmlFor="minTHC" className="text-xs text-muted-foreground">
               Min THC %
             </Label>
             <Input
@@ -214,7 +214,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
             />
           </div>
           <div>
-            <Label htmlFor="maxTHC" className="text-xs text-gray-500">
+            <Label htmlFor="maxTHC" className="text-xs text-muted-foreground">
               Max THC %
             </Label>
             <Input

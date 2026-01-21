@@ -20,7 +20,7 @@ import {
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
@@ -40,14 +40,6 @@ import {
   type AdminUser,
   type UserOrderSummary,
 } from '@/lib/api/admin-users';
-
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  reviewing: 'bg-blue-100 text-blue-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  fulfilled: 'bg-purple-100 text-purple-800',
-};
 
 export default function AdminUserDetailPage() {
   const params = useParams();
@@ -145,7 +137,7 @@ export default function AdminUserDetailPage() {
             </Button>
           </Link>
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-slate-100 overflow-hidden">
+            <div className="h-14 w-14 rounded-full bg-muted/50 overflow-hidden">
               {logoUrl ? (
                 <img
                   src={`${strapiUrl}${logoUrl}`}
@@ -160,12 +152,14 @@ export default function AdminUserDetailPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-slate-900">
+                <h1 className="text-2xl font-bold ">
                   {fullName || user.username}
                 </h1>
-                <Badge className={user.blocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}>
-                  {user.blocked ? 'Blocked' : 'Active'}
-                </Badge>
+                <StatusBadge
+                  status={user.blocked ? 'blocked' : 'active'}
+                  variant="user-account"
+                  showDot={false}
+                />
               </div>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
@@ -174,8 +168,8 @@ export default function AdminUserDetailPage() {
 
         <div className="flex items-center gap-2">
           <Button variant="outline" asChild>
-            <a href={`mailto:${user.email}`}>
-              <Mail className="mr-2 h-4 w-4" />
+            <a className="flex items-center gap-2" href={`mailto:${user.email}`}>
+              <Mail className="h-4 w-4" />
               Send Email
             </a>
           </Button>
@@ -274,21 +268,27 @@ export default function AdminUserDetailPage() {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Email Confirmed</span>
-                <Badge className={user.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                  {user.confirmed ? 'Yes' : 'Pending'}
-                </Badge>
+                <StatusBadge
+                  status={user.confirmed ? 'confirmed' : 'unconfirmed'}
+                  variant="user-confirmation"
+                  showDot={false}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Account Access</span>
-                <Badge className={user.blocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}>
-                  {user.blocked ? 'Blocked' : 'Active'}
-                </Badge>
+                <StatusBadge
+                  status={user.blocked ? 'blocked' : 'active'}
+                  variant="user-account"
+                  showDot={false}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">User Type</span>
-                <Badge className="bg-slate-100 text-slate-800">
-                  {user.userType === 'admin' ? 'Admin' : 'Reseller'}
-                </Badge>
+                <StatusBadge
+                  status={user.userType}
+                  variant="user-type"
+                  showDot={false}
+                />
               </div>
             </CardContent>
           </Card>
@@ -371,11 +371,11 @@ export default function AdminUserDetailPage() {
                   {recentOrders.map((order) => (
                     <div
                       key={order.id}
-                      className="flex items-center justify-between rounded-lg border p-4 hover:bg-slate-50 transition-colors"
+                      className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/30 transition-colors"
                     >
                       <div className="flex items-center space-x-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-                          <Package className="h-5 w-5 text-slate-600" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50">
+                          <Package className="h-5 w-5 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">{order.attributes.inquiry_number}</p>
@@ -389,9 +389,7 @@ export default function AdminUserDetailPage() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
-                        <Badge className={statusColors[order.attributes.status] || 'bg-slate-100'}>
-                          {order.attributes.status.charAt(0).toUpperCase() + order.attributes.status.slice(1)}
-                        </Badge>
+                        <StatusBadge status={order.attributes.status} variant="order" size="sm" />
                         <Link href={`/admin-portal/orders/${order.id}`}>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
                             <ChevronRight className="h-4 w-4" />

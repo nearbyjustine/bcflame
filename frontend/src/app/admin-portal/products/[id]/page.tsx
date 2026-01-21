@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -100,6 +101,9 @@ export default function AdminProductDetailPage() {
         sort_order: data.attributes.sort_order,
         base_price_per_pound: data.attributes.base_price_per_pound,
         pricing_model: data.attributes.pricing_model || 'per_pound',
+        pricing_unit: data.attributes.pricing_unit || 'per_pound',
+        grade_category: data.attributes.grade_category,
+        sizes_available: data.attributes.sizes_available,
         customization_enabled: data.attributes.customization_enabled,
       });
 
@@ -245,12 +249,12 @@ export default function AdminProductDetailPage() {
   const images = product.attributes.images?.data || [];
 
   const stockStatus = !product.inventory
-    ? { status: 'unknown', label: 'No inventory', className: 'bg-slate-100 text-slate-600' }
+    ? 'unknown'
     : product.inventory.attributes.quantity_in_stock <= 0
-    ? { status: 'out_of_stock', label: 'Out of stock', className: 'bg-red-100 text-red-800' }
+    ? 'out_of_stock'
     : product.inventory.attributes.quantity_in_stock <= product.inventory.attributes.reorder_point
-    ? { status: 'low_stock', label: 'Low stock', className: 'bg-yellow-100 text-yellow-800' }
-    : { status: 'in_stock', label: 'In stock', className: 'bg-green-100 text-green-800' };
+    ? 'low_stock'
+    : 'in_stock';
 
   return (
     <div className="space-y-6">
@@ -264,10 +268,12 @@ export default function AdminProductDetailPage() {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-slate-900">{product.attributes.name}</h1>
-              <Badge className={isPublished ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'}>
-                {isPublished ? 'Published' : 'Draft'}
-              </Badge>
+              <h1 className="text-2xl font-bold ">{product.attributes.name}</h1>
+              <StatusBadge
+                status={isPublished ? 'published' : 'draft'}
+                variant="published"
+                showDot={false}
+              />
             </div>
             <p className="text-sm text-muted-foreground">SKU: {product.attributes.sku}</p>
           </div>
@@ -353,6 +359,41 @@ export default function AdminProductDetailPage() {
                     onChange={(e) => handleFormChange('thc_content', e.target.value)}
                     placeholder="e.g., 20-25%"
                   />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="grade_category">Grade Category</Label>
+                  <Select
+                    value={formData.grade_category || ''}
+                    onValueChange={(value) => handleFormChange('grade_category', value || undefined)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="High-end">High-end</SelectItem>
+                      <SelectItem value="Mid-end">Mid-end</SelectItem>
+                      <SelectItem value="Low-end">Low-end</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sizes_available">Sizes Available</Label>
+                  <Select
+                    value={formData.sizes_available || ''}
+                    onValueChange={(value) => handleFormChange('sizes_available', value || undefined)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Large">Large</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Small">Small</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -465,7 +506,9 @@ export default function AdminProductDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Price per Pound ($)</Label>
+                <Label htmlFor="price">
+                  Base Price ($) {formData.pricing_unit === 'per_half_pound' ? 'per ½ lb' : 'per lb'}
+                </Label>
                 <Input
                   id="price"
                   type="number"
@@ -473,6 +516,22 @@ export default function AdminProductDetailPage() {
                   value={formData.base_price_per_pound || ''}
                   onChange={(e) => handleFormChange('base_price_per_pound', parseFloat(e.target.value) || 0)}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pricing_unit">Pricing Unit</Label>
+                <Select
+                  value={formData.pricing_unit}
+                  onValueChange={(value) => handleFormChange('pricing_unit', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="per_pound">Per Pound (1 lb)</SelectItem>
+                    <SelectItem value="per_half_pound">Per Half Pound (½ lb)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -519,7 +578,7 @@ export default function AdminProductDetailPage() {
                 Inventory
               </CardTitle>
               <CardDescription>
-                <Badge className={stockStatus.className}>{stockStatus.label}</Badge>
+                <StatusBadge status={stockStatus} variant="stock" showDot={false} />
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -585,8 +644,8 @@ export default function AdminProductDetailPage() {
                 />
               </div>
 
-              {stockStatus.status === 'low_stock' && (
-                <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-lg text-yellow-800 text-sm">
+              {stockStatus === 'low_stock' && (
+                <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-800 dark:text-amber-300 text-sm">
                   <AlertTriangle className="h-4 w-4" />
                   <span>Stock is below reorder point</span>
                 </div>

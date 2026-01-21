@@ -16,19 +16,7 @@ export async function getInventory(params?: GetInventoryParams): Promise<Invento
     page = 1,
     pageSize = 25,
     productId,
-    belowReorderPoint,
   } = params || {};
-
-  const filters: any = {};
-
-  if (productId) {
-    filters.product = { id: { $eq: productId } };
-  }
-
-  if (belowReorderPoint) {
-    // Filter where quantity_in_stock <= reorder_point
-    // Note: This requires custom filtering logic in Strapi or frontend post-processing
-  }
 
   const queryParams = new URLSearchParams({
     'pagination[page]': page.toString(),
@@ -36,8 +24,8 @@ export async function getInventory(params?: GetInventoryParams): Promise<Invento
     'populate': 'product,last_restocked_by',
   });
 
-  if (Object.keys(filters).length > 0) {
-    queryParams.append('filters', JSON.stringify(filters));
+  if (productId) {
+    queryParams.append('filters[product][id][$eq]', productId.toString());
   }
 
   const response = await strapiApi.get<InventoryResponse>(`/api/inventories?${queryParams}`);

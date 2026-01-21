@@ -10,7 +10,7 @@ import type { Strapi } from '@strapi/strapi';
 // ============================================================================
 
 type BackgroundType = 'solid_color' | 'gradient' | 'texture' | 'image';
-type BudCategory = 'trim_quality' | 'flower_grade' | 'visual_style';
+type BudCategory = 'trim_quality' | 'flower_grade' | 'visual_style' | 'bud_count';
 type FontCategory = 'sans_serif' | 'serif' | 'display' | 'script';
 type PackagingType = 'mylar_bag' | 'glass_jar' | 'preroll_tube' | 'child_resistant_container' | 'tin_container';
 
@@ -34,6 +34,10 @@ const budStyles: { name: string; category: BudCategory; description: string; sor
   { name: 'Fluffy Nugs', category: 'visual_style', description: 'Airy, light bud structure', sort_order: 6 },
   { name: 'Purple Hues', category: 'visual_style', description: 'Distinctive purple coloration', sort_order: 7 },
   { name: 'Frosty Trichomes', category: 'visual_style', description: 'Heavy trichome coverage', sort_order: 8 },
+  { name: '1 Bud', category: 'bud_count', description: 'Single premium bud', sort_order: 9 },
+  { name: '2 Buds', category: 'bud_count', description: 'Two select buds', sort_order: 10 },
+  { name: '3 Buds', category: 'bud_count', description: 'Three quality buds', sort_order: 11 },
+  { name: '4 Buds', category: 'bud_count', description: 'Four choice buds', sort_order: 12 },
 ];
 
 const fontStyles: { name: string; font_family: string; category: FontCategory; sort_order: number }[] = [
@@ -157,7 +161,7 @@ async function seedBudStyles(strapi: Strapi): Promise<number> {
       data: {
         ...style,
         publishedAt: new Date(),
-      },
+      } as any, // Cast to any to allow new bud_count category before types are regenerated
     });
     created++;
   }

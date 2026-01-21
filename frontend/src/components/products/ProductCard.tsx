@@ -153,12 +153,12 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
         <div className="absolute top-2 right-2 flex flex-col gap-2">
           {getStockBadge(stockStatus)}
           {attributes.on_sale && (
-            <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+            <span className="bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded">
               On Sale
             </span>
           )}
           {attributes.featured && (
-            <span className="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded">
+            <span className="bg-secondary text-secondary-foreground text-xs font-bold px-2 py-1 rounded">
               Featured
             </span>
           )}
@@ -187,11 +187,14 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
           </div>
         )}
 
-        {/* Price display - show per-pound pricing or tiered pricing */}
+        {/* Price display - show per-pound/half-pound pricing or tiered pricing */}
         {attributes.base_price_per_pound && attributes.pricing_model === 'per_pound' ? (
           <div className="flex items-center justify-between pt-2 border-t">
             <p className="text-sm text-muted-foreground">Starting at</p>
-            <p className="text-xl font-bold">{formatPrice(attributes.base_price_per_pound)}/lb</p>
+            <p className="text-xl font-bold">
+              {formatPrice(attributes.base_price_per_pound)}
+              {attributes.pricing_unit === 'per_half_pound' ? '/½lb' : '/lb'}
+            </p>
           </div>
         ) : selectedPricing && attributes.pricing?.length > 0 ? (
           <>
@@ -232,7 +235,7 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
                 e.stopPropagation(); // Stop event bubbling
                 onCustomize();
               }}
-              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:opacity-90 transition-opacity"
+              className="w-full bg-gradient-to-r from-primary to-destructive hover:opacity-90 transition-opacity"
             >
               <Settings className="mr-2 h-4 w-4" />
               Customize

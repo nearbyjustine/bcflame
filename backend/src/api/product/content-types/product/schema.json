@@ -52,6 +52,16 @@
     "flavor_profile": {
       "type": "text"
     },
+    "grade_category": {
+      "type": "enumeration",
+      "enum": ["High-end", "Mid-end", "Low-end"],
+      "required": false
+    },
+    "sizes_available": {
+      "type": "enumeration",
+      "enum": ["Large", "Medium", "Small"],
+      "required": false
+    },
     "product_url": {
       "type": "string",
       "maxLength": 1000
@@ -82,6 +92,11 @@
     "pricing_model": {
       "type": "enumeration",
       "enum": ["per_pound", "tiered"],
+      "default": "per_pound"
+    },
+    "pricing_unit": {
+      "type": "enumeration",
+      "enum": ["per_pound", "per_half_pound"],
       "default": "per_pound"
     },
     "features": {

@@ -152,7 +152,7 @@ export default function OrdersPage() {
           const customer = row.original.customer;
           return (
             <div className="min-w-[150px]">
-              <p className="font-medium text-slate-900">
+              <p className="font-medium ">
                 {customer?.username || 'Unknown'}
               </p>
               <p className="text-xs text-muted-foreground">
@@ -310,7 +310,7 @@ export default function OrdersPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Order Management</h1>
+          <h1 className="text-2xl font-bold ">Order Management</h1>
           <p className="text-sm text-muted-foreground">
             View and manage all order inquiries from resellers
           </p>
@@ -335,7 +335,7 @@ export default function OrdersPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <Card
-          className={`cursor-pointer transition-colors ${selectedStatus === 'all' ? 'border-primary bg-primary/5' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedStatus === 'all' ? 'border-primary bg-primary/5' : 'hover:bg-muted/30'}`}
           onClick={() => handleStatusFilterChange('all')}
         >
           <CardContent className="p-4">
@@ -344,38 +344,38 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedStatus === 'pending' ? 'border-amber-500 bg-amber-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedStatus === 'pending' ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleStatusFilterChange('pending')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.pending}</p>
             <p className="text-xs text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedStatus === 'reviewing' ? 'border-blue-500 bg-blue-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedStatus === 'reviewing' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleStatusFilterChange('reviewing')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-blue-600">{stats.reviewing}</p>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.reviewing}</p>
             <p className="text-xs text-muted-foreground">Reviewing</p>
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedStatus === 'approved' ? 'border-green-500 bg-green-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedStatus === 'approved' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleStatusFilterChange('approved')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.approved}</p>
             <p className="text-xs text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors ${selectedStatus === 'fulfilled' ? 'border-purple-500 bg-purple-50' : 'hover:bg-slate-50'}`}
+          className={`cursor-pointer transition-colors ${selectedStatus === 'fulfilled' ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' : 'hover:bg-muted/30'}`}
           onClick={() => handleStatusFilterChange('fulfilled')}
         >
           <CardContent className="p-4">
-            <p className="text-2xl font-bold text-purple-600">{stats.fulfilled}</p>
+            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.fulfilled}</p>
             <p className="text-xs text-muted-foreground">Fulfilled</p>
           </CardContent>
         </Card>

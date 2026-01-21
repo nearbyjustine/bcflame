@@ -18,7 +18,7 @@ import {
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/admin/StatusBadge';
 import { getAdminDashboardStats, type AdminDashboardStats } from '@/lib/api/dashboard';
 
 interface StatCard {
@@ -35,18 +35,10 @@ interface RecentOrder {
   inquiryNumber: string;
   customerName: string;
   companyName: string;
-  status: 'pending' | 'reviewing' | 'approved' | 'rejected' | 'fulfilled';
+  status: 'pending' | 'reviewing' | 'approved' | 'cancelled' | 'fulfilled';
   total: number;
   createdAt: string;
 }
-
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  reviewing: 'bg-blue-100 text-blue-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  fulfilled: 'bg-purple-100 text-purple-800',
-};
 
 export default function AdminDashboardPage() {
   const [dashboardData, setDashboardData] = useState<AdminDashboardStats | null>(null);
@@ -160,7 +152,7 @@ export default function AdminDashboardPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold ">Dashboard</h1>
           <p className="text-sm text-muted-foreground">
             Welcome back! Here&apos;s what&apos;s happening with your business.
           </p>
@@ -256,7 +248,7 @@ export default function AdminDashboardPage() {
                 dashboardData.recentOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between rounded-lg border p-4 hover:bg-slate-50 transition-colors"
+                    className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/30 transition-colors"
                   >
                     <div className="flex items-center space-x-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
@@ -270,9 +262,7 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <Badge className={statusColors[order.status]}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </Badge>
+                      <StatusBadge status={order.status} variant="order" size="sm" />
                       <Link href={`/admin-portal/orders/${order.id}`}>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <ChevronRight className="h-4 w-4" />

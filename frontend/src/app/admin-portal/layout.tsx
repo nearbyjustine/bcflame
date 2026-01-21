@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard,
   ShoppingCart,
-  Image,
+  Image as ImageIcon,
   Package,
   Users,
   Bell,
@@ -19,6 +20,7 @@ import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { useAdminStore } from '@/stores/adminStore';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 import {
   Sheet,
   SheetContent,
@@ -42,7 +44,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: '/admin-portal/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: '/admin-portal/orders', label: 'Orders', icon: <ShoppingCart className="w-5 h-5" /> },
-  { href: '/admin-portal/media', label: 'Media', icon: <Image className="w-5 h-5" /> },
+  { href: '/admin-portal/media', label: 'Media', icon: <ImageIcon className="w-5 h-5" /> },
   { href: '/admin-portal/products', label: 'Products', icon: <Package className="w-5 h-5" /> },
   { href: '/admin-portal/users', label: 'Users', icon: <Users className="w-5 h-5" /> },
 ];
@@ -102,7 +104,7 @@ export default function AdminPortalLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-muted-foreground">Loading...</p>
@@ -112,16 +114,16 @@ export default function AdminPortalLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <Toaster richColors position="top-right" />
       
       {/* Sidebar - Desktop */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r bg-white lg:block">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r bg-card lg:block">
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center border-b px-6">
             <Link href="/admin-portal/dashboard" className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-primary">BC Flame</span>
+              <Image src="/header_logo.svg" alt="BC Flame" width={100} height={32} className="h-8 w-auto" />
               <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                 Admin
               </span>
@@ -138,7 +140,7 @@ export default function AdminPortalLayout({
                   'flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                   isActiveRoute(item.href)
                     ? 'bg-primary text-primary-foreground'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
                 {item.icon}
@@ -172,13 +174,13 @@ export default function AdminPortalLayout({
       </aside>
 
       {/* Top Bar - Mobile & Desktop */}
-      <header className="fixed top-0 right-0 z-30 h-16 border-b bg-white lg:left-64 left-0">
+      <header className="fixed top-0 right-0 z-30 h-16 border-b bg-card lg:left-64 left-0">
         <div className="flex h-full items-center justify-between px-4 lg:px-6">
           {/* Mobile Menu Button */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <button
-                className="lg:hidden p-2 rounded-md hover:bg-slate-100 transition-colors"
+                className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6" />
@@ -187,7 +189,7 @@ export default function AdminPortalLayout({
             <SheetContent side="left" className="w-[280px] p-0">
               <SheetHeader className="border-b px-6 py-4">
                 <SheetTitle className="text-left flex items-center space-x-2">
-                  <span className="text-xl font-bold text-primary">BC Flame</span>
+                  <Image src="/header_logo.svg" alt="BC Flame" width={100} height={32} className="h-8 w-auto" />
                   <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                     Admin
                   </span>
@@ -203,7 +205,7 @@ export default function AdminPortalLayout({
                       'flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                       isActiveRoute(item.href)
                         ? 'bg-primary text-primary-foreground'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     )}
                   >
                     {item.icon}
@@ -239,28 +241,31 @@ export default function AdminPortalLayout({
 
           {/* Page Title - Hidden on mobile */}
           <div className="hidden lg:block">
-            <h1 className="text-lg font-semibold text-slate-900">
+            <h1 className="text-lg font-semibold text-foreground">
               {navItems.find(item => isActiveRoute(item.href))?.label || 'Admin Portal'}
             </h1>
           </div>
 
           {/* Mobile Title */}
           <div className="lg:hidden">
-            <span className="text-lg font-bold text-primary">BC Flame Admin</span>
+            <Image src="/header_logo.svg" alt="BC Flame" width={100} height={32} className="h-8 w-auto" />
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Notification Bell */}
             <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
               <PopoverTrigger asChild>
                 <button
-                  className="relative p-2 rounded-md hover:bg-slate-100 transition-colors"
+                  className="relative p-2 rounded-md hover:bg-muted transition-colors"
                   aria-label="Notifications"
                 >
-                  <Bell className="w-5 h-5 text-slate-600" />
+                  <Bell className="w-5 h-5 text-muted-foreground" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs font-medium text-destructive-foreground">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -293,7 +298,7 @@ export default function AdminPortalLayout({
                         <div
                           key={notification.id}
                           className={cn(
-                            'px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors',
+                            'px-4 py-3 hover:bg-background cursor-pointer transition-colors',
                             !notification.isRead && 'bg-blue-50/50'
                           )}
                           onClick={() => {
@@ -335,7 +340,7 @@ export default function AdminPortalLayout({
                                   e.stopPropagation();
                                   markAsRead(notification.id);
                                 }}
-                                className="p-1 hover:bg-slate-200 rounded"
+                                className="p-1 hover:bg-muted rounded"
                               >
                                 <X className="h-3 w-3 text-muted-foreground" />
                               </button>
