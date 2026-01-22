@@ -1,0 +1,20 @@
+export default {
+  routes: [
+    {
+      method: 'GET',
+      path: '/messages',
+      handler: 'message.find',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/messages',
+      handler: 'message.create',
+      config: {
+        policies: [],
+      },
+    },
+  ],
+};

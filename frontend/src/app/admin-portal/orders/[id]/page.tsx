@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 
 import { StatusBadge, OrderStatus, PaymentStatus, InvoiceStatus } from '@/components/admin/StatusBadge';
 import { Button } from '@/components/ui/button';
+import { MessageButton } from '@/components/admin/messages/MessageButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -554,12 +555,22 @@ export default function OrderDetailPage() {
                 )}
               </div>
               {order.customer?.id && (
-                <Link href={`/admin-portal/users/${order.customer.id}`}>
-                  <Button variant="outline" size="sm" className="w-full mt-2">
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Customer Profile
-                  </Button>
-                </Link>
+                <div className="flex flex-col gap-2 mt-2">
+                  <Link href={`/admin-portal/users/${order.customer.id}`} className="w-full">
+                    <Button variant="outline" size="sm" className="w-full">
+                      <Eye className="mr-2 h-4 w-4" />
+                      View Customer Profile
+                    </Button>
+                  </Link>
+                  <MessageButton 
+                    userId={order.customer.id} 
+                    userName={order.customer.username} 
+                    variant="default"
+                    size="sm"
+                    showIcon={true}
+                    showText={true}
+                  />
+                </div>
               )}
             </CardContent>
           </Card>

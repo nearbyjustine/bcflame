@@ -81,10 +81,10 @@ export default function BackgroundFontSelector({
       {/* Backgrounds */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-bold text-neutral-600 uppercase tracking-widest flex items-center space-x-2">
+          <label className="text-sm font-bold text-neutral-600 dark:text-neutral-300 uppercase tracking-widest flex items-center space-x-2">
             <Palette size={14} /> <span>Background Theme</span>
           </label>
-          <div className="text-sm text-neutral-700 font-semibold">
+          <div className="text-sm text-neutral-700 dark:text-neutral-300 font-semibold">
             {selectedBackgroundIds.length} / {backgroundLimits.max}
           </div>
         </div>
@@ -95,8 +95,8 @@ export default function BackgroundFontSelector({
               onClick={() => handleBackgroundSelect(bg.id)}
               className={`w-full text-left p-4 rounded-xl border transition-all ${
                 selectedBackgroundIds.includes(bg.id)
-                  ? 'border-orange-500 bg-orange-50 text-neutral-900 ring-2 ring-orange-200'
-                  : 'border-neutral-200 text-neutral-700 hover:border-orange-300 hover:bg-orange-50/50'
+                  ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 text-neutral-900 dark:text-orange-100 ring-2 ring-orange-200 dark:ring-orange-800'
+                  : 'border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:border-orange-300 dark:hover:border-orange-600 hover:bg-orange-50/50 dark:hover:bg-orange-900/20'
               }`}
             >
               <div className="font-semibold">{bg.attributes.name}</div>
@@ -108,10 +108,10 @@ export default function BackgroundFontSelector({
       {/* Fonts */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-bold text-neutral-600 uppercase tracking-widest flex items-center space-x-2">
+          <label className="text-sm font-bold text-neutral-600 dark:text-neutral-300 uppercase tracking-widest flex items-center space-x-2">
             <Type size={14} /> <span>Typography</span>
           </label>
-          <div className="text-sm text-neutral-700 font-semibold">
+          <div className="text-sm text-neutral-700 dark:text-neutral-300 font-semibold">
             {selectedFontIds.length} / {fontLimits.max}
           </div>
         </div>
@@ -122,8 +122,8 @@ export default function BackgroundFontSelector({
               onClick={() => handleFontSelect(font.id)}
               className={`w-full text-left p-4 rounded-xl border transition-all ${
                 selectedFontIds.includes(font.id)
-                  ? 'border-orange-500 bg-orange-50 text-neutral-900 ring-2 ring-orange-200'
-                  : 'border-neutral-200 text-neutral-700 hover:border-orange-300 hover:bg-orange-50/50'
+                  ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 text-neutral-900 dark:text-orange-100 ring-2 ring-orange-200 dark:ring-orange-800'
+                  : 'border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:border-orange-300 dark:hover:border-orange-600 hover:bg-orange-50/50 dark:hover:bg-orange-900/20'
               }`}
             >
               <div className="font-semibold">{font.attributes.name}</div>
@@ -136,12 +136,12 @@ export default function BackgroundFontSelector({
           <div className="mt-6">
             <label
               htmlFor="logo-upload"
-              className="text-sm font-bold text-neutral-600 uppercase tracking-widest mb-3 block flex items-center space-x-2"
+              className="text-sm font-bold text-neutral-600 dark:text-neutral-300 uppercase tracking-widest mb-3 flex items-center space-x-2"
             >
               <Upload size={14} /> <span>Upload Business Logo</span>
             </label>
             <label htmlFor="logo-upload" className="block cursor-pointer">
-              <div className="p-6 rounded-xl border-2 border-dashed border-neutral-300 flex flex-col items-center justify-center text-neutral-600 hover:border-orange-400 hover:bg-orange-50/30 transition-colors group">
+              <div className="p-6 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 flex flex-col items-center justify-center text-neutral-600 dark:text-neutral-400 hover:border-orange-400 dark:hover:border-orange-500 hover:bg-orange-50/30 dark:hover:bg-orange-900/20 transition-colors group">
                 <Upload size={32} className="mb-2 group-hover:text-orange-500 transition-colors" />
                 <p className="text-sm">Upload Business Logo</p>
                 <p className="text-[10px] uppercase mt-1">PNG, SVG (Max 2MB)</p>

@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "messages",
+  "info": {
+    "singularName": "message",
+    "pluralName": "messages",
+    "displayName": "Message",
+    "description": "Individual chat messages"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "conversation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::conversation.conversation",
+      "inversedBy": "messages"
+    },
+    "sender": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "content": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 5000
+    },
+    "relatedOrder": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::order-inquiry.order-inquiry"
+    },
+    "isRead": {
+      "type": "boolean",
+      "default": false
+    },
+    "messageType": {
+      "type": "enumeration",
+      "enum": ["text", "system", "order_update"],
+      "default": "text",
+      "required": true
+    },
+    "readAt": {
+      "type": "datetime",
+      "default": null
+    }
+  }
+}

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ShoppingCart, Menu } from 'lucide-react';
-import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
@@ -56,7 +55,6 @@ export default function PortalLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster richColors position="top-right" />
       {/* CartDrawer hidden - code preserved for future use */}
       {/* <CartDrawer /> */}
       <nav className="border-b">
@@ -79,29 +77,36 @@ export default function PortalLayout({
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col space-y-4 mt-6">
-                  <a 
-                    href="/dashboard" 
+                  <a
+                    href="/dashboard"
                     className="text-sm hover:text-primary py-2 border-b border-border"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
                   </a>
-                  <a 
-                    href="/products" 
+                  <a
+                    href="/products"
                     className="text-sm hover:text-primary py-2 border-b border-border"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Products
                   </a>
-                  <a 
-                    href="/media-hub" 
+                  <a
+                    href="/messages"
+                    className="text-sm hover:text-primary py-2 border-b border-border"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Messages
+                  </a>
+                  <a
+                    href="/media-hub"
                     className="text-sm hover:text-primary py-2 border-b border-border"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Media Hub
                   </a>
-                  <a 
-                    href="/orders" 
+                  <a
+                    href="/orders"
                     className="text-sm hover:text-primary py-2 border-b border-border"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -142,6 +147,7 @@ export default function PortalLayout({
             <div className="hidden md:flex space-x-4">
               <a href="/dashboard" className="text-sm hover:text-primary">Dashboard</a>
               <a href="/products" className="text-sm hover:text-primary">Products</a>
+              <a href="/messages" className="text-sm hover:text-primary">Messages</a>
               <a href="/media-hub" className="text-sm hover:text-primary">Media Hub</a>
               <a href="/orders" className="text-sm hover:text-primary">Orders</a>
               {/* Inventory hidden - will be admin-only feature */}

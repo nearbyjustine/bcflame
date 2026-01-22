@@ -15,8 +15,8 @@ import {
   LogOut,
   Check,
   X,
+  MessageSquare,
 } from 'lucide-react';
-import { Toaster } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { useAdminStore } from '@/stores/adminStore';
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: '/admin-portal/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: '/admin-portal/orders', label: 'Orders', icon: <ShoppingCart className="w-5 h-5" /> },
+  { href: '/admin-portal/messages', label: 'Messages', icon: <MessageSquare className="w-5 h-5" /> },
   { href: '/admin-portal/media', label: 'Media', icon: <ImageIcon className="w-5 h-5" /> },
   { href: '/admin-portal/products', label: 'Products', icon: <Package className="w-5 h-5" /> },
   { href: '/admin-portal/users', label: 'Users', icon: <Users className="w-5 h-5" /> },
@@ -115,8 +116,6 @@ export default function AdminPortalLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster richColors position="top-right" />
-      
       {/* Sidebar - Desktop */}
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r bg-card lg:block">
         <div className="flex h-full flex-col">
