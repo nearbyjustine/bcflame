@@ -43,6 +43,17 @@ services:
       TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
       HOST: 0.0.0.0
       PORT: 1337
+      # Email configuration
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-BC Flame}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
+      EMAIL_ADMIN_RECIPIENTS: ${EMAIL_ADMIN_RECIPIENTS}
+      # Manual seeding: docker exec bcflame_strapi npm run seed
+      SEED_DATA: ${SEED_DATA:-false}
     ports:
       - "${STRAPI_PORT:-1337}:1337"
     volumes:

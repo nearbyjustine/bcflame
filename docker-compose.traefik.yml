@@ -56,7 +56,7 @@ services:
       EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS}
       EMAIL_ADMIN_RECIPIENTS: ${EMAIL_ADMIN_RECIPIENTS}
       # Set to 'true' to seed database on first startup
-      SEED_DATA: ${SEED_DATA:-false}
+      SEED_DATA: ${SEED_DATA:-true}
     volumes:
       - strapi_uploads:/app/public/uploads
     networks:
