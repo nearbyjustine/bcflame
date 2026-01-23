@@ -9,6 +9,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { CartDrawer } from '@/components/layout/CartDrawer';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 import {
   Sheet,
   SheetContent,
@@ -157,6 +158,7 @@ export default function PortalLayout({
           <div className="flex items-center space-x-4">
             {/* Cart Icon - hidden, code preserved for future use */}
             <ThemeToggle />
+            <NotificationDropdown />
             <div className="hidden md:block text-sm">
               <p className="font-medium">{user?.companyName || user?.username}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>

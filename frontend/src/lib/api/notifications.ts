@@ -2,7 +2,7 @@ import { strapiApi } from './strapi';
 
 export interface Notification {
   id: number;
-  type: 'new_order' | 'low_stock' | 'payment_received' | 'order_status_changed' | 'payment_reminder' | 'new_product' | 'system';
+  type: 'new_order' | 'low_stock' | 'payment_received' | 'order_status_changed' | 'payment_reminder' | 'new_product' | 'new_message' | 'system';
   title: string;
   message: string;
   isRead: boolean;

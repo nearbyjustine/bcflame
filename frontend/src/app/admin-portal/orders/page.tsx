@@ -11,12 +11,16 @@ import {
   FileText,
   RefreshCw,
   Filter,
-  Download
+  Download,
+  Edit3
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DataTable } from '@/components/admin/DataTable';
 import { StatusBadge, OrderStatus, PaymentStatus } from '@/components/admin/StatusBadge';
+import { BulkActionToolbar } from '@/components/admin/BulkActionToolbar';
+import { BulkStatusDialog } from '@/components/admin/BulkStatusDialog';
+import { ExportDialog } from '@/components/admin/ExportDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -71,6 +75,15 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<string>(statusFilter || 'all');
+
+  // Bulk action state
+  const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
+  const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
+  const [bulkStatus, setBulkStatus] = useState<OrderStatus>('reviewing');
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  // Export state
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   // Fetch orders from API
   const fetchOrders = async () => {
@@ -294,6 +307,65 @@ export default function OrdersPage() {
     }
   };
 
+  // Handle bulk status update
+  const handleBulkStatusUpdate = async () => {
+    setIsBulkProcessing(true);
+    try {
+      const orderIds = selectedOrders.map((o) => o.id);
+      const response = await strapiApi.post('/api/order-inquiries/bulk-update-status', {
+        orderIds,
+        status: bulkStatus,
+      });
+
+      if (response.data.success) {
+        toast.success(`${response.data.updated} orders updated successfully`);
+        if (response.data.failed > 0) {
+          toast.warning(`${response.data.failed} orders failed to update`);
+        }
+        fetchOrders(); // Refresh
+        setSelectedOrders([]); // Clear selection
+        setBulkStatusDialogOpen(false);
+      }
+    } catch (error) {
+      toast.error('Bulk update failed');
+      console.error('Bulk update error:', error);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
+  // Handle export
+  const handleExport = async (format: 'csv' | 'xlsx', exportAll: boolean) => {
+    try {
+      const params = new URLSearchParams({ format });
+
+      if (!exportAll && selectedOrders.length > 0) {
+        params.append('orderIds', selectedOrders.map((o) => o.id).join(','));
+      }
+
+      const response = await strapiApi.get(`/api/order-inquiries/export?${params}`, {
+        responseType: 'blob',
+      });
+
+      // Trigger download
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orders-${Date.now()}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success('Export completed successfully');
+      setExportDialogOpen(false);
+    } catch (error) {
+      toast.error('Export failed');
+      console.error('Export error:', error);
+    }
+  };
+
   // Calculate summary stats
   const stats = useMemo(() => {
     return {
@@ -325,7 +397,7 @@ export default function OrdersPage() {
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)}>
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -412,6 +484,24 @@ export default function OrdersPage() {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Bulk Action Toolbar */}
+          {selectedOrders.length > 0 && (
+            <div className="mb-4">
+              <BulkActionToolbar
+                selectedCount={selectedOrders.length}
+                onClearSelection={() => setSelectedOrders([])}
+                actions={[
+                  {
+                    label: 'Update Status',
+                    icon: <Edit3 className="mr-2 h-4 w-4" />,
+                    onClick: () => setBulkStatusDialogOpen(true),
+                  },
+                ]}
+              />
+            </div>
+          )}
+
+          {/* Data Table */}
           <DataTable
             columns={columns}
             data={orders}
@@ -419,10 +509,32 @@ export default function OrdersPage() {
             searchPlaceholder="Search by customer name, email, or company..."
             isLoading={isLoading}
             showColumnVisibility={true}
+            showRowSelection={true}
+            onRowSelectionChange={setSelectedOrders}
             pageSize={10}
           />
         </CardContent>
       </Card>
+
+      {/* Bulk Status Dialog */}
+      <BulkStatusDialog
+        open={bulkStatusDialogOpen}
+        onOpenChange={setBulkStatusDialogOpen}
+        selectedCount={selectedOrders.length}
+        currentStatus={bulkStatus}
+        onStatusChange={setBulkStatus}
+        onConfirm={handleBulkStatusUpdate}
+        isProcessing={isBulkProcessing}
+      />
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        selectedCount={selectedOrders.length}
+        totalCount={orders.length}
+        onExport={handleExport}
+      />
     </div>
   );
 }

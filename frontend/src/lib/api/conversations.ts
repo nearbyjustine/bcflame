@@ -19,6 +19,7 @@ export interface Conversation {
   status: 'active' | 'archived';
   createdAt: string;
   updatedAt: string;
+  messages?: Message[]; // Populated when fetching single conversation
 }
 
 export interface Message {

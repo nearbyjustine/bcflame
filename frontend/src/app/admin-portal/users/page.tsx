@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 
 import { DataTable } from '@/components/admin/DataTable';
 import { StatusBadge } from '@/components/admin/StatusBadge';
+import { BulkActionToolbar } from '@/components/admin/BulkActionToolbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -46,6 +47,7 @@ import {
   unblockUser,
   type AdminUser,
 } from '@/lib/api/admin-users';
+import { strapiApi } from '@/lib/api/strapi';
 
 export default function AdminUsersPage() {
   const router = useRouter();
@@ -70,6 +72,9 @@ export default function AdminUsersPage() {
 
   // Create user dialog
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
+
+  // Bulk action state
+  const [selectedUsers, setSelectedUsers] = useState<AdminUser[]>([]);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -130,6 +135,29 @@ export default function AdminUsersPage() {
     setSelectedUser(user);
     setActionType(action);
     setActionDialogOpen(true);
+  };
+
+  // Handle bulk action
+  const handleBulkAction = async (action: 'approve' | 'block' | 'unblock') => {
+    try {
+      const userIds = selectedUsers.map((u) => u.id);
+      const response = await strapiApi.post('/api/users/bulk-update', {
+        userIds,
+        action,
+      });
+
+      if (response.data.success) {
+        toast.success(`${response.data.updated} users updated successfully`);
+        if (response.data.failed > 0) {
+          toast.warning(`${response.data.failed} users failed to update`);
+        }
+        fetchUsers(); // Refresh
+        setSelectedUsers([]); // Clear selection
+      }
+    } catch (error) {
+      toast.error('Bulk action failed');
+      console.error('Bulk action error:', error);
+    }
   };
 
   const columns: ColumnDef<AdminUser>[] = [
@@ -352,12 +380,43 @@ export default function AdminUsersPage() {
       {/* Users Table */}
       <Card>
         <CardContent className="pt-6">
+          {/* Bulk Action Toolbar */}
+          {selectedUsers.length > 0 && (
+            <div className="mb-4">
+              <BulkActionToolbar
+                selectedCount={selectedUsers.length}
+                onClearSelection={() => setSelectedUsers([])}
+                actions={[
+                  {
+                    label: 'Approve',
+                    icon: <CheckCircle className="mr-2 h-4 w-4" />,
+                    onClick: () => handleBulkAction('approve'),
+                  },
+                  {
+                    label: 'Block',
+                    icon: <Ban className="mr-2 h-4 w-4" />,
+                    onClick: () => handleBulkAction('block'),
+                    variant: 'destructive',
+                  },
+                  {
+                    label: 'Unblock',
+                    icon: <CheckCircle className="mr-2 h-4 w-4" />,
+                    onClick: () => handleBulkAction('unblock'),
+                  },
+                ]}
+              />
+            </div>
+          )}
+
+          {/* Data Table */}
           <DataTable
             columns={columns}
             data={users}
             searchKey="email"
             searchPlaceholder="Search by email or company..."
             isLoading={isLoading}
+            showRowSelection={true}
+            onRowSelectionChange={setSelectedUsers}
           />
         </CardContent>
       </Card>

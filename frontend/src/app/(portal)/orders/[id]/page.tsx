@@ -7,7 +7,7 @@ import { getOrderInquiryById } from '@/lib/api/customization';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { OrderInquiry } from '@/types/customization';
+import type { FlatOrderInquiry } from '@/types/customization';
 import { getImageUrl } from '@/lib/utils/image';
 
 // Status badge variant mapping
@@ -54,7 +54,7 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const orderId = parseInt(params.id as string);
 
-  const [order, setOrder] = useState<OrderInquiry | null>(null);
+  const [order, setOrder] = useState<FlatOrderInquiry | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +67,34 @@ export default function OrderDetailPage() {
       setIsLoading(true);
       setError(null);
       const data = await getOrderInquiryById(orderId);
-      setOrder(data);
+
+      // Transform Strapi response to flat structure
+      const flatOrder: FlatOrderInquiry = {
+        id: data.id,
+        ...data.attributes,
+        product: data.attributes.product?.data ? {
+          id: data.attributes.product.data.id,
+          name: data.attributes.product.data.attributes.name,
+          sku: data.attributes.product.data.attributes.sku,
+          category: data.attributes.product.data.attributes.category,
+          images: data.attributes.product.data.attributes.images?.data.map(img => ({
+            id: img.id,
+            url: img.attributes.url,
+            alternativeText: img.attributes.alternativeText,
+          })),
+        } : {
+          id: 0,
+          name: 'Unknown Product',
+          category: '',
+        },
+        customer: data.attributes.customer?.data ? {
+          id: data.attributes.customer.data.id,
+          username: data.attributes.customer.data.attributes.username,
+          email: data.attributes.customer.data.attributes.email,
+        } : undefined,
+      };
+
+      setOrder(flatOrder);
     } catch (err: any) {
       console.error('Error fetching order:', err);
       setError('Failed to load order details. Please try again later.');
@@ -281,7 +308,7 @@ export default function OrderDetailPage() {
                         className="flex justify-between items-center p-3 bg-muted rounded-lg"
                       >
                         <span className="text-sm font-medium">
-                          {item.unit_size}
+                          {item.unit_size} {item.unit_size_unit}
                         </span>
                         <span className="text-sm text-muted-foreground">
                           Quantity: {item.quantity}
@@ -289,9 +316,9 @@ export default function OrderDetailPage() {
                       </div>
                     ))}
                   </div>
-                  {order.total_weight > 0 && (
+                  {order.total_weight && order.total_weight > 0 && (
                     <p className="text-sm text-muted-foreground mt-2">
-                      Total Weight: {order.total_weight} {order.weight_unit}
+                      Total Weight: {order.total_weight} {order.weight_unit || 'lb'}
                     </p>
                   )}
                 </div>

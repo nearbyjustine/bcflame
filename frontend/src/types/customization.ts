@@ -86,6 +86,15 @@ export interface PreBaggingSelection {
   customText?: string;
 }
 
+// Backend response format for prebagging (snake_case from database)
+export interface PreBaggingSelectionResponse {
+  option_id: number;
+  quantity: number;
+  unit_size: number;
+  unit_size_unit: string;
+  custom_text?: string;
+}
+
 export interface CustomizationSelections {
   photos: number[];
   budStyles: number[];
@@ -141,7 +150,7 @@ export interface OrderInquiry {
     selected_bud_styles?: number[];
     selected_backgrounds?: number[];
     selected_fonts?: number[];
-    selected_prebagging?: PreBaggingSelection[];
+    selected_prebagging?: PreBaggingSelectionResponse[];
     additional_notes?: string;
     notes?: string;
     reviewed_at?: string;
@@ -174,6 +183,43 @@ export interface OrderInquiriesResponse {
 export interface SingleOrderInquiryResponse {
   data: OrderInquiry;
   meta: {};
+}
+
+// Flattened version of OrderInquiry for easier consumption in components
+export interface FlatOrderInquiry {
+  id: number;
+  inquiry_number: string;
+  status: 'pending' | 'in_review' | 'approved' | 'rejected' | 'completed';
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  selected_photos?: number[];
+  selected_bud_styles?: number[];
+  selected_backgrounds?: number[];
+  selected_fonts?: number[];
+  selected_prebagging?: PreBaggingSelectionResponse[];
+  notes?: string;
+  total_weight?: number;
+  weight_unit?: string;
+  reviewed_at?: string;
+  createdAt: string;
+  updatedAt: string;
+  product: {
+    id: number;
+    name: string;
+    sku?: string;
+    category: string;
+    images?: Array<{
+      id: number;
+      url: string;
+      alternativeText?: string;
+    }>;
+  };
+  customer?: {
+    id: number;
+    username: string;
+    email: string;
+  };
 }
 
 export interface BudStylesResponse {

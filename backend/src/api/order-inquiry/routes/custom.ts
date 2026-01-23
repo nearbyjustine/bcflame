@@ -21,5 +21,23 @@ export default {
         policies: [],
       },
     },
+    {
+      method: 'POST',
+      path: '/order-inquiries/bulk-update-status',
+      handler: 'order-inquiry.bulkUpdateStatus',
+      config: {
+        policies: [],
+        middlewares: ['api::order-inquiry.require-auth'],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/order-inquiries/export',
+      handler: 'order-inquiry.export',
+      config: {
+        policies: [],
+        middlewares: ['api::order-inquiry.require-auth'],
+      },
+    },
   ],
 };
