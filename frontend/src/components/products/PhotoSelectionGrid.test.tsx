@@ -52,7 +52,7 @@ describe('PhotoSelectionGrid', () => {
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
         selectedPhotoIds={[0, 1, 2, 3, 4]} // Max 5 reached
-        limits={mockLimits}{5}
+        limits={mockLimits}
         onToggle={onToggle}
       />
     );
@@ -71,7 +71,7 @@ describe('PhotoSelectionGrid', () => {
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
         selectedPhotoIds={[0, 1, 2, 3, 4]}
-        limits={mockLimits}{5}
+        limits={mockLimits}
         onToggle={onToggle}
       />
     );
@@ -88,7 +88,7 @@ describe('PhotoSelectionGrid', () => {
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
         selectedPhotoIds={[0, 1, 2]}
-        limits={mockLimits}{5}
+        limits={mockLimits}
         onToggle={vi.fn()}
       />
     );
@@ -101,7 +101,7 @@ describe('PhotoSelectionGrid', () => {
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
         selectedPhotoIds={[0, 2]}
-        limits={mockLimits}{5}
+        limits={mockLimits}
         onToggle={vi.fn()}
       />
     );
@@ -112,11 +112,11 @@ describe('PhotoSelectionGrid', () => {
   });
 
   it('applies orange border to selected photos', () => {
-    render(
+    const { container } = render(
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
         selectedPhotoIds={[1, 3]}
-        limits={mockLimits}{5}
+        limits={mockLimits}
         onToggle={vi.fn()}
       />
     );

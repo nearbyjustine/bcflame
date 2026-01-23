@@ -18,19 +18,29 @@ interface StrapiMediaWrapper {
 }
 
 /**
+ * Simplified image format (used in order inquiries and other contexts)
+ */
+interface SimplifiedImage {
+  id: number;
+  url: string;
+  alternativeText?: string;
+  name?: string;
+}
+
+/**
  * Type guard to check if image is in Strapi wrapper format
  */
 function isStrapiWrappedImage(
-  image: ProductImage | StrapiMediaWrapper
+  image: ProductImage | StrapiMediaWrapper | SimplifiedImage
 ): image is StrapiMediaWrapper {
   return 'attributes' in image && typeof image.attributes === 'object';
 }
 
 /**
- * Extract image URL from either ProductImage or Strapi wrapper format
+ * Extract image URL from either ProductImage, SimplifiedImage, or Strapi wrapper format
  */
 export function getImageUrl(
-  image: ProductImage | StrapiMediaWrapper | null | undefined
+  image: ProductImage | StrapiMediaWrapper | SimplifiedImage | null | undefined
 ): string | null {
   if (!image) return null;
 
@@ -51,10 +61,10 @@ export function getImageUrl(
 }
 
 /**
- * Extract image name from either ProductImage or Strapi wrapper format
+ * Extract image name from either ProductImage, SimplifiedImage, or Strapi wrapper format
  */
 export function getImageName(
-  image: ProductImage | StrapiMediaWrapper | null | undefined,
+  image: ProductImage | StrapiMediaWrapper | SimplifiedImage | null | undefined,
   fallback: string = 'Image'
 ): string {
   if (!image) return fallback;
@@ -67,10 +77,10 @@ export function getImageName(
 }
 
 /**
- * Extract image alt text from either ProductImage or Strapi wrapper format
+ * Extract image alt text from either ProductImage, SimplifiedImage, or Strapi wrapper format
  */
 export function getImageAlt(
-  image: ProductImage | StrapiMediaWrapper | null | undefined,
+  image: ProductImage | StrapiMediaWrapper | SimplifiedImage | null | undefined,
   fallback: string = ''
 ): string {
   if (!image) return fallback;

@@ -202,7 +202,7 @@ export default function OrderDetailPage() {
               {product.images && product.images.length > 0 && (
                 <div className="flex-shrink-0">
                   <img
-                    src={getImageUrl(product.images[0].url)}
+                    src={getImageUrl(product.images[0]) ?? undefined}
                     alt={product.images[0].alternativeText || product.name}
                     className="w-24 h-24 object-cover rounded-lg border"
                   />

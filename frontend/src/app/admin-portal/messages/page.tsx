@@ -119,7 +119,7 @@ export default function MessagesPage() {
           <ConversationList
             conversations={filteredConversations}
             currentUserId={user.id}
-            currentUserType={user.userType}
+            currentUserType={user.userType ?? 'reseller'}
             onViewOrders={(conversation) => setSelectedConversation(conversation)}
           />
         )}

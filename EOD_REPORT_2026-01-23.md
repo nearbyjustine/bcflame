@@ -1,64 +1,98 @@
 # End of Day Report – January 23, 2026
 
 ## Shift Covered
-- **Time:** Evening of Jan 22 – Early Morning Jan 23
-- **Actual work time:** ~6 hours
-  (Includes feature planning, backend/frontend integration, debugging, and DevOps fixes)
+- **Time:** Evening of Jan 22 – Morning Jan 23
+- **Actual work time:** ~8 hours
+  (Includes feature development, backend/frontend integration, and testing)
 
 ---
 
 ## Completed Tasks
 
-### 1. Messaging System Phase 3 Kickoff (Frontend)
-- **What I did:** Started the implementation of the frontend messaging logic. Specifically worked on identifying existing conversations and creating new ones when a partner initiates contact. Integrated with the backend API to handle conversation flow.
-- **What problem this solves:** Establishes the core communication channel between partners and admins.
-- **Who benefits:** **Partners** (direct line to support), **Admins** (streamlined inquiry management).
+### 1. Order-Linked Messaging (Cart Functionality in Messages)
+- **What I did:** Implemented functionality to show orders directly within the messaging interface. Partners can now attach orders to their conversations, allowing admins to view order context alongside messages.
+- **What problem this solves:** Previously, admins had to cross-reference order numbers manually. Now, order details are embedded inline for faster support.
+- **Who benefits:** **Admins** (streamlined support workflow), **Partners** (better order-related communication).
 
-### 2. Docker Seed Script Port Conflict Resolution
-- **What I did:** Debugged and resolved a critical issue where the database seed script failed due to port `1337` being in use. Modified the container configuration to allow seeding on a dedicated port/process.
-- **Why it matters to operations:** Ensures developers and CI/CD pipelines can reliably reset and populate the database without manual intervention or container conflicts.
-- **Current status:** Fixed and verified.
+### 2. Bulk Order Status Update Feature
+- **What I did:** Implemented bulk selection and status update functionality for orders in the admin portal. Admins can now select multiple orders and update their statuses simultaneously.
+- **What problem this solves:** Reduces repetitive manual work when processing batches of orders (e.g., marking 20 orders as "shipped" after fulfillment).
+- **Who benefits:** **Admin/Operations** (significant time savings on bulk processing).
 
-### 3. Messaging Feature Planning
-- **What I did:** Conducted a detailed planning session for Phase 3 (Messaging). Mapped out the requirements for real-time updates, conversation persistence, and user interface needs.
-- **Why it matters to operations:** Provides a clear roadmap for the remaining messaging features, preventing scope creep and ensuring all business requirements are met.
-- **Current status:** Planning complete, implementation in progress.
+### 3. Data Export Feature for Orders
+- **What I did:** Added export dialog and service for exporting order inquiry data. Admins can now download order data for reporting and external processing.
+- **Why it matters to operations:** Enables data analysis, reporting to stakeholders, and integration with external tools (e.g., Excel, accounting software).
+- **Current status:** Done.
 
-### 4. Media Upload "BigInt" Bug Fix
-- **What I did:** Debugged and fixed a `invalid input syntax for type bigint` error in the media upload flow. The system was attempting to save file sizes as decimals, causing database rejections. Enforced integer conversion for file size data.
-- **What problem this solves:** Prevents upload failures when admins add product images or assets.
-- **Current status:** Fixed.
-
-### 5. API Permission (403 Error) Resolution
-- **What I did:** Investigated and resolved a "403 Forbidden" error preventing the frontend from fetching product details (`getProductById`). adjusted Strapi permission settings/token handling to ensure correct access levels.
-- **Why it matters to operations:** unblocks the frontend team from accessing necessary product data.
-- **Current status:** Fixed.
-
-### 6. Logo Integration (Header & Login)
-- **What I did:** Integrated the official BC Flame logo (`logo.svg`) into the main application header and the login screen, replacing placeholders.
-- **Why it matters to operations:** critical for brand consistency and professional appearance (Phase 2 requirement).
-- **Current status:** Deployed.
+### 4. Message Notifications System
+- **What I did:** Created lifecycle hooks for the message content type to trigger notifications when new messages are received. This enables real-time awareness of new communications.
+- **Why it matters to operations:** Ensures admins and partners don't miss important messages in the conversation thread.
+- **Current status:** Done.
 
 ---
 
 ## Technical Work (Supporting Details)
 
-### Backend & DevOps
-- Modified Docker setup to handle port conflicts during seeding.
-- Verified Strapi controller logic for `message` and `conversation` endpoints.
-- Debugged PostgreSQL data type issues for media assets.
+### Backend Changes
+- **New File:** `backend/src/api/message/content-types/message/lifecycles.ts` - Message lifecycle hooks for notifications
+- **New File:** `backend/src/api/order-inquiry/services/export.ts` - Export service for order data
+- **Modified:** `backend/src/api/order-inquiry/controllers/order-inquiry.ts` - Added bulk status update endpoint
+- **Modified:** `backend/src/api/order-inquiry/routes/custom.ts` - New routes for export and bulk actions
+- **New Service:** `backend/src/services/order-message.ts` + tests - Service for order-message linking
 
-### Frontend
-- Implemented `createConversation` and conversation lookup logic.
-- Integrated `logo.svg` across public and protected layouts.
-- Fixed API client error handling for 403 responses.
+### Frontend Changes
+- **New Component:** `frontend/src/components/admin/BulkActionToolbar.tsx` - Toolbar for bulk operations
+- **New Component:** `frontend/src/components/admin/BulkStatusDialog.tsx` - Dialog for bulk status updates
+- **New Component:** `frontend/src/components/admin/ExportDialog.tsx` - Export configuration dialog
+- **New Component:** `frontend/src/components/admin/messages/OrderMessageBubble.tsx` - Order display in messages
+- **New Component:** `frontend/src/components/admin/messages/OrdersModal.tsx` - Order selection modal
+- **New Page:** `frontend/src/app/(portal)/orders/[id]/page.tsx` - Partner order detail page
+- **Modified:** Admin orders page, messages pages, conversation list, and message thread components
+
+---
+
+## Relation to Project Plans
+
+### Reference: [.claude/plans/plan.md](file:///Users/justinecastaneda/Desktop/bcflame/.claude/plans/plan.md)
+
+This work advances multiple major tasks from the BC Flame Premium Client Portal development plan:
+
+| Plan Section | Major Task | Status | Today's Contribution |
+|--------------|------------|--------|---------------------|
+| Phase 2C: Enhancements | **Major Task 11: Notifications System** | ✅ In Progress | Message lifecycle hooks for notifications |
+| Phase 2C: Enhancements | **Major Task 17: Partner Communication Tools** | ✅ In Progress | Order-linked messaging, message threads |
+| Phase 2B: Frontend | **Major Task 7: Order Inquiry Page** | ✅ Enhanced | Bulk status updates, data export, partner order detail page |
+
+### Specific Plan Items Completed
+
+From **Major Task 11 (Notifications System)**:
+- ✅ Created notification lifecycle hooks (triggers on new messages)
+- ✅ Partner receives notification on new message
+
+From **Major Task 17 (Partner Communication Tools)**:
+- ✅ Create Message content type with order_inquiry relation
+- ✅ Attach order inquiry context to messages
+- ✅ Reply to messages within conversation thread
+
+From **Major Task 7 (Order Inquiry Page)**:
+- ✅ Order Detail page for partners (`/orders/[id]/page.tsx`)
+- ✅ Bulk status update (admin workflow enhancement)
+- ✅ Export functionality (data download for external analysis)
+
+### Reference: [IMPLEMENTATION_PLAN.md](file:///Users/justinecastaneda/Desktop/bcflame/IMPLEMENTATION_PLAN.md)
+
+| Plan Section | Status | Today's Contribution |
+|--------------|--------|---------------------|
+| Part 4: Messaging System | ✅ Progressed | Order-message integration, lifecycle notifications |
+| Part 3: Partner Management | ✅ Enhanced | Bulk operations, data export for order history |
+| Phase 3 (4-5 days estimated) | In Progress | ~Day 3-4 work completed |
 
 ---
 
 ## Business Impact Summary
-- **Unblocked Development:** Fixing the seed script and API permissions removes major friction points for the dev team.
-- **Core Feature Progress:** Messaging system (a key business value add) is now actively under construction.
-- **Brand Consistency:** Logo integration completes the visual branding planned in Phase 2.
+- **Operational Efficiency:** Bulk status updates dramatically reduce time spent on repetitive order management tasks.
+- **Data Accessibility:** Export feature enables external reporting and analysis without manual data extraction.
+- **Communication Quality:** Order-linked messages provide full context in a single view, reducing support time.
 
 ---
 
@@ -69,6 +103,16 @@
 ---
 
 ## Next Planned Tasks
-- [ ] Complete full end-to-end flow for sending/receiving messages.
-- [ ] Implement real-time updates (WebSocket/Pusher) for new messages.
-- [ ] UI Polish for the conversation view (Chat bubbles, timestamps).
+*(Per [.claude/plans/plan.md](file:///Users/justinecastaneda/Desktop/bcflame/.claude/plans/plan.md))*
+
+- [ ] Complete Major Task 17: Email integration for new message notifications
+- [ ] Implement real-time message updates (WebSocket/polling per Major Task 7.6)
+- [ ] Complete reseller portal messaging view (Phase 5 from `IMPLEMENTATION_PLAN.md`)
+- [ ] UI polish on conversation view (timestamps, read receipts)
+
+---
+
+## Notes
+- The implementation follows the phased approach in `.claude/plans/plan.md`, currently in **Phase 2C: Enhancements & Polish**.
+- Bulk operations and export features were added as enhancements to the Partner Management section to maximize admin efficiency.
+- Message notification lifecycle hooks are ready for integration with email service when configured (per Major Task 17.3).

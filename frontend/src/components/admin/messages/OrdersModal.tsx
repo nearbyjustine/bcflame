@@ -183,7 +183,7 @@ export function OrdersModal({
                     {order.product.images && order.product.images.length > 0 && (
                       <div className="flex-shrink-0">
                         <img
-                          src={getImageUrl(order.product.images[0].url)}
+                          src={getImageUrl(order.product.images[0]) ?? undefined}
                           alt={
                             order.product.images[0].alternativeText ||
                             order.product.name
