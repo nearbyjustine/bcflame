@@ -5,6 +5,7 @@ import {
   generateNewOrderEmailForCustomer,
   generateOrderStatusUpdateEmail,
 } from '../../../../templates/order-email'
+import { createOrderPlacedMessage, createOrderStatusChangeMessage } from '../../../../services/order-message'
 
 // Access global strapi instance (Strapi 4 doesn't pass it in lifecycle events)
 declare const strapi: any
@@ -232,6 +233,12 @@ export default {
           strapi.log.info('Customer confirmation email sent successfully:', customerResult.messageId)
         }
       }
+
+      // Create automated chat message for order placement
+      const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer;
+      if (customerId) {
+        await createOrderPlacedMessage(result.id, customerId);
+      }
     } catch (error) {
       strapi.log.error('Error in afterCreate lifecycle:', error)
       // Don't throw - we don't want to fail the creation if email fails
@@ -331,81 +338,8 @@ export default {
           strapi.log.warn('Failed to create reseller notification:', notifError);
         }
 
-        // Send chat message for status update
-        try {
-          const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer;
-          
-          // 1. Find an Admin user to be the sender/participant
-          // First check for existing conversation to reuse the admin
-          let adminId;
-          let conversation = await strapi.db.query('api::conversation.conversation').findOne({
-            where: {
-              participant_partner: customerId,
-              status: 'active',
-            },
-            populate: ['participant_admin'],
-          });
-
-          if (conversation && conversation.participant_admin) {
-            adminId = conversation.participant_admin.id;
-          } else {
-            // Find any admin user to assign
-            const adminUser = await strapi.db.query('plugin::users-permissions.user').findOne({
-              where: { userType: 'admin' },
-            });
-            
-            if (adminUser) {
-              adminId = adminUser.id;
-            } else {
-              strapi.log.warn('No admin user found to send status chat message');
-            }
-          }
-
-          if (adminId) {
-            // 2. Create conversation if it doesn't exist
-            if (!conversation) {
-              conversation = await strapi.db.query('api::conversation.conversation').create({
-                data: {
-                  participant_admin: adminId,
-                  participant_partner: customerId,
-                  status: 'active',
-                  lastMessageAt: new Date(),
-                  lastMessagePreview: 'Conversation started',
-                  unreadCount_admin: 0,
-                  unreadCount_partner: 0,
-                },
-              });
-            }
-
-            // 3. Create the status update message
-            const statusMessage = `Order #${inquiry.inquiry_number} status updated to: ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`;
-            
-            await strapi.db.query('api::message.message').create({
-              data: {
-                content: statusMessage,
-                conversation: conversation.id,
-                sender: adminId,
-                isRead: false,
-                readAt: null,
-                publishedAt: new Date(), // Ensure it's published
-              },
-            });
-
-            // Update conversation last message
-            await strapi.db.query('api::conversation.conversation').update({
-              where: { id: conversation.id },
-              data: {
-                lastMessageAt: new Date(),
-                lastMessagePreview: statusMessage,
-                unreadCount_partner: (conversation.unreadCount_partner || 0) + 1,
-              },
-            });
-
-            strapi.log.info(`Created status update chat message for order ${inquiry.inquiry_number}`);
-          }
-        } catch (chatError) {
-          strapi.log.error('Failed to create status update chat message:', chatError);
-        }
+        // Create automated chat message for status update
+        await createOrderStatusChangeMessage(result.id, previousStatus, newStatus);
       }
     } catch (error) {
       strapi.log.error('Error in afterUpdate lifecycle:', error)

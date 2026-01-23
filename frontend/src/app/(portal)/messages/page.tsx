@@ -150,7 +150,7 @@ export default function ResellerMessagesPage() {
 
       {/* Chat Interface */}
       <Card className="flex flex-col h-[calc(100vh-250px)]">
-        <MessageThread messages={messages} currentUserId={user.id} />
+        <MessageThread messages={messages} currentUserId={user.id} userType="reseller" />
 
         {typingUsernames.length > 0 && (
           <TypingIndicator username={typingUsernames[0]} />

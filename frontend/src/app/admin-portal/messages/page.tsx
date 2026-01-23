@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ConversationList } from '@/components/admin/messages/ConversationList';
 import { ConnectionStatus } from '@/components/admin/messages/ConnectionStatus';
+import { OrdersModal } from '@/components/admin/messages/OrdersModal';
 import { useSocketContext } from '@/contexts/SocketContext';
 import { getConversations, type Conversation } from '@/lib/api/conversations';
 import { useAuthStore } from '@/stores/authStore';
@@ -18,6 +19,7 @@ export default function MessagesPage() {
   const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   // Load conversations
   useEffect(() => {
@@ -118,9 +120,24 @@ export default function MessagesPage() {
             conversations={filteredConversations}
             currentUserId={user.id}
             currentUserType={user.userType}
+            onViewOrders={(conversation) => setSelectedConversation(conversation)}
           />
         )}
       </Card>
+
+      {/* Orders Modal */}
+      {selectedConversation && (
+        <OrdersModal
+          conversationId={selectedConversation.id}
+          partnerName={
+            user.userType === 'admin'
+              ? selectedConversation.participant_partner.username
+              : selectedConversation.participant_admin.username
+          }
+          isOpen={!!selectedConversation}
+          onClose={() => setSelectedConversation(null)}
+        />
+      )}
     </div>
   );
 }

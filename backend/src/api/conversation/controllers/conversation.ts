@@ -267,5 +267,69 @@ export default factories.createCoreController(
 
       return { unreadCount: totalUnread };
     },
+
+    // Get all orders for the partner in this conversation
+    async getPartnerOrders(ctx) {
+      try {
+        const { id } = ctx.params;
+        const user = ctx.state.user;
+        const { status } = ctx.query;
+
+        // Get conversation and verify access (admin only)
+        const conversation = await strapi.db.query('api::conversation.conversation').findOne({
+          where: { id },
+          populate: {
+            participant_admin: { select: ['id'] },
+            participant_partner: { select: ['id'] },
+          },
+        });
+
+        if (!conversation) {
+          return ctx.notFound('Conversation not found');
+        }
+
+        // Verify user is admin and participant
+        const adminId = conversation.participant_admin?.id || conversation.participant_admin;
+
+        if (user.userType !== 'admin') {
+          return ctx.forbidden('Only admins can view partner orders');
+        }
+
+        if (adminId !== user.id) {
+          return ctx.forbidden('Access denied');
+        }
+
+        // Get partnerId
+        const partnerId = conversation.participant_partner?.id || conversation.participant_partner;
+
+        // Build where clause
+        const where: any = { customer: partnerId };
+        if (status) {
+          where.status = status;
+        }
+
+        // Fetch orders with product info
+        const orders = await strapi.db.query('api::order-inquiry.order-inquiry').findMany({
+          where,
+          populate: {
+            product: {
+              select: ['id', 'name', 'sku'],
+              populate: {
+                images: {
+                  select: ['id', 'url', 'alternativeText'],
+                },
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          limit: 50,
+        });
+
+        return { data: orders };
+      } catch (error) {
+        strapi.log.error('Error in getPartnerOrders:', error);
+        return ctx.internalServerError('Failed to fetch partner orders');
+      }
+    },
   })
 );

@@ -40,5 +40,13 @@ export default {
         policies: [],
       },
     },
+    {
+      method: 'GET',
+      path: '/conversations/:id/partner-orders',
+      handler: 'conversation.getPartnerOrders',
+      config: {
+        policies: [],
+      },
+    },
   ],
 };

@@ -5,13 +5,15 @@ import { format, isSameDay } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import type { Message } from '@/lib/api/conversations';
+import { OrderMessageBubble } from './OrderMessageBubble';
 
 interface MessageThreadProps {
   messages: Message[];
   currentUserId: number;
+  userType: 'admin' | 'reseller';
 }
 
-export function MessageThread({ messages, currentUserId }: MessageThreadProps) {
+export function MessageThread({ messages, currentUserId, userType }: MessageThreadProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -68,44 +70,53 @@ export function MessageThread({ messages, currentUserId }: MessageThreadProps) {
                   </AvatarFallback>
                 </Avatar>
 
-                <div
-                  className={cn(
-                    'flex flex-col max-w-[70%]',
-                    isOwnMessage && 'items-end'
-                  )}
-                >
+                {/* Render order update messages differently */}
+                {message.messageType === 'order_update' && message.relatedOrder ? (
+                  <OrderMessageBubble
+                    message={message}
+                    isOwnMessage={isOwnMessage}
+                    userType={userType}
+                  />
+                ) : (
                   <div
                     className={cn(
-                      'rounded-2xl px-4 py-2',
-                      isOwnMessage
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
+                      'flex flex-col max-w-[70%]',
+                      isOwnMessage && 'items-end'
                     )}
                   >
-                    {message.messageType === 'system' && (
-                      <div className="text-xs font-medium mb-1 opacity-80">
-                        System Message
-                      </div>
-                    )}
-                    <p className="text-sm whitespace-pre-wrap break-words">
-                      {message.content}
-                    </p>
-                  </div>
+                    <div
+                      className={cn(
+                        'rounded-2xl px-4 py-2',
+                        isOwnMessage
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
+                      )}
+                    >
+                      {message.messageType === 'system' && (
+                        <div className="text-xs font-medium mb-1 opacity-80">
+                          System Message
+                        </div>
+                      )}
+                      <p className="text-sm whitespace-pre-wrap break-words">
+                        {message.content}
+                      </p>
+                    </div>
 
-                  <div
-                    className={cn(
-                      'flex items-center gap-2 mt-1 px-2',
-                      isOwnMessage && 'flex-row-reverse'
-                    )}
-                  >
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(message.createdAt), 'h:mm a')}
-                    </span>
-                    {isOwnMessage && message.isRead && (
-                      <span className="text-xs text-muted-foreground">✓ Read</span>
-                    )}
+                    <div
+                      className={cn(
+                        'flex items-center gap-2 mt-1 px-2',
+                        isOwnMessage && 'flex-row-reverse'
+                      )}
+                    >
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(message.createdAt), 'h:mm a')}
+                      </span>
+                      {isOwnMessage && message.isRead && (
+                        <span className="text-xs text-muted-foreground">✓ Read</span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })}

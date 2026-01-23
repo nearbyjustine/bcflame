@@ -29,12 +29,29 @@ export interface Message {
   messageType: 'text' | 'system' | 'order_update';
   relatedOrder?: {
     id: number;
-    inquiryNumber: string;
+    inquiry_number: string;
   };
   isRead: boolean;
   readAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface OrderInquirySummary {
+  id: number;
+  inquiry_number: string;
+  status: string;
+  createdAt: string;
+  product: {
+    id: number;
+    name: string;
+    sku: string;
+    images?: Array<{
+      id: number;
+      url: string;
+      alternativeText?: string;
+    }>;
+  };
 }
 
 export interface ConversationsResponse {
@@ -109,4 +126,17 @@ export async function markConversationAsRead(conversationId: number): Promise<vo
 export async function getUnreadCount(): Promise<number> {
   const response = await strapiApi.get<{ unreadCount: number }>('/api/conversations/unread-count');
   return response.data.unreadCount;
+}
+
+// Get all orders for partner in conversation
+export async function getPartnerOrders(
+  conversationId: number,
+  status?: string
+): Promise<OrderInquirySummary[]> {
+  const params = status ? { status } : {};
+  const response = await strapiApi.get<{ data: OrderInquirySummary[] }>(
+    `/api/conversations/${conversationId}/partner-orders`,
+    { params }
+  );
+  return response.data.data;
 }

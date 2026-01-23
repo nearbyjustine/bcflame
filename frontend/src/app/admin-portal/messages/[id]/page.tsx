@@ -9,6 +9,7 @@ import { MessageThread } from '@/components/admin/messages/MessageThread';
 import { MessageInput } from '@/components/admin/messages/MessageInput';
 import { TypingIndicator } from '@/components/admin/messages/TypingIndicator';
 import { ConnectionStatus } from '@/components/admin/messages/ConnectionStatus';
+import { OrdersModal } from '@/components/admin/messages/OrdersModal';
 import { useSocketContext } from '@/contexts/SocketContext';
 import {
   getConversation,
@@ -18,7 +19,7 @@ import {
   type Message,
 } from '@/lib/api/conversations';
 import { useAuthStore } from '@/stores/authStore';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ConversationPage() {
@@ -33,6 +34,7 @@ export default function ConversationPage() {
   const [loading, setLoading] = useState(true);
   const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
 
   // Load conversation
   useEffect(() => {
@@ -168,13 +170,22 @@ export default function ConversationPage() {
             <p className="text-sm text-muted-foreground">{otherUser.companyName}</p>
           )}
         </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setShowOrdersModal(true)}
+          title="View partner orders"
+        >
+          <ShoppingCart className="w-5 h-5" />
+        </Button>
       </div>
 
       <ConnectionStatus isConnected={isConnected} className="mb-4" />
 
       {/* Chat Interface */}
       <Card className="flex flex-col h-[calc(100vh-250px)]">
-        <MessageThread messages={messages} currentUserId={user.id} />
+        <MessageThread messages={messages} currentUserId={user.id} userType="admin" />
 
         {typingUsernames.length > 0 && (
           <TypingIndicator username={typingUsernames[0]} />
@@ -190,6 +201,13 @@ export default function ConversationPage() {
           }
         />
       </Card>
+
+      <OrdersModal
+        conversationId={conversationId}
+        partnerName={otherUser.username}
+        isOpen={showOrdersModal}
+        onClose={() => setShowOrdersModal(false)}
+      />
     </div>
   );
 }
