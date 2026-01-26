@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bcflame_tunnel
+    restart: unless-stopped
+    command: tunnel run
+    volumes:
+      - ~/.cloudflared:/etc/cloudflared
+      - ./cloudflared-config.yml:/etc/cloudflared/config.yml
+    networks:
+      - bcflame_network
+    depends_on:
+      - nginx
+
+# Reuse the network from docker-compose.prod.yml
+networks:
+  bcflame_network:
+    external: true
+    name: bcflame_network  # Should match the one created by prod compose

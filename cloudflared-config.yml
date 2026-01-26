@@ -1,19 +1,19 @@
 tunnel: a81f971c-0bbf-46f5-a212-f21c66475617
-credentials-file: /home/hows.tine/.cloudflared/a81f971c-0bbf-46f5-a212-f21c66475617.json
+credentials-file: /etc/cloudflared/a81f971c-0bbf-46f5-a212-f21c66475617.json
 
 ingress:
   - hostname: bcflame.online
-    service: https://localhost:443
+    service: https://nginx
     originRequest:
       noTLSVerify: true
   
   - hostname: www.bcflame.online
-    service: https://localhost:443
+    service: https://nginx
     originRequest:
       noTLSVerify: true
 
   - hostname: api.bcflame.online
-    service: https://localhost:443
+    service: https://nginx
     originRequest:
       noTLSVerify: true
 
