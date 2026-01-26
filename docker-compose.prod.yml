@@ -21,6 +21,19 @@ services:
     # Do not expose port externally in production
     # Only accessible via internal network
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bcflame_tunnel
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ~/.cloudflared:/etc/cloudflared
+      - ./cloudflared-config.yml:/etc/cloudflared/config.yml
+    networks:
+      - bcflame_network
+    depends_on:
+      - nginx
+
   strapi:
     build:
       context: ./backend
