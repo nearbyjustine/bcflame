@@ -14,7 +14,7 @@
   "attributes": {
     "type": {
       "type": "enumeration",
-      "enum": ["new_order", "low_stock", "payment_received", "order_status_changed", "payment_reminder", "new_product", "system"],
+      "enum": ["new_order", "low_stock", "payment_received", "order_status_changed", "payment_reminder", "new_product", "new_message", "system"],
       "required": true
     },
     "recipient": {

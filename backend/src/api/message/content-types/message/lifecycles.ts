@@ -2,8 +2,6 @@
  * Message lifecycle hooks
  */
 
-declare const strapi: any;
-
 export default {
   /**
    * After create - notify recipient of new message

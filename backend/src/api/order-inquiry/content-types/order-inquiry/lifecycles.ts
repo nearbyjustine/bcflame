@@ -7,9 +7,6 @@ import {
 } from '../../../../templates/order-email'
 import { createOrderPlacedMessage, createOrderStatusChangeMessage } from '../../../../services/order-message'
 
-// Access global strapi instance (Strapi 4 doesn't pass it in lifecycle events)
-declare const strapi: any
-
 /** Number of grams in one pound */
 const GRAMS_PER_POUND = 453.592
 
