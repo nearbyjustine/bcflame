@@ -14,8 +14,4 @@ services:
     depends_on:
       - nginx
 
-# Reuse the network from docker-compose.prod.yml
-networks:
-  bcflame_network:
-    external: true
-    name: bcflame_network  # Should match the one created by prod compose
+
