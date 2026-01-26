@@ -19,7 +19,7 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["pending", "reviewing", "approved", "rejected", "fulfilled"],
+      "enum": ["pending", "reviewing", "approved", "rejected", "fulfilled", "cancelled"],
       "default": "pending",
       "required": true
     },

@@ -72,6 +72,7 @@ function getStatusMessage(status: string): string {
     approved: 'Great news! Your order inquiry has been approved. We will contact you shortly with the next steps.',
     rejected: 'We regret to inform you that we cannot fulfill this order inquiry at this time. Please contact us for more information.',
     fulfilled: 'Your order has been fulfilled. Thank you for your business!',
+    cancelled: 'Your order inquiry has been cancelled. If you have any questions, please contact us.',
   }
   return messages[status] || 'Your order status has been updated.'
 }

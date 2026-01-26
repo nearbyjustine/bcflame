@@ -215,10 +215,10 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
       for (const id of orderIds) {
         try {
           const updated = await strapi.entityService.update(
-            'api::order-inquiry.order-inquiry',
+            'api::order-inquiry.order-inquiry' as any,
             id,
             {
-              data: { status },
+              data: { status } as any,
             }
           );
 
