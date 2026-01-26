@@ -2,6 +2,7 @@ export default [
   'strapi::logger',
   'strapi::errors',
   'global::log-user-context',
+  'global::rate-limit',
   {
     name: 'strapi::security',
     config: {

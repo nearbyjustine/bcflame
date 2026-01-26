@@ -131,8 +131,8 @@ export default ({ strapi }) => ({
         },
       };
     } catch (error) {
-      strapi.log.error('Dashboard admin stats error:', error);
-      ctx.throw(500, 'Failed to fetch dashboard statistics');
+      strapi.log.error('Dashboard admin stats error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to fetch dashboard statistics');
     }
   },
 
@@ -224,8 +224,8 @@ export default ({ strapi }) => ({
         },
       };
     } catch (error) {
-      strapi.log.error('Dashboard reseller stats error:', error);
-      ctx.throw(500, 'Failed to fetch dashboard statistics');
+      strapi.log.error('Dashboard reseller stats error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to fetch dashboard statistics');
     }
   },
 });

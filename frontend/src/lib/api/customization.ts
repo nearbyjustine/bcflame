@@ -87,12 +87,6 @@ export async function submitOrderInquiry(
   // Determine weight unit from selections (use first selection's unit or default to 'lb')
   const weightUnit = selections.preBagging[0]?.unitSizeUnit || 'lb';
 
-  // DEBUG: Check if JWT cookie exists
-  const Cookies = (await import('js-cookie')).default;
-  const jwt = Cookies.get('jwt');
-  console.log('🔍 DEBUG: JWT cookie exists:', !!jwt);
-  console.log('🔍 DEBUG: JWT value:', jwt?.substring(0, 20) + '...');
-
   const response = await strapiApi.post<SingleOrderInquiryResponse>('/api/order-inquiries', {
     data: {
       product: productId,

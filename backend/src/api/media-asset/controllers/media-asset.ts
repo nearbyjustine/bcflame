@@ -103,7 +103,8 @@ export default factories.createCoreController('api::media-asset.media-asset' as 
         },
       };
     } catch (error) {
-      ctx.throw(500, error);
+      strapi.log.error('Media asset upload error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to upload media asset');
     }
   },
 }));

@@ -93,8 +93,8 @@ export default factories.createCoreController('api::campaign-kit.campaign-kit' a
 
       return ctx.body;
     } catch (error) {
-      console.error('Campaign kit download error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Campaign kit download error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to download campaign kit');
     }
   },
 }));

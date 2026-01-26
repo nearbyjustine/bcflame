@@ -12,6 +12,14 @@ export default factories.createCoreController(
         return ctx.badRequest('conversationId query parameter required');
       }
 
+      // Validate pagination parameters
+      const pageNum = Math.max(1, parseInt(page as string) || 1);
+      const pageSizeNum = Math.min(100, Math.max(1, parseInt(pageSize as string) || 50));
+
+      if (isNaN(pageNum) || isNaN(pageSizeNum)) {
+        return ctx.badRequest('Invalid pagination parameters');
+      }
+
       // Verify user has access to conversation
       const conversation = await strapi.db.query('api::conversation.conversation').findOne({
         where: { id: conversationId },
@@ -41,8 +49,8 @@ export default factories.createCoreController(
           },
         },
         orderBy: { createdAt: 'desc' },
-        limit: parseInt(pageSize as string),
-        offset: (parseInt(page as string) - 1) * parseInt(pageSize as string),
+        limit: pageSizeNum,
+        offset: (pageNum - 1) * pageSizeNum,
       });
 
       // Reverse to show oldest first

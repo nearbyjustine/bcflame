@@ -19,6 +19,7 @@ export default {
       handler: 'order-inquiry.statistics',
       config: {
         policies: [],
+        middlewares: ['api::order-inquiry.require-auth'],
       },
     },
     {

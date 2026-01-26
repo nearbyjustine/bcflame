@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Settings } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { ProductImageGallery } from './ProductImageGallery';
@@ -253,7 +254,12 @@ export function ProductDetailClient({
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Full Description</h3>
                   <div
-                    dangerouslySetInnerHTML={{ __html: attributes.full_description }}
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(attributes.full_description, {
+                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'h3', 'h4', 'h5'],
+                        ALLOWED_ATTR: []
+                      })
+                    }}
                   />
                 </div>
               )}

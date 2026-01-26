@@ -189,8 +189,8 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         },
       };
     } catch (error) {
-      console.error('Invoice generation error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Invoice generation error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to generate invoice');
     }
   },
 
@@ -269,8 +269,8 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         },
       };
     } catch (error) {
-      console.error('Invoice regeneration error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Invoice regeneration error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to regenerate invoice');
     }
   },
 
@@ -296,8 +296,8 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         data: invoices,
       };
     } catch (error) {
-      console.error('Invoice history error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Invoice history error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to fetch invoice history');
     }
   },
 
@@ -344,8 +344,8 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         },
       };
     } catch (error) {
-      console.error('Invoice email error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Invoice email error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to send invoice email');
     }
   },
 
@@ -378,8 +378,8 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         },
       };
     } catch (error) {
-      console.error('Invoice PDF download error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Invoice PDF download error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to download invoice PDF');
     }
   },
 }));

@@ -30,7 +30,7 @@ export default ({ env }) => {
         port: env.int('DATABASE_PORT', env.int('DB_PORT', 5432)),
         database: env('DATABASE_NAME', env('DB_NAME', 'bcflame_db')),
         user: env('DATABASE_USERNAME', env('DB_USER', 'bcflame')),
-        password: env('DATABASE_PASSWORD', env('DB_PASSWORD', 'bcflame_dev_password')),
+        password: env('DATABASE_PASSWORD', env('DB_PASSWORD')),
         ssl: env.bool('DATABASE_SSL', false) && {
           rejectUnauthorized: env.bool('DATABASE_SSL_SELF', false),
         },

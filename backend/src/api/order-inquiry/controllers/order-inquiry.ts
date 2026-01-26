@@ -119,6 +119,12 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
    */
   async statistics(ctx) {
     try {
+      // Ensure only admins can view statistics
+      const user = ctx.state.user;
+      if (!user || user.userType !== 'admin') {
+        return ctx.forbidden('Only admins can view statistics');
+      }
+
       // Total orders
       const total = await strapi.db.query('api::order-inquiry.order-inquiry').count();
 
@@ -174,8 +180,8 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
         },
       };
     } catch (error) {
-      console.error('Order statistics error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Order statistics error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to fetch order statistics');
     }
   },
 

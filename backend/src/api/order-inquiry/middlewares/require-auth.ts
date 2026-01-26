@@ -18,7 +18,6 @@ export default (config, { strapi }) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    strapi.log.debug(`🔥 Token extracted (first 30 chars): ${token.substring(0, 30)}...`);
 
     try {
       // If user is not already populated by Strapi's built-in auth, verify manually

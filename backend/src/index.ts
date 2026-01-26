@@ -17,6 +17,20 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }) {
+    // Validate critical environment variables in production
+    const nodeEnv = process.env.NODE_ENV;
+    if (nodeEnv === 'production') {
+      const requiredEnvVars = ['DB_PASSWORD', 'JWT_SECRET', 'ADMIN_JWT_SECRET', 'APP_KEYS'];
+      const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+      if (missingVars.length > 0) {
+        throw new Error(
+          `CRITICAL: Missing required environment variables in production: ${missingVars.join(', ')}\n` +
+          'Application cannot start without these variables.'
+        );
+      }
+    }
+
     // Initialize Socket.IO when Strapi server starts
     const httpServer = strapi.server.httpServer;
     const io = initializeSocket(httpServer);

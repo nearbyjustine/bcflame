@@ -55,8 +55,8 @@ export default factories.createCoreController('api::product.product', ({ strapi 
         },
       };
     } catch (error) {
-      console.error('Product statistics error:', error);
-      ctx.throw(500, error);
+      strapi.log.error('Product statistics error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to fetch product statistics');
     }
   },
 }));
