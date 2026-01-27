@@ -24,7 +24,7 @@ export const rateLimitRules: RateLimitRules = {
   // Authentication endpoints - Very strict
   login: {
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per 15 minutes
+    max: 50, // 50 attempts per 15 minutes
     message: 'Too many login attempts. Please try again later.',
     skipSuccessfulRequests: true, // Don't count successful logins
   },
@@ -39,7 +39,7 @@ export const rateLimitRules: RateLimitRules = {
   // Public API endpoints - Moderate
   public: {
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per 15 minutes
+    max: 2000, // 2000 requests per 15 minutes
     message: 'Too many requests. Please try again later.',
   },
 
