@@ -14,10 +14,10 @@ services:
     networks:
       - bcflame_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bcflame}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bcflame} -d ${DB_NAME:-bcflame_db}"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
     # Do not expose port externally in production
     # Only accessible via internal network
 
@@ -81,9 +81,9 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:1337/_health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: 45s
+      timeout: 15s
+      retries: 5
       start_period: 60s
     # Do not expose port externally
     # nginx will proxy to this service

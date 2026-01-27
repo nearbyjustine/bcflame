@@ -137,12 +137,16 @@ export default (config: any, { strapi }: { strapi: any }) => {
       return next();
     }
 
+    // Variables needed for post-processing
+    let ruleConfig;
+    let entry;
+
     try {
       // Determine which rate limit rule to apply
       const isAuthenticated = !!ctx.state.user;
       const isAdminUser = isAdmin(ctx);
       const ruleName = determineRateLimitRule(path, isAuthenticated, isAdminUser);
-      const ruleConfig = getRateLimitConfig(ruleName);
+      ruleConfig = getRateLimitConfig(ruleName);
 
       // Get client identifier
       const clientId = getClientIdentifier(ctx);
@@ -150,7 +154,7 @@ export default (config: any, { strapi }: { strapi: any }) => {
 
       // Get or create rate limit entry
       const now = Date.now();
-      let entry = store[storeKey];
+      entry = store[storeKey];
 
       if (!entry || entry.resetTime < now) {
         // Create new entry or reset expired entry
@@ -206,23 +210,33 @@ export default (config: any, { strapi }: { strapi: any }) => {
 
         return; // Don't call next()
       }
+    } catch (error) {
+      // Log error but don't block the request if rate limiting fails
+      console.error('[Rate Limit] Error in rate limit pre-processing:', error);
+      // Ensure we call next() if we failed during pre-processing
+      // But we are outside the try/catch logic for next() below
+      return next();
+    }
 
-      // Rate limit not exceeded, continue to next middleware
-      await next();
+    // Rate limit not exceeded or errored in pre-check, continue to next middleware
+    try {
+        await next();
+    } catch (err) {
+        throw err;
+    }
 
+    try {
       // Handle skipSuccessfulRequests option
-      if (ruleConfig.skipSuccessfulRequests && ctx.status < 400) {
+      if (ruleConfig && ruleConfig.skipSuccessfulRequests && ctx.status < 400 && entry) {
         entry.count--;
       }
 
       // Handle skipFailedRequests option
-      if (ruleConfig.skipFailedRequests && ctx.status >= 400) {
+      if (ruleConfig && ruleConfig.skipFailedRequests && ctx.status >= 400 && entry) {
         entry.count--;
       }
     } catch (error) {
-      // Log error but don't block the request if rate limiting fails
-      console.error('[Rate Limit] Error in rate limit middleware:', error);
-      return next();
+       console.error('[Rate Limit] Error in rate limit post-processing:', error);
     }
   };
 };
