@@ -125,8 +125,17 @@ export async function createOrderPlacedMessage(orderId: number, customerId: numb
     // Emit Socket.IO events
     const io = strapi.io;
     if (io) {
+      // Ensure relatedOrder is properly serialized for Socket.IO emission
+      const messageForSocket = {
+        ...message,
+        relatedOrder: message.relatedOrder ? {
+          id: message.relatedOrder.id,
+          inquiry_number: message.relatedOrder.inquiry_number,
+        } : null,
+      };
+
       io.to(`conversation:${conversation.id}`).emit('message:new', {
-        message,
+        message: messageForSocket,
         conversationId: conversation.id,
       });
 
@@ -221,8 +230,17 @@ export async function createOrderStatusChangeMessage(
     // Emit Socket.IO events
     const io = strapi.io;
     if (io) {
+      // Ensure relatedOrder is properly serialized for Socket.IO emission
+      const messageForSocket = {
+        ...message,
+        relatedOrder: message.relatedOrder ? {
+          id: message.relatedOrder.id,
+          inquiry_number: message.relatedOrder.inquiry_number,
+        } : null,
+      };
+
       io.to(`conversation:${conversation.id}`).emit('message:new', {
-        message,
+        message: messageForSocket,
         conversationId: conversation.id,
       });
 

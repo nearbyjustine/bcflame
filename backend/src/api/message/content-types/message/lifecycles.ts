@@ -2,6 +2,8 @@
  * Message lifecycle hooks
  */
 
+import { createNotification } from '../../../../services/notification';
+
 export default {
   /**
    * After create - notify recipient of new message
@@ -10,7 +12,7 @@ export default {
     const { result } = event;
 
     try {
-      // Fetch message with conversation and sender
+      // Fetch message with conversation, sender, and relatedOrder
       const message = await strapi.db.query('api::message.message').findOne({
         where: { id: result.id },
         populate: {
@@ -18,6 +20,7 @@ export default {
             populate: ['participant_admin', 'participant_partner'],
           },
           sender: true,
+          relatedOrder: true,
         },
       });
 
@@ -59,17 +62,28 @@ export default {
         ? `/admin-portal/messages/${message.conversation.id}`
         : `/messages/${message.conversation.id}`;
 
-      // Create notification for recipient
-      await strapi.entityService.create('api::notification.notification', {
-        data: {
-          type: 'new_message',
-          title: `New message from ${senderName}`,
-          message: `You have a new message`,
-          isRead: false,
-          recipient: recipientId,
-          link: link,
+      // Build notification data with message metadata
+      const notificationData: any = {
+        type: 'new_message',
+        title: `New message from ${senderName}`,
+        message: message.content.substring(0, 200), // Include message preview
+        recipient: recipientId,
+        link: link,
+        metadata: {
+          messageType: message.messageType,
+          messageId: message.id,
+          conversationId: message.conversation.id,
         },
-      });
+      };
+
+      // Include relatedOrder if it's an order_update message
+      if (message.messageType === 'order_update' && message.relatedOrder) {
+        notificationData.relatedOrder = message.relatedOrder.id || message.relatedOrder;
+        notificationData.title = `Order update from ${senderName}`;
+      }
+
+      // Create notification and emit Socket.IO event
+      await createNotification(strapi, notificationData);
 
       strapi.log.info(`✉️ Created new message notification for user ${recipientId} from ${senderName}`);
     } catch (error) {

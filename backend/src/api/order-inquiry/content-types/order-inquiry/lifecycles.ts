@@ -6,6 +6,7 @@ import {
   generateOrderStatusUpdateEmail,
 } from '../../../../templates/order-email'
 import { createOrderPlacedMessage, createOrderStatusChangeMessage } from '../../../../services/order-message'
+import { createNotification } from '../../../../services/notification'
 
 /** Number of grams in one pound */
 const GRAMS_PER_POUND = 453.592
@@ -199,15 +200,12 @@ export default {
 
       // Create admin notification for new order
       try {
-        await strapi.entityService.create('api::notification.notification', {
-          data: {
-            type: 'new_order',
-            title: `New Order: ${inquiry.inquiry_number || `#${result.id}`}`,
-            message: `${orderData.customerCompany || orderData.customerName} placed a new order`,
-            isRead: false,
-            relatedOrder: result.id,
-            link: `/admin-portal/orders/${result.id}`,
-          },
+        await createNotification(strapi, {
+          type: 'new_order',
+          title: `New Order: ${inquiry.inquiry_number || `#${result.id}`}`,
+          message: `${orderData.customerCompany || orderData.customerName} placed a new order`,
+          relatedOrder: result.id,
+          link: `/admin-portal/orders/${result.id}`,
         });
         strapi.log.info(`Created admin notification for order ${inquiry.inquiry_number}`);
       } catch (notifError) {
@@ -320,16 +318,13 @@ export default {
         // Create reseller notification for status change
         try {
           const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer
-          await strapi.entityService.create('api::notification.notification', {
-            data: {
-              type: 'order_status_changed',
-              title: `Order ${inquiry.inquiry_number} - Status Updated`,
-              message: `Your order status has been updated to: ${newStatus}`,
-              isRead: false,
-              relatedOrder: result.id,
-              recipient: customerId,
-              link: `/orders/${result.id}`,
-            },
+          await createNotification(strapi, {
+            type: 'order_status_changed',
+            title: `Order ${inquiry.inquiry_number} - Status Updated`,
+            message: `Your order status has been updated to: ${newStatus}`,
+            relatedOrder: result.id,
+            recipient: customerId,
+            link: `/orders/${result.id}`,
           });
           strapi.log.info(`Created reseller notification for order ${inquiry.inquiry_number} status change`);
         } catch (notifError) {

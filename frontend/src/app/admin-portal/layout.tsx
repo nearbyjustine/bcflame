@@ -34,6 +34,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 
 interface NavItem {
   href: string;
@@ -256,7 +257,7 @@ export default function AdminPortalLayout({
             <ThemeToggle />
 
             {/* Notification Bell */}
-            <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+            {/* <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
               <PopoverTrigger asChild>
                 <button
                   className="relative p-2 rounded-md hover:bg-muted transition-colors"
@@ -368,7 +369,8 @@ export default function AdminPortalLayout({
                   </div>
                 )}
               </PopoverContent>
-            </Popover>
+            </Popover> */}
+            <NotificationDropdown />
 
             {/* User Avatar - Desktop only */}
             <div className="hidden lg:flex items-center space-x-2">

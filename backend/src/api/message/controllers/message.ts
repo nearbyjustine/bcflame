@@ -45,7 +45,7 @@ export default factories.createCoreController(
             select: ['id', 'username', 'userType'],
           },
           relatedOrder: {
-            select: ['id', 'inquiryNumber'],
+            select: ['id', 'inquiry_number'],
           },
         },
         orderBy: { createdAt: 'desc' },

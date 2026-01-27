@@ -3,12 +3,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, Package, Calendar, User } from 'lucide-react';
-import { getOrderInquiryById } from '@/lib/api/customization';
+import {
+  getOrderInquiryById,
+  getBudStyles,
+  getBackgroundStyles,
+  getFontStyles,
+  getPreBaggingOptions
+} from '@/lib/api/customization';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { FlatOrderInquiry } from '@/types/customization';
+import type {
+  FlatOrderInquiry,
+  BudStyle,
+  BackgroundStyle,
+  FontStyle,
+  PreBaggingOption
+} from '@/types/customization';
 import { getImageUrl } from '@/lib/utils/image';
+import { strapiApi } from '@/lib/api/strapi';
 
 // Status badge variant mapping
 const getStatusVariant = (
@@ -58,9 +71,38 @@ export default function OrderDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Customization data
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [budStyles, setBudStyles] = useState<BudStyle[]>([]);
+  const [backgrounds, setBackgrounds] = useState<BackgroundStyle[]>([]);
+  const [fonts, setFonts] = useState<FontStyle[]>([]);
+  const [preBaggingOptions, setPreBaggingOptions] = useState<PreBaggingOption[]>([]);
+
   useEffect(() => {
     fetchOrder();
+    fetchCustomizationData();
   }, [orderId]);
+
+  const fetchCustomizationData = async () => {
+    try {
+      const [photosData, budStylesData, backgroundsData, fontsData, preBaggingData] = await Promise.all([
+        strapiApi.get('/api/product-photos', { params: { populate: '*' } }).catch(() => ({ data: { data: [] } })),
+        getBudStyles().catch(() => []),
+        getBackgroundStyles().catch(() => []),
+        getFontStyles().catch(() => []),
+        getPreBaggingOptions().catch(() => []),
+      ]);
+
+      setPhotos(photosData.data.data || []);
+      setBudStyles(budStylesData);
+      setBackgrounds(backgroundsData);
+      setFonts(fontsData);
+      setPreBaggingOptions(preBaggingData);
+    } catch (err) {
+      console.error('Error fetching customization data:', err);
+      // Non-critical, so we don't show an error to the user
+    }
+  };
 
   const fetchOrder = async () => {
     try {
@@ -232,14 +274,27 @@ export default function OrderDetailPage() {
               <div>
                 <h4 className="text-sm font-medium mb-2">Selected Photos</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {order.selected_photos.map((photo, idx) => (
-                    <div
-                      key={idx}
-                      className="px-3 py-2 bg-muted rounded-lg text-sm text-center"
-                    >
-                      Photo {idx + 1}
-                    </div>
-                  ))}
+                  {order.selected_photos.map((photoId) => {
+                    const photo = photos.find((p: any) => p.id === photoId);
+                    return (
+                      <div
+                        key={photoId}
+                        className="relative aspect-square rounded-lg overflow-hidden border bg-muted"
+                      >
+                        {photo?.attributes?.image?.data ? (
+                          <img
+                            src={getImageUrl(photo.attributes.image.data) ?? undefined}
+                            alt={photo.attributes.name || 'Photo'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
+                            Photo #{photoId}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -249,14 +304,22 @@ export default function OrderDetailPage() {
               <div>
                 <h4 className="text-sm font-medium mb-2">Bud Styles</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {order.selected_bud_styles.map((style, idx) => (
-                    <div
-                      key={idx}
-                      className="px-3 py-2 bg-muted rounded-lg text-sm text-center"
-                    >
-                      {typeof style === 'string' ? style : `Style ${idx + 1}`}
-                    </div>
-                  ))}
+                  {order.selected_bud_styles.map((styleId) => {
+                    const style = budStyles.find((s) => s.id === styleId);
+                    return (
+                      <div
+                        key={styleId}
+                        className="px-3 py-2 bg-muted rounded-lg text-sm"
+                      >
+                        <p className="font-medium">{style?.attributes.name || `Style #${styleId}`}</p>
+                        {style?.attributes.description && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {style.attributes.description}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -267,14 +330,27 @@ export default function OrderDetailPage() {
                 <div>
                   <h4 className="text-sm font-medium mb-2">Backgrounds</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {order.selected_backgrounds.map((bg, idx) => (
-                      <div
-                        key={idx}
-                        className="px-3 py-2 bg-muted rounded-lg text-sm text-center"
-                      >
-                        {typeof bg === 'string' ? bg : `Background ${idx + 1}`}
-                      </div>
-                    ))}
+                    {order.selected_backgrounds.map((bgId) => {
+                      const bg = backgrounds.find((b) => b.id === bgId);
+                      return (
+                        <div
+                          key={bgId}
+                          className="px-3 py-2 bg-muted rounded-lg text-sm"
+                        >
+                          <div className="flex items-center gap-2">
+                            {bg?.attributes.color_hex && (
+                              <div
+                                className="w-6 h-6 rounded border"
+                                style={{ backgroundColor: bg.attributes.color_hex }}
+                              />
+                            )}
+                            <span className="font-medium">
+                              {bg?.attributes.name || `Background #${bgId}`}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -284,14 +360,22 @@ export default function OrderDetailPage() {
               <div>
                 <h4 className="text-sm font-medium mb-2">Fonts</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {order.selected_fonts.map((font, idx) => (
-                    <div
-                      key={idx}
-                      className="px-3 py-2 bg-muted rounded-lg text-sm text-center"
-                    >
-                      {typeof font === 'string' ? font : `Font ${idx + 1}`}
-                    </div>
-                  ))}
+                  {order.selected_fonts.map((fontId) => {
+                    const font = fonts.find((f) => f.id === fontId);
+                    return (
+                      <div
+                        key={fontId}
+                        className="px-3 py-2 bg-muted rounded-lg text-sm"
+                      >
+                        <p className="font-medium">{font?.attributes.name || `Font #${fontId}`}</p>
+                        {font?.attributes.font_family && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {font.attributes.font_family}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -302,19 +386,34 @@ export default function OrderDetailPage() {
                 <div>
                   <h4 className="text-sm font-medium mb-2">Pre-bagging Options</h4>
                   <div className="space-y-2">
-                    {order.selected_prebagging.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex justify-between items-center p-3 bg-muted rounded-lg"
-                      >
-                        <span className="text-sm font-medium">
-                          {item.unit_size} {item.unit_size_unit}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          Quantity: {item.quantity}
-                        </span>
-                      </div>
-                    ))}
+                    {order.selected_prebagging.map((item, idx) => {
+                      const option = preBaggingOptions.find((o) => o.id === item.option_id);
+                      return (
+                        <div
+                          key={idx}
+                          className="p-3 bg-muted rounded-lg"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">
+                                {option?.attributes.name || 'Pre-bagging Option'}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {item.unit_size} {item.unit_size_unit} per unit
+                              </p>
+                            </div>
+                            <span className="text-sm font-semibold">
+                              Qty: {item.quantity}
+                            </span>
+                          </div>
+                          {item.custom_text && (
+                            <p className="text-xs text-muted-foreground mt-2 border-t pt-2">
+                              Custom text: {item.custom_text}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                   {order.total_weight && order.total_weight > 0 && (
                     <p className="text-sm text-muted-foreground mt-2">

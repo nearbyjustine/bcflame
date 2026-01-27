@@ -116,24 +116,42 @@ export default factories.createCoreController('api::notification.notification' a
 
     try {
       // Build filter based on user type
-      const where: any = {
+      const filters: any = {
         isRead: false,
       };
 
       if (user.userType === 'admin') {
-        where.$or = [
+        filters.$or = [
           { recipient: null },
           { adminUser: user.id },
         ];
       } else {
-        where.recipient = user.id;
+        filters.recipient = user.id;
       }
 
-      // Update all unread notifications for this user
-      await strapi.db.query('api::notification.notification').updateMany({
-        where,
-        data: { isRead: true },
-      });
+      // Find all unread notifications for this user
+      const notifications = await strapi.entityService.findMany(
+        'api::notification.notification' as any,
+        {
+          filters,
+          fields: ['id'],
+        }
+      );
+
+      // Update each notification individually
+      const notificationArray = Array.isArray(notifications) ? notifications : [notifications];
+
+      await Promise.all(
+        notificationArray.map((notification: any) =>
+          strapi.entityService.update(
+            'api::notification.notification' as any,
+            notification.id,
+            {
+              data: { isRead: true } as any,
+            }
+          )
+        )
+      );
 
       return {
         data: {

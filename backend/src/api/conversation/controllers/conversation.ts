@@ -48,6 +48,9 @@ export default factories.createCoreController(
               sender: {
                 select: ['id', 'username', 'userType'],
               },
+              relatedOrder: {
+                select: ['id', 'inquiry_number'],
+              },
             },
             orderBy: { createdAt: 'asc' },
             limit: 100, // Last 100 messages

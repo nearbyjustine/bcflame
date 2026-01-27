@@ -20,9 +20,12 @@ import {
   markAllAsRead,
   type Notification,
 } from '@/lib/api/notifications';
+import { useSocketContext } from '@/contexts/SocketContext';
+import { toast } from 'sonner';
 
 export function NotificationDropdown() {
   const router = useRouter();
+  const { socket } = useSocketContext();
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,11 +52,51 @@ export function NotificationDropdown() {
   useEffect(() => {
     fetchNotifications();
 
-    // Poll every 30 seconds
+    // Poll every 30 seconds as fallback (in case Socket.IO fails)
     const interval = setInterval(fetchNotifications, 30000);
 
     return () => clearInterval(interval);
   }, []);
+
+  // Listen for real-time notification events via Socket.IO
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = (data: { notification: any }) => {
+      const newNotification = data.notification;
+
+      // Add to notifications list
+      setNotifications((prev) => {
+        // Check if notification already exists
+        const exists = prev.some((n) => n.id === newNotification.id);
+        if (exists) return prev;
+
+        // Add new notification to the beginning
+        return [newNotification, ...prev].slice(0, 5); // Keep only 5 most recent
+      });
+
+      // Increment unread count
+      setUnreadCount((prev) => prev + 1);
+
+      // Show toast notification
+      toast.info(newNotification.title, {
+        description: newNotification.message,
+        action: newNotification.link
+          ? {
+              label: 'View',
+              onClick: () => router.push(newNotification.link),
+            }
+          : undefined,
+      });
+    };
+
+    // Listen for new notifications
+    socket.on('notification:new', handleNewNotification);
+
+    return () => {
+      socket.off('notification:new', handleNewNotification);
+    };
+  }, [socket, router]);
 
   // Handle notification click
   const handleNotificationClick = async (notification: Notification) => {

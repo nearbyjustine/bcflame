@@ -46,13 +46,14 @@ const notificationTypeLabels = {
 };
 
 export default function NotificationsPage() {
+  type ReadStatuses = 'all' | 'unread' | 'read';
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [readFilter, setReadFilter] = useState<'all' | 'unread' | 'read'>('all');
+  const [readFilter, setReadFilter] = useState<ReadStatuses>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
   // Fetch notifications with filters
@@ -161,7 +162,7 @@ export default function NotificationsPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <Tabs value={readFilter} onValueChange={(v) => setReadFilter(v as any)}>
+        <Tabs value={readFilter} onValueChange={(v: string | ReadStatuses) => setReadFilter(v as ReadStatuses)}>
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="unread">Unread</TabsTrigger>

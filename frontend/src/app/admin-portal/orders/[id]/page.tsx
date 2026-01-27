@@ -41,6 +41,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { strapiApi } from '@/lib/api/strapi';
+import {
+  getBudStyles,
+  getBackgroundStyles,
+  getFontStyles,
+  getPreBaggingOptions
+} from '@/lib/api/customization';
+import type {
+  BudStyle,
+  BackgroundStyle,
+  FontStyle,
+  PreBaggingOption,
+  PreBaggingSelectionResponse
+} from '@/types/customization';
+import { getImageUrl } from '@/lib/utils/image';
 
 interface OrderDetail {
   id: number;
@@ -97,6 +111,35 @@ export default function OrderDetailPage() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  // Customization data
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [budStyles, setBudStyles] = useState<BudStyle[]>([]);
+  const [backgrounds, setBackgrounds] = useState<BackgroundStyle[]>([]);
+  const [fonts, setFonts] = useState<FontStyle[]>([]);
+  const [preBaggingOptions, setPreBaggingOptions] = useState<PreBaggingOption[]>([]);
+
+  // Fetch customization data
+  const fetchCustomizationData = async () => {
+    try {
+      const [photosData, budStylesData, backgroundsData, fontsData, preBaggingData] = await Promise.all([
+        strapiApi.get('/api/product-photos', { params: { populate: '*' } }).catch(() => ({ data: { data: [] } })),
+        getBudStyles().catch(() => []),
+        getBackgroundStyles().catch(() => []),
+        getFontStyles().catch(() => []),
+        getPreBaggingOptions().catch(() => []),
+      ]);
+
+      setPhotos(photosData.data.data || []);
+      setBudStyles(budStylesData);
+      setBackgrounds(backgroundsData);
+      setFonts(fontsData);
+      setPreBaggingOptions(preBaggingData);
+    } catch (err) {
+      console.error('Error fetching customization data:', err);
+      // Non-critical, so we don't show an error to the user
+    }
+  };
+
   // Fetch order details
   const fetchOrder = async () => {
     setIsLoading(true);
@@ -140,6 +183,7 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     fetchOrder();
+    fetchCustomizationData();
   }, [orderId]);
 
   // Debounced auto-save for admin notes
@@ -433,35 +477,115 @@ export default function OrderDetailPage() {
                     <Separator />
                     <div>
                       <h4 className="font-medium mb-3">Customizations</h4>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {order.selected_photos && (
+                      <div className="space-y-3">
+                        {/* Photos */}
+                        {order.selected_photos && Array.isArray(order.selected_photos) && order.selected_photos.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Photos:</span>{' '}
-                            <span>{Array.isArray(order.selected_photos) ? order.selected_photos.length : 1} selected</span>
+                            <span className="text-muted-foreground font-medium">Photos:</span>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {order.selected_photos.map((photoId: number) => {
+                                const photo = photos.find((p: any) => p.id === photoId);
+                                return (
+                                  <div
+                                    key={photoId}
+                                    className="relative w-16 h-16 rounded overflow-hidden border bg-muted"
+                                  >
+                                    {photo?.attributes?.image?.data ? (
+                                      <img
+                                        src={getImageUrl(photo.attributes.image.data) ?? undefined}
+                                        alt={photo.attributes.name || 'Photo'}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
+                                        #{photoId}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
-                        {order.selected_bud_styles && (
+
+                        {/* Bud Styles */}
+                        {order.selected_bud_styles && Array.isArray(order.selected_bud_styles) && order.selected_bud_styles.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Bud Style:</span>{' '}
-                            <span>{typeof order.selected_bud_styles === 'string' ? order.selected_bud_styles : 'Custom'}</span>
+                            <span className="text-muted-foreground font-medium">Bud Styles:</span>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {order.selected_bud_styles.map((styleId: number) => {
+                                const style = budStyles.find((s) => s.id === styleId);
+                                return (
+                                  <span key={styleId} className="inline-flex items-center px-2 py-1 bg-muted rounded text-xs">
+                                    {style?.attributes.name || `Style #${styleId}`}
+                                  </span>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
-                        {order.selected_backgrounds && (
+
+                        {/* Backgrounds */}
+                        {order.selected_backgrounds && Array.isArray(order.selected_backgrounds) && order.selected_backgrounds.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Background:</span>{' '}
-                            <span>{typeof order.selected_backgrounds === 'string' ? order.selected_backgrounds : 'Custom'}</span>
+                            <span className="text-muted-foreground font-medium">Backgrounds:</span>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {order.selected_backgrounds.map((bgId: number) => {
+                                const bg = backgrounds.find((b) => b.id === bgId);
+                                return (
+                                  <span key={bgId} className="inline-flex items-center gap-1.5 px-2 py-1 bg-muted rounded text-xs">
+                                    {bg?.attributes.color_hex && (
+                                      <span
+                                        className="w-3 h-3 rounded-full border"
+                                        style={{ backgroundColor: bg.attributes.color_hex }}
+                                      />
+                                    )}
+                                    {bg?.attributes.name || `Background #${bgId}`}
+                                  </span>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
-                        {order.selected_fonts && (
+
+                        {/* Fonts */}
+                        {order.selected_fonts && Array.isArray(order.selected_fonts) && order.selected_fonts.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Font:</span>{' '}
-                            <span>{typeof order.selected_fonts === 'string' ? order.selected_fonts : 'Custom'}</span>
+                            <span className="text-muted-foreground font-medium">Fonts:</span>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {order.selected_fonts.map((fontId: number) => {
+                                const font = fonts.find((f) => f.id === fontId);
+                                return (
+                                  <span key={fontId} className="inline-flex items-center px-2 py-1 bg-muted rounded text-xs">
+                                    {font?.attributes.name || `Font #${fontId}`}
+                                  </span>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
-                        {order.selected_prebagging && (
+
+                        {/* Pre-bagging */}
+                        {order.selected_prebagging && Array.isArray(order.selected_prebagging) && order.selected_prebagging.length > 0 && (
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Pre-bagging:</span>{' '}
-                            <span>{typeof order.selected_prebagging === 'string' ? order.selected_prebagging : 'Yes'}</span>
+                            <span className="text-muted-foreground font-medium">Pre-bagging:</span>
+                            <div className="mt-2 space-y-1.5">
+                              {order.selected_prebagging.map((item: PreBaggingSelectionResponse, idx: number) => {
+                                const option = preBaggingOptions.find((o) => o.id === item.option_id);
+                                return (
+                                  <div key={idx} className="px-2 py-1.5 bg-muted rounded text-xs">
+                                    <span className="font-medium">{option?.attributes.name || 'Pre-bagging Option'}</span>
+                                    {' - '}
+                                    <span>{item.unit_size} {item.unit_size_unit}</span>
+                                    {' × '}
+                                    <span>{item.quantity}</span>
+                                    {item.custom_text && (
+                                      <span className="text-muted-foreground ml-2">({item.custom_text})</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
                       </div>

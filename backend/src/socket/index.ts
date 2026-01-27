@@ -20,14 +20,20 @@ export const initializeSocket = (httpServer: HTTPServer) => {
 
   // Connection handler
   io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.data.userId}`);
+    const userId = socket.data.userId;
+    console.log(`User connected: ${userId}`);
+
+    // Join user-specific room for targeted notifications
+    const userRoom = `user:${userId}`;
+    socket.join(userRoom);
+    console.log(`User ${userId} joined personal room: ${userRoom}`);
 
     // Register event handlers
     registerMessageHandlers(io, socket);
     registerConversationHandlers(io, socket);
 
     socket.on('disconnect', (reason) => {
-      console.log(`User disconnected: ${socket.data.userId}, reason: ${reason}`);
+      console.log(`User disconnected: ${userId}, reason: ${reason}`);
     });
   });
 

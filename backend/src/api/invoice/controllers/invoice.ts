@@ -371,12 +371,27 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         invoice.pdfUrl = pdfUrl;
       }
 
-      return {
-        data: {
-          pdfUrl: invoice.pdfUrl,
-          invoiceNumber: invoice.invoiceNumber,
-        },
-      };
+      // Construct the full path to the PDF file
+      const fs = require('fs');
+      const path = require('path');
+      const pdfPath = path.join(strapi.dirs.static.public, invoice.pdfUrl);
+
+      // Check if file exists
+      if (!fs.existsSync(pdfPath)) {
+        strapi.log.error('PDF file not found on disk:', pdfPath);
+        return ctx.notFound('PDF file not found. Please regenerate the invoice.');
+      }
+
+      // Read the file
+      const fileBuffer = fs.readFileSync(pdfPath);
+
+      // Set headers for PDF download
+      ctx.set('Content-Type', 'application/pdf');
+      ctx.set('Content-Disposition', `attachment; filename="${invoice.invoiceNumber}.pdf"`);
+      ctx.set('Content-Length', fileBuffer.length.toString());
+
+      // Send the file buffer
+      ctx.body = fileBuffer;
     } catch (error) {
       strapi.log.error('Invoice PDF download error:', { error: error.message, stack: error.stack });
       return ctx.internalServerError('Failed to download invoice PDF');
