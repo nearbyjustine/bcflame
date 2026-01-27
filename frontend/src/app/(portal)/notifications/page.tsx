@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const notificationIcons = {
   new_order: ShoppingCart,
@@ -47,7 +47,6 @@ const notificationTypeLabels = {
 
 export default function NotificationsPage() {
   const router = useRouter();
-  const { toast } = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,10 +71,9 @@ export default function NotificationsPage() {
       setTotalCount(response.meta.pagination.total);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch notifications. Please try again.',
-        variant: 'destructive',
+      console.error('Failed to fetch notifications:', error);
+      toast.error('Failed to fetch notifications', {
+        description: 'Please try again.',
       });
     } finally {
       setIsLoading(false);
@@ -91,17 +89,14 @@ export default function NotificationsPage() {
     try {
       const success = await markAllAsRead();
       if (success) {
-        toast({
-          title: 'Success',
+        toast.success('Success', {
           description: 'All notifications marked as read',
         });
         fetchNotifications();
       }
     } catch (error) {
-      toast({
-        title: 'Error',
+      toast.error('Error', {
         description: 'Failed to mark all as read',
-        variant: 'destructive',
       });
     }
   };
@@ -114,10 +109,8 @@ export default function NotificationsPage() {
         fetchNotifications();
       }
     } catch (error) {
-      toast({
-        title: 'Error',
+      toast.error('Error', {
         description: 'Failed to update notification',
-        variant: 'destructive',
       });
     }
   };
