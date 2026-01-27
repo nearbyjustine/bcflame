@@ -7,12 +7,14 @@ import { Textarea } from '@/components/ui/textarea';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
+  onTyping?: () => void;
   disabled?: boolean;
   placeholder?: string;
 }
 
 export function MessageInput({
   onSendMessage,
+  onTyping,
   disabled = false,
   placeholder = 'Type a message...',
 }: MessageInputProps) {
@@ -47,7 +49,10 @@ export function MessageInput({
       <div className="flex items-end gap-2">
         <Textarea
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e) => {
+            setContent(e.target.value);
+            onTyping?.();
+          }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled || isSending}
