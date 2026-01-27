@@ -42,7 +42,7 @@ export interface UnreadCountResponse {
 export async function getUnreadCount(): Promise<number> {
   try {
     const response = await strapiApi.get<UnreadCountResponse>('/api/notifications/unread/count');
-    return response.data.data.count;
+    return response.data?.data?.count || 0;
   } catch (error) {
     console.error('Failed to fetch unread count:', error);
     return 0;
@@ -66,7 +66,7 @@ export async function getUnreadNotifications(limit: number = 10): Promise<Notifi
         populate: ['relatedOrder', 'relatedProduct'],
       },
     });
-    return response.data.data;
+    return response.data?.data || [];
   } catch (error) {
     console.error('Failed to fetch unread notifications:', error);
     return [];

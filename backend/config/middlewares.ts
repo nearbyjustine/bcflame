@@ -9,7 +9,8 @@ export default [
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          'connect-src': ["'self'", 'https:', 'http:'],
+          'connect-src': ["'self'", 'https:', 'http:', 'blob:'],
+          'script-src': ["'self'", "'unsafe-inline'", 'blob:', 'https:'],
           'img-src': [
             "'self'",
             'data:',

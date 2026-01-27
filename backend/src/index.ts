@@ -20,8 +20,13 @@ export default {
     // Validate critical environment variables in production
     const nodeEnv = process.env.NODE_ENV;
     if (nodeEnv === 'production') {
-      const requiredEnvVars = ['DB_PASSWORD', 'JWT_SECRET', 'ADMIN_JWT_SECRET', 'APP_KEYS'];
-      const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+      const requiredEnvVars = ['DATABASE_PASSWORD', 'JWT_SECRET', 'ADMIN_JWT_SECRET', 'APP_KEYS'];
+      const missingVars = requiredEnvVars.filter(varName => {
+        if (varName === 'DATABASE_PASSWORD') {
+          return !process.env.DATABASE_PASSWORD && !process.env.DB_PASSWORD;
+        }
+        return !process.env[varName];
+      });
 
       if (missingVars.length > 0) {
         throw new Error(

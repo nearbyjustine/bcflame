@@ -60,7 +60,13 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   fetchNotifications: async () => {
     try {
       const response = await strapiApi.get('/api/notifications/unread');
-      const { unreadCount, notifications } = response.data.data;
+      const data = response.data?.data;
+      
+      if (!data) {
+        return;
+      }
+
+      const { unreadCount = 0, notifications = [] } = data;
 
       const { unreadCount: prevCount, notifications: prevNotifications } = get();
 

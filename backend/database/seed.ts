@@ -12,11 +12,22 @@ import { seedUsers } from './seeders/user-seeder';
 import { seedInventory } from './seeders/inventory-seeder';
 import { seedPermissions } from './seeders/permissions-seeder';
 
+// Parse command line arguments
+const args = process.argv.slice(2);
+const specificPort = args.find(arg => arg.startsWith('--port='))?.split('=')[1];
+
 // Load environment variables from .env file
 config({ path: path.resolve(__dirname, '..', '.env') });
 
 async function runSeeders() {
   console.log('🚀 Starting database seeding...\n');
+
+  // Set the port if specified via env var or arg
+  const seedPort = specificPort || process.env.SEED_PORT;
+  if (seedPort) {
+    process.env.PORT = seedPort;
+    console.log(`🔌 Using custom port: ${seedPort}`);
+  }
 
   // Initialize Strapi with the app directory context
   const appContext = await Strapi({
