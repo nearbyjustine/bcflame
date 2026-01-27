@@ -48,6 +48,54 @@ export default factories.createCoreController('api::notification.notification' a
   },
 
   /**
+   * Get unread notifications and count for the current user
+   */
+  async getUnread(ctx) {
+    const user = ctx.state.user;
+
+    if (!user) {
+      return ctx.unauthorized('You must be logged in');
+    }
+
+    try {
+      // Build filter based on user type
+      const where: any = {
+        isRead: false,
+      };
+
+      // Admin users see all notifications without recipient OR with their adminUser ID
+      if (user.userType === 'admin') {
+        where.$or = [
+          { recipient: null }, // Global notifications
+          { adminUser: user.id },
+        ];
+      } else {
+        // Reseller users see only their own notifications
+        where.recipient = user.id;
+      }
+
+      const [unreadCount, notifications] = await Promise.all([
+        strapi.db.query('api::notification.notification').count({ where }),
+        strapi.entityService.findMany('api::notification.notification' as any, {
+          filters: where,
+          populate: ['relatedOrder', 'relatedProduct', 'recipient', 'adminUser'],
+          sort: 'createdAt:desc',
+        }),
+      ]);
+
+      return {
+        data: {
+          unreadCount,
+          notifications,
+        },
+      };
+    } catch (error) {
+      console.error('Get unread notifications error:', error);
+      return ctx.internalServerError('Failed to retrieve unread notifications');
+    }
+  },
+
+  /**
    * Mark all notifications as read for current user
    */
   async markAllAsRead(ctx) {
