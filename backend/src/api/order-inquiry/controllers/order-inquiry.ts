@@ -8,6 +8,52 @@ import { generateCSV, generateXLSX } from '../services/export';
 
 export default factories.createCoreController('api::order-inquiry.order-inquiry', ({ strapi }) => ({
   /**
+   * Find order inquiries with proper population
+   * GET /api/order-inquiries
+   */
+  async find(ctx) {
+    // Ensure customer and product are always populated
+    if (!ctx.query.populate) {
+      ctx.query.populate = {};
+    }
+
+    // Convert string populate to object if needed
+    if (typeof ctx.query.populate === 'string') {
+      ctx.query.populate = { [ctx.query.populate]: true };
+    }
+
+    // Always include customer and product
+    ctx.query.populate.customer = ctx.query.populate.customer || true;
+    ctx.query.populate.product = ctx.query.populate.product || true;
+
+    // Call default find with enhanced populate
+    return await super.find(ctx);
+  },
+
+  /**
+   * Find one order inquiry with proper population
+   * GET /api/order-inquiries/:id
+   */
+  async findOne(ctx) {
+    // Ensure customer and product are always populated
+    if (!ctx.query.populate) {
+      ctx.query.populate = {};
+    }
+
+    // Convert string populate to object if needed
+    if (typeof ctx.query.populate === 'string') {
+      ctx.query.populate = { [ctx.query.populate]: true };
+    }
+
+    // Always include customer and product
+    ctx.query.populate.customer = ctx.query.populate.customer || true;
+    ctx.query.populate.product = ctx.query.populate.product || true;
+
+    // Call default findOne with enhanced populate
+    return await super.findOne(ctx);
+  },
+
+  /**
    * Create a single order inquiry
    * POST /api/order-inquiries
    */

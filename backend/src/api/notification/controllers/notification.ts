@@ -79,14 +79,23 @@ export default factories.createCoreController('api::notification.notification' a
         strapi.entityService.findMany('api::notification.notification' as any, {
           filters: where,
           populate: ['relatedOrder', 'relatedProduct', 'recipient', 'adminUser'],
-          sort: 'createdAt:desc',
+          sort: { createdAt: 'desc' },
+          fields: ['id', 'type', 'title', 'message', 'isRead', 'link', 'createdAt', 'updatedAt'],
         }),
       ]);
+
+      // Ensure all notifications have valid timestamps
+      const notificationArray = Array.isArray(notifications) ? notifications : [notifications];
+      const notificationsWithTimestamps = notificationArray.map((notification: any) => ({
+        ...notification,
+        createdAt: notification.createdAt || new Date().toISOString(),
+        updatedAt: notification.updatedAt || new Date().toISOString(),
+      }));
 
       return {
         data: {
           unreadCount,
-          notifications,
+          notifications: notificationsWithTimestamps,
         },
       };
     } catch (error) {
@@ -160,13 +169,47 @@ export default factories.createCoreController('api::notification.notification' a
         filters.recipient = user.id;
       }
 
+      // Get pagination params from query or use defaults
+      const page = ctx.query.pagination?.page || 1;
+      const pageSize = ctx.query.pagination?.pageSize || 25;
+      const start = (page - 1) * pageSize;
+
+      // Get total count for pagination
+      const totalCount = await strapi.db.query('api::notification.notification').count({
+        where: filters,
+      });
+
+      // Get notifications with pagination
       const notifications = await strapi.entityService.findMany('api::notification.notification' as any, {
         ...ctx.query,
         filters,
+        start,
+        limit: pageSize,
+        sort: ctx.query.sort || { createdAt: 'desc' },
         populate: ['relatedOrder', 'relatedProduct', 'recipient'],
+        fields: ['id', 'type', 'title', 'message', 'isRead', 'link', 'createdAt', 'updatedAt'],
       });
 
-      return notifications;
+      // Ensure all notifications have valid timestamps
+      const notificationArray = Array.isArray(notifications) ? notifications : [notifications];
+      const notificationsWithTimestamps = notificationArray.map((notification: any) => ({
+        ...notification,
+        createdAt: notification.createdAt || new Date().toISOString(),
+        updatedAt: notification.updatedAt || new Date().toISOString(),
+      }));
+
+      // Return in proper format with pagination metadata
+      return {
+        data: notificationsWithTimestamps,
+        meta: {
+          pagination: {
+            page,
+            pageSize,
+            pageCount: Math.ceil(totalCount / pageSize),
+            total: totalCount,
+          },
+        },
+      };
     } catch (error) {
       console.error('Find notifications error:', error);
       return ctx.internalServerError('Failed to retrieve notifications');
