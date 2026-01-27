@@ -72,6 +72,13 @@ export default {
         { action: 'api::message.message.create' },
         { action: 'api::message.message.update' },
         { action: 'api::message.message.delete' },
+        // Notification
+        { action: 'api::notification.notification.find' },
+        { action: 'api::notification.notification.findOne' },
+        { action: 'api::notification.notification.update' },
+        { action: 'api::notification.notification.getUnread' },
+        { action: 'api::notification.notification.getUnreadCount' },
+        { action: 'api::notification.notification.markAllAsRead' },
       ];
 
       for (const perm of permissions) {

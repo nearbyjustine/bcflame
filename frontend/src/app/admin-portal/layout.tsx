@@ -325,12 +325,14 @@ export default function AdminPortalLayout({
                                 </p>
                               )}
                               <p className="text-xs text-muted-foreground mt-1">
-                                {new Date(notification.createdAt).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                })}
+                                {notification.createdAt
+                                  ? new Date(notification.createdAt).toLocaleString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      hour: 'numeric',
+                                      minute: '2-digit',
+                                    })
+                                  : 'No date'}
                               </p>
                             </div>
                             {!notification.isRead && (

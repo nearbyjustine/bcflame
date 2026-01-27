@@ -86,7 +86,15 @@ export function NotificationDropdown() {
 
   // Format time ago
   const formatTimeAgo = (dateString: string) => {
+    if (!dateString) return 'Unknown time';
+
     const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

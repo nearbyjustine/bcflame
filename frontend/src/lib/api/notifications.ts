@@ -36,6 +36,11 @@ export interface UnreadCountResponse {
   };
 }
 
+export interface NotificationFilters {
+  type?: string;
+  isRead?: boolean;
+}
+
 /**
  * Get unread notifications count for current user
  */
@@ -131,6 +136,71 @@ export async function markAllAsRead(): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Failed to mark all notifications as read:', error);
+    return false;
+  }
+}
+
+/**
+ * Get notifications with filtering and pagination
+ */
+export async function getNotifications(
+  page: number = 1,
+  pageSize: number = 25,
+  filters?: NotificationFilters
+): Promise<NotificationResponse> {
+  try {
+    const filterParams: any = {};
+
+    if (filters?.type) {
+      filterParams.type = filters.type;
+    }
+
+    if (filters?.isRead !== undefined) {
+      filterParams.isRead = filters.isRead;
+    }
+
+    const response = await strapiApi.get<NotificationResponse>('/api/notifications', {
+      params: {
+        filters: filterParams,
+        sort: 'createdAt:desc',
+        pagination: {
+          page,
+          pageSize,
+        },
+        populate: ['relatedOrder', 'relatedProduct'],
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error);
+    return {
+      data: [],
+      meta: {
+        pagination: {
+          page: 1,
+          pageSize: 25,
+          pageCount: 0,
+          total: 0,
+        },
+      },
+    };
+  }
+}
+
+/**
+ * Toggle notification read status
+ */
+export async function toggleReadStatus(
+  notificationId: number,
+  isRead: boolean
+): Promise<boolean> {
+  try {
+    await strapiApi.put(`/api/notifications/${notificationId}`, {
+      data: { isRead },
+    });
+    return true;
+  } catch (error) {
+    console.error('Failed to toggle notification read status:', error);
     return false;
   }
 }

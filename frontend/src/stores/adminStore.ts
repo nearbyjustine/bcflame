@@ -116,7 +116,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   markAsRead: async (id: number) => {
     try {
-      await strapiApi.put(`/api/notifications/${id}/read`);
+      await strapiApi.put(`/api/notifications/${id}`, {
+        data: { isRead: true },
+      });
 
       set((state) => ({
         notifications: state.notifications.map((n) =>
@@ -132,7 +134,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   markAllAsRead: async () => {
     try {
-      await strapiApi.post('/api/notifications/read-all');
+      await strapiApi.post('/api/notifications/mark-all-read');
 
       set({
         notifications: get().notifications.map((n) => ({ ...n, isRead: true })),

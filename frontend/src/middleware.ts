@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Define protected path groups
-  const resellerPaths = ['/dashboard', '/products', '/media-hub', '/orders', '/profile'];
+  const resellerPaths = ['/dashboard', '/products', '/media-hub', '/orders', '/profile', '/notifications'];
   const adminPaths = ['/admin-portal'];
   
   const isResellerRoute = resellerPaths.some(path => pathname.startsWith(path));
@@ -64,6 +64,7 @@ export const config = {
     '/media-hub/:path*',
     '/orders/:path*',
     '/profile/:path*',
+    '/notifications/:path*',
     '/admin-portal/:path*',
     '/login'
   ],
