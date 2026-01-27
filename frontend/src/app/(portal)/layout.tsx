@@ -65,7 +65,7 @@ export default function PortalLayout({
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+                  className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
                   aria-label="Open menu"
                 >
                   <Menu className="w-6 h-6" />
@@ -145,7 +145,7 @@ export default function PortalLayout({
             </Sheet>
             
             <Image src="/header_logo.svg" alt="BC Flame" width={120} height={40} className="h-10 w-auto" />
-            <div className="hidden md:flex space-x-4">
+            <div className="hidden lg:flex space-x-4">
               <a href="/dashboard" className="text-sm hover:text-primary">Dashboard</a>
               <a href="/products" className="text-sm hover:text-primary">Products</a>
               <a href="/messages" className="text-sm hover:text-primary">Messages</a>
