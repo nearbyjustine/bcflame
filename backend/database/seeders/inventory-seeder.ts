@@ -4,11 +4,12 @@
  */
 
 import type { Strapi } from '@strapi/strapi';
+import { WEIGHT_UNIT } from '../../src/constants/units';
 
 interface InventoryData {
   product: number | string;
   quantity_in_stock: number;
-  unit: 'lb';
+  unit: typeof WEIGHT_UNIT;
   reorder_point: number;
   reorder_quantity: number;
   location?: string;
@@ -56,9 +57,9 @@ export async function seedInventory(strapi: Strapi) {
       const product = products[i];
 
       // Vary stock levels for testing:
-      // - Some products: well stocked (50+ lb)
+      // - Some products: well stocked (50+ P)
       // - Some products: low stock (near reorder point)
-      // - Some products: out of stock (0 lb)
+      // - Some products: out of stock (0 P)
       let quantity: number;
       const stockType = i % 5; // Cycle through 5 patterns
 
@@ -84,7 +85,7 @@ export async function seedInventory(strapi: Strapi) {
       const inventoryData: InventoryData = {
         product: product.id,
         quantity_in_stock: quantity,
-        unit: 'lb',
+        unit: WEIGHT_UNIT,
         reorder_point: 15,
         reorder_quantity: 50,
         location: `Warehouse ${String.fromCharCode(65 + (i % 3))}`, // A, B, or C
@@ -102,7 +103,7 @@ export async function seedInventory(strapi: Strapi) {
                          quantity <= 15 ? 'LOW STOCK' :
                          'IN STOCK';
 
-      console.log(`✅ Created inventory for ${product.name}: ${quantity} lb (${stockLabel})`);
+      console.log(`✅ Created inventory for ${product.name}: ${quantity} ${WEIGHT_UNIT} (${stockLabel})`);
     }
 
     console.log('🎉 Inventory seeding completed successfully!');

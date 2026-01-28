@@ -45,8 +45,8 @@ const mockProduct: Product = {
     featured: true,
     sort_order: 1,
     pricing: [
-      { id: 1, weight: '1 lb', amount: 1000, currency: 'USD' },
-      { id: 2, weight: '5 lbs', amount: 4500, currency: 'USD' },
+      { id: 1, weight: '1 P', amount: 1000, currency: 'USD' },
+      { id: 2, weight: '5 P', amount: 4500, currency: 'USD' },
     ],
     base_price_per_pound: null,
     pricing_model: 'tiered',
@@ -256,8 +256,8 @@ describe('ProductDetailClient', () => {
       />
     );
 
-    expect(screen.getByText('1 lb')).toBeInTheDocument();
-    expect(screen.getByText('5 lbs')).toBeInTheDocument();
+    expect(screen.getByText('1 P')).toBeInTheDocument();
+    expect(screen.getByText('5 P')).toBeInTheDocument();
     expect(screen.getByText('$1,000.00')).toBeInTheDocument();
     expect(screen.getByText('$4,500.00')).toBeInTheDocument();
   });
@@ -281,7 +281,7 @@ describe('ProductDetailClient', () => {
       />
     );
 
-    expect(screen.getByText('$1,200.00/lb')).toBeInTheDocument();
+    expect(screen.getByText('$1,200.00/P')).toBeInTheDocument();
   });
 
   it('renders related products section', () => {

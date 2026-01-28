@@ -93,7 +93,7 @@ describe('Order Inquiry Lifecycles', () => {
               businessLicense: 'CA-LIC-123456',
             },
             total_weight: 0.22,
-            weight_unit: 'lb',
+            weight_unit: 'P',
             notes: 'Test notes',
             createdAt: '2026-01-13T10:00:00.000Z',
           }),
@@ -267,7 +267,7 @@ describe('Order Inquiry Lifecycles', () => {
 
   describe('price calculation', () => {
     it('calculates price using base_price_per_pound for custom weights', async () => {
-      // Set up mock for custom weight (0.022 lb = ~10g) not in pricing tiers
+      // Set up mock for custom weight (0.022 P = ~10g) not in pricing tiers
       mockStrapi.db.query().findOne.mockResolvedValueOnce({
         id: 1,
         inquiry_number: 'INQ-20260113-1234',
@@ -287,7 +287,7 @@ describe('Order Inquiry Lifecycles', () => {
           businessLicense: 'CA-LIC-123456',
         },
         total_weight: 0.022,
-        weight_unit: 'lb',
+        weight_unit: 'P',
         createdAt: '2026-01-13T10:00:00.000Z',
       })
 
@@ -330,7 +330,7 @@ describe('Order Inquiry Lifecycles', () => {
           businessLicense: 'CA-LIC-123456',
         },
         total_weight: 0.015,
-        weight_unit: 'lb',
+        weight_unit: 'P',
         createdAt: '2026-01-13T10:00:00.000Z',
       })
 

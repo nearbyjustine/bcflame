@@ -11,6 +11,7 @@ import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { HALF_WEIGHT_UNIT_DISPLAY, WEIGHT_UNIT_DISPLAY } from '@/lib/utils/units';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -157,7 +158,7 @@ export function ProductDetailClient({
                 </p>
                 <p className="text-3xl font-bold">
                   {formatPrice(attributes.base_price_per_pound)}
-                  {attributes.pricing_unit === 'per_half_pound' ? '/½lb' : '/lb'}
+                  {attributes.pricing_unit === 'per_half_pound' ? HALF_WEIGHT_UNIT_DISPLAY : WEIGHT_UNIT_DISPLAY}
                 </p>
               </div>
             ) : attributes.pricing && attributes.pricing.length > 0 ? (

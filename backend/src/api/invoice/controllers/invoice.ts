@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi';
 import invoiceService from '../../../services/invoice-service';
+import { WEIGHT_UNIT } from '../../../constants/units';
 
 export default factories.createCoreController('api::invoice.invoice' as any, ({ strapi }) => ({
   /**
@@ -60,7 +61,7 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
 
       // Helper function to format weight display
       const formatWeightDisplay = (weight: number, unit: string, weightInPounds: number): string => {
-        return `${weight} ${unit} (${weightInPounds.toFixed(2)} lb)`;
+        return `${weight} ${unit} (${weightInPounds.toFixed(2)} ${WEIGHT_UNIT})`;
       };
 
       // Calculate line items from order data

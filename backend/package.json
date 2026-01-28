@@ -10,6 +10,7 @@
     "copy:templates": "mkdir -p dist/src/templates/html && cp -r src/templates/html/* dist/src/templates/html/",
     "strapi": "strapi",
     "seed": "ts-node database/seed.ts",
+    "types:generate": "strapi ts:generate-types",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage"

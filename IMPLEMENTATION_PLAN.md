@@ -114,7 +114,7 @@ pricing_unit: 'per_pound',
 3. Update price label (line 267):
 ```tsx
 <Label htmlFor="price">
-  Base Price ($) {formData.pricing_unit === 'per_half_pound' ? 'per ½ lb' : 'per lb'}
+  Base Price ($) {formData.pricing_unit === 'per_half_pound' ? 'per 0.5 lb' : 'per lb'}
 </Label>
 ```
 

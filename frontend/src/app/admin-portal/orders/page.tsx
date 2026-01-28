@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { strapiApi } from '@/lib/api/strapi';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 
 interface Order {
   id: number;
@@ -239,7 +240,7 @@ export default function OrdersPage() {
         header: 'Weight',
         cell: ({ row }) => {
           const weight = row.getValue('total_weight') as number;
-          const unit = row.original.weight_unit || 'lb';
+          const unit = row.original.weight_unit || WEIGHT_UNIT;
           return weight ? `${weight} ${unit}` : '—';
         },
       },

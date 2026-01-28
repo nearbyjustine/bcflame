@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { GetProductsParams } from '@/lib/api/products';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 
 interface FilterPanelProps {
   filters: GetProductsParams;
@@ -161,7 +162,7 @@ export function FilterPanel({ filters, onFilterChange }: FilterPanelProps) {
 
       {/* Price Range */}
       <div className="space-y-2">
-        <Label>Price Range ($/lb)</Label>
+        <Label>Price Range ($/{WEIGHT_UNIT})</Label>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label htmlFor="minPrice" className="text-xs text-muted-foreground">

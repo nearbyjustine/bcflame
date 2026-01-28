@@ -21,7 +21,7 @@ export interface CartItem {
   unitPrice: number;
   /** Weight of this item in pounds */
   weight: number;
-  /** Weight unit (typically 'lb') */
+  /** Weight unit (typically 'P') */
   weightUnit: string;
   /** Timestamp when item was added */
   addedAt: string;

@@ -1,4 +1,5 @@
 import { strapiApi } from './strapi';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 import type {
   BudStyle,
   BackgroundStyle,
@@ -84,8 +85,8 @@ export async function submitOrderInquiry(
     return sum + (selection.quantity * selection.unitSize);
   }, 0);
 
-  // Determine weight unit from selections (use first selection's unit or default to 'lb')
-  const weightUnit = selections.preBagging[0]?.unitSizeUnit || 'lb';
+  // Determine weight unit from selections (use first selection's unit or default to WEIGHT_UNIT)
+  const weightUnit = selections.preBagging[0]?.unitSizeUnit || WEIGHT_UNIT;
 
   const response = await strapiApi.post<SingleOrderInquiryResponse>('/api/order-inquiries', {
     data: {

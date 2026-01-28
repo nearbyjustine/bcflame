@@ -10,7 +10,7 @@ export interface InventoryAttributes {
     data: Product;
   };
   quantity_in_stock: number;
-  unit: 'lb';
+  unit: 'P';
   reorder_point: number;
   reorder_quantity: number;
   location?: string;

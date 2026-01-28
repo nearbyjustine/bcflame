@@ -7,6 +7,7 @@ import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getImageUrl, getImageAlt } from '@/lib/utils/image';
+import { HALF_WEIGHT_UNIT_DISPLAY, WEIGHT_UNIT_DISPLAY } from '@/lib/utils/units';
 
 export type StockStatus = 'available' | 'unavailable';
 
@@ -193,7 +194,7 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
             <p className="text-sm text-muted-foreground">Starting at</p>
             <p className="text-xl font-bold">
               {formatPrice(attributes.base_price_per_pound)}
-              {attributes.pricing_unit === 'per_half_pound' ? '/½lb' : '/lb'}
+              {attributes.pricing_unit === 'per_half_pound' ? HALF_WEIGHT_UNIT_DISPLAY : WEIGHT_UNIT_DISPLAY}
             </p>
           </div>
         ) : selectedPricing && attributes.pricing?.length > 0 ? (

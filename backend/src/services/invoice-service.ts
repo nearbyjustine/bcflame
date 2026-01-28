@@ -9,7 +9,7 @@ import path from 'path';
 
 interface LineItem {
   description: string;
-  quantity: number | string;  // Allow both number and formatted string (e.g., "1000 g (2.2 lb)")
+  quantity: number | string;  // Allow both number and formatted string (e.g., "1000 g (2.2 P)")
   unitPrice: number;
   total: number;
 }
@@ -264,7 +264,7 @@ const invoiceService = {
           xPos = 50;
           doc.text(item.description || '', xPos + 5, yPos, { width: columnWidths[0] - 10 });
           xPos += columnWidths[0];
-          // Handle both string (e.g., "1000 g (2.2 lb)") and number quantities
+          // Handle both string (e.g., "1000 g (2.2 P)") and number quantities
           doc.text(String(item.quantity || 0), xPos + 5, yPos, { width: columnWidths[1] - 10 });
           xPos += columnWidths[1];
           doc.text(`$${(item.unitPrice || 0).toFixed(2)}`, xPos + 5, yPos, { width: columnWidths[2] - 10 });

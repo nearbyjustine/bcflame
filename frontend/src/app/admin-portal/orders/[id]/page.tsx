@@ -55,6 +55,7 @@ import type {
   PreBaggingSelectionResponse
 } from '@/types/customization';
 import { getImageUrl } from '@/lib/utils/image';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 
 interface OrderDetail {
   id: number;
@@ -465,7 +466,7 @@ export default function OrderDetailPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {order.total_weight} {order.weight_unit || 'lb'}
+                      {order.total_weight} {order.weight_unit || WEIGHT_UNIT}
                     </p>
                     <p className="text-sm text-muted-foreground">Total Weight</p>
                   </div>

@@ -47,6 +47,7 @@ import {
   type ProductWithInventory,
 } from '@/lib/api/admin-products';
 import { getImageUrl } from '@/lib/utils/image';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 
 function getStockStatus(product: ProductWithInventory): 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown' {
   if (!product.inventory) {
@@ -212,7 +213,7 @@ export default function AdminProductsPage() {
     },
     {
       accessorKey: 'attributes.base_price_per_pound',
-      header: 'Price/lb',
+      header: `Price/${WEIGHT_UNIT}`,
       cell: ({ row }) => {
         const price = row.original.attributes.base_price_per_pound;
         return price ? `$${price.toFixed(2)}` : '-';

@@ -1,4 +1,5 @@
 import { strapiApi } from './strapi';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 import type { Product, ProductsResponse, SingleProductResponse } from '@/types/product';
 
 export interface AdminProductsParams {
@@ -274,7 +275,7 @@ export async function updateProductInventory(
       data: {
         product: productId,
         quantity_in_stock: data.quantity_in_stock || 0,
-        unit: 'lb',
+        unit: WEIGHT_UNIT,
         reorder_point: data.reorder_point || 10,
         reorder_quantity: data.reorder_quantity || 50,
         location: data.location,

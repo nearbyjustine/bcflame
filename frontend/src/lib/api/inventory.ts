@@ -1,4 +1,5 @@
 import { strapiApi } from './strapi';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 import type { InventoryResponse, SingleInventoryResponse } from '@/types/inventory';
 
 export interface GetInventoryParams {
@@ -48,7 +49,7 @@ export async function getInventoryItem(id: number): Promise<SingleInventoryRespo
 export async function createInventoryItem(data: {
   product: number;
   quantity_in_stock: number;
-  unit?: 'lb';
+  unit?: 'P';
   reorder_point?: number;
   reorder_quantity?: number;
   location?: string;
@@ -69,7 +70,7 @@ export async function updateInventoryItem(
   id: number,
   data: Partial<{
     quantity_in_stock: number;
-    unit: 'lb';
+    unit: 'P';
     reorder_point: number;
     reorder_quantity: number;
     location: string;

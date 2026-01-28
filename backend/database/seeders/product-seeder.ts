@@ -235,7 +235,7 @@ export async function seedProducts(strapi: Strapi) {
         // Find the 7g pricing (smallest tier) to calculate per-pound price
         const smallestTier = pricingComponents.find(p => p.weight === '7g');
         if (smallestTier) {
-          // 7g = 0.015432 lb, so price per pound = price per 7g / 0.015432
+          // 7g = 0.015432 P, so price per pound = price per 7g / 0.015432
           basePricePerPound = parseFloat((smallestTier.amount / 0.015432).toFixed(2));
         } else {
           // Fallback: use first available tier

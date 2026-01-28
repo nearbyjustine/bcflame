@@ -14,13 +14,13 @@ describe('Unit Conversions', () => {
     })
 
     it('converts common prebagging weights correctly', () => {
-      // 3.5g = ~0.00772 lb
+      // 3.5g = ~0.00772 P
       expect(gramsToLbs(3.5)).toBeCloseTo(0.00772, 4)
-      // 7g = ~0.01543 lb
+      // 7g = ~0.01543 P
       expect(gramsToLbs(7)).toBeCloseTo(0.01543, 4)
-      // 14g = ~0.03086 lb
+      // 14g = ~0.03086 P
       expect(gramsToLbs(14)).toBeCloseTo(0.03086, 4)
-      // 28g = ~0.06173 lb
+      // 28g = ~0.06173 P
       expect(gramsToLbs(28)).toBeCloseTo(0.06173, 4)
     })
 
@@ -29,7 +29,7 @@ describe('Unit Conversions', () => {
     })
 
     it('handles large weights correctly', () => {
-      // 1000g = ~2.205 lb
+      // 1000g = ~2.205 P
       expect(gramsToLbs(1000)).toBeCloseTo(2.205, 2)
     })
   })
@@ -44,20 +44,20 @@ describe('Unit Conversions', () => {
     })
 
     it('handles fractional pounds correctly', () => {
-      // 0.5 lb = ~226.796 g
+      // 0.5 P = ~226.796 g
       expect(lbsToGrams(0.5)).toBeCloseTo(226.796, 2)
     })
   })
 
   describe('round-trip conversions', () => {
-    it('converts grams to lbs and back correctly', () => {
+    it('converts grams to Ps and back correctly', () => {
       const originalGrams = 14
-      const lbs = gramsToLbs(originalGrams)
-      const backToGrams = lbsToGrams(lbs)
+      const Ps = gramsToLbs(originalGrams)
+      const backToGrams = lbsToGrams(Ps)
       expect(backToGrams).toBeCloseTo(originalGrams, 5)
     })
 
-    it('converts lbs to grams and back correctly', () => {
+    it('converts Ps to grams and back correctly', () => {
       const originalLbs = 2.5
       const grams = lbsToGrams(originalLbs)
       const backToLbs = gramsToLbs(grams)

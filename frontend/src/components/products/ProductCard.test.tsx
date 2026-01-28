@@ -177,7 +177,7 @@ describe('ProductCard', () => {
     };
     render(<ProductCard product={perPoundProduct} />);
     expect(screen.getByText(/Starting at/)).toBeInTheDocument();
-    expect(screen.getByText(/\$3,234\.21\/lb/)).toBeInTheDocument();
+    expect(screen.getByText(/\$3,234\.21\/P/)).toBeInTheDocument();
   });
 
   it('displays tiered pricing when pricing_model is tiered', () => {

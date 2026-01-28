@@ -22,6 +22,7 @@ import type {
 } from '@/types/customization';
 import { getImageUrl } from '@/lib/utils/image';
 import { strapiApi } from '@/lib/api/strapi';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 
 // Status badge variant mapping
 const getStatusVariant = (
@@ -417,7 +418,7 @@ export default function OrderDetailPage() {
                   </div>
                   {order.total_weight && order.total_weight > 0 && (
                     <p className="text-sm text-muted-foreground mt-2">
-                      Total Weight: {order.total_weight} {order.weight_unit || 'lb'}
+                      Total Weight: {order.total_weight} {order.weight_unit || WEIGHT_UNIT}
                     </p>
                   )}
                 </div>

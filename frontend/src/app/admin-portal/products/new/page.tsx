@@ -26,6 +26,7 @@ import {
   type CreateProductData,
   type InventoryUpdateData,
 } from '@/lib/api/admin-products';
+import { WEIGHT_UNIT } from '@/lib/utils/units';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -303,7 +304,7 @@ export default function NewProductPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="price">
-                  Base Price ($) {formData.pricing_unit === 'per_half_pound' ? 'per ½ lb' : 'per lb'}
+                  Base Price ($) {formData.pricing_unit === 'per_half_pound' ? `per 0.5 ${WEIGHT_UNIT}` : `per ${WEIGHT_UNIT}`}
                 </Label>
                 <Input
                   id="price"
@@ -325,8 +326,8 @@ export default function NewProductPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="per_pound">Per Pound (1 lb)</SelectItem>
-                    <SelectItem value="per_half_pound">Per Half Pound (½ lb)</SelectItem>
+                    <SelectItem value="per_pound">Per Pound (1 {WEIGHT_UNIT})</SelectItem>
+                    <SelectItem value="per_half_pound">Per Half Pound (0.5 {WEIGHT_UNIT})</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

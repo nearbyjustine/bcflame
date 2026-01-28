@@ -26,8 +26,8 @@
     },
     "unit": {
       "type": "enumeration",
-      "enum": ["lb"],
-      "default": "lb",
+      "enum": ["g", "oz", "P", "Half_P", "lb", "Half_lb"],
+      "default": "P",
       "required": true
     },
     "reorder_point": {
