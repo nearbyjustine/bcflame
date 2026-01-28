@@ -56,11 +56,16 @@ export default {
       // Determine link based on recipient type
       const recipient = await strapi.db.query('plugin::users-permissions.user').findOne({
         where: { id: recipientId },
+        select: ['id', 'username', 'email', 'userType'],
       });
 
-      const link = recipient?.userType === 'admin'
+      // Generate the correct link based on who is receiving the notification
+      const isAdminRecipient = recipient?.userType === 'admin';
+      const link = isAdminRecipient
         ? `/admin-portal/messages/${message.conversation.id}`
         : `/messages/${message.conversation.id}`;
+
+      strapi.log.info(`📧 Creating message notification - Recipient ID: ${recipientId}, Username: ${recipient?.username}, UserType: ${recipient?.userType}, IsAdmin: ${isAdminRecipient}, Link: ${link}`);
 
       // Build notification data with message metadata
       const notificationData: any = {
