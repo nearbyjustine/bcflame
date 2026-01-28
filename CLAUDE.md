@@ -124,13 +124,17 @@ npm run strapi     # Strapi CLI commands
 - `src/index.ts` - Bootstrap hooks
 
 **Email Notification System:**
-- **Service**: `src/services/email.ts` - Nodemailer-based email service with singleton pattern
-- **Templates**: `src/templates/order-email.ts` - HTML/text email templates for order notifications
+- **Service**: `src/services/resend-email.ts` - Resend API-based email service with singleton pattern
+- **Templates**:
+  - `src/templates/html/` - HTML email templates (new-order-admin.html, new-order-customer.html, order-status-update.html)
+  - `src/templates/email-renderer.ts` - Template rendering utility with placeholder replacement
+  - `src/templates/order-email.ts` - Email generation functions (uses renderer)
 - **Lifecycle Hooks**: Order inquiry lifecycle hooks trigger automatic emails:
   - `afterCreate`: Sends notification to admin and confirmation to customer
   - `afterUpdate`: Sends status update email when order status changes
-- **Configuration**: Environment-based SMTP configuration (see Email Configuration section)
+- **Configuration**: Environment-based Resend configuration (see Email Configuration section)
 - **Testing**: Full unit test coverage for service, templates, and lifecycle hooks
+- **Legacy**: `src/services/email.ts` - Nodemailer SMTP service (kept for backward compatibility)
 
 **Built-in Features:**
 - Strapi Users-Permissions plugin for JWT authentication
@@ -172,21 +176,34 @@ openssl rand -base64 32
 - `DB_PASSWORD` - Change in production
 - All secrets must be generated, never use defaults in production
 
-**Email Configuration:**
-- `SMTP_HOST` - SMTP server hostname (e.g., smtp.gmail.com)
-- `SMTP_PORT` - SMTP server port (default: 587 for TLS)
-- `SMTP_SECURE` - Use SSL (true) or TLS (false)
-- `SMTP_USER` - SMTP authentication username
-- `SMTP_PASS` - SMTP authentication password (use app-specific password for Gmail)
+**Email Configuration (Resend):**
+- `RESEND_API_KEY` - Resend API key (required)
+- `RESEND_FROM_EMAIL` - Sender email address (default: onboarding@resend.dev)
 - `EMAIL_FROM_NAME` - Sender name (default: BC Flame)
-- `EMAIL_FROM_ADDRESS` - Sender email address
 - `EMAIL_ADMIN_RECIPIENTS` - Comma-separated list of admin emails for order notifications
 
-**Gmail Setup Example:**
-1. Enable 2-Factor Authentication on your Google account
-2. Generate an App Password: Google Account → Security → 2-Step Verification → App passwords
-3. Use the 16-character app password for `SMTP_PASS`
-4. Set `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_SECURE=false`
+**Resend Setup:**
+1. Sign up at https://resend.com
+2. Get your API key from the dashboard
+3. Set `RESEND_API_KEY` in your `.env` file
+4. **Default**: Use `onboarding@resend.dev` (no verification needed)
+5. **Custom Domain** (production):
+   - Go to https://resend.com/domains
+   - Add your domain (e.g., `bcflame.online`)
+   - Configure DNS records (SPF, DKIM, DMARC)
+   - Wait for verification (5-10 minutes)
+   - Update `RESEND_FROM_EMAIL=business@bcflame.online`
+6. Restart backend: `docker-compose restart strapi`
+
+**Fallback**: If custom domain fails verification, the system automatically falls back to `onboarding@resend.dev`
+
+**SMTP Configuration (Legacy - Optional):**
+The old SMTP configuration is still available but no longer used by default. If you need SMTP:
+- `SMTP_HOST` - SMTP server hostname (e.g., smtp.gmail.com)
+- `SMTP_PORT` - SMTP server port (default: 587)
+- `SMTP_SECURE` - Use SSL (true) or TLS (false)
+- `SMTP_USER`, `SMTP_PASS` - SMTP credentials
+- `EMAIL_FROM_ADDRESS` - SMTP sender email
 
 ### Service URLs
 

@@ -3,34 +3,32 @@
  * Provides health check and test endpoints for email service
  */
 
-import { EmailService } from '../../../services/email';
+import { ResendEmailService } from '../../../services/resend-email';
 
 export default {
   /**
-   * Health check endpoint - tests SMTP connection
+   * Health check endpoint - tests Resend API connection
    * GET /api/email/health
    */
   async health(ctx) {
     try {
-      const emailService = EmailService.getInstance();
+      const emailService = ResendEmailService.getInstance();
       const isConnected = await emailService.verifyConnection();
 
       if (isConnected) {
         ctx.send({
           status: 'ok',
-          message: 'Email service is properly configured and can connect to SMTP server',
+          message: 'Email service is properly configured and ready to send emails via Resend',
           config: {
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: process.env.SMTP_SECURE === 'true',
-            from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_ADDRESS}>`,
+            apiKey: process.env.RESEND_API_KEY ? 'Configured' : 'Missing',
+            from: `${process.env.EMAIL_FROM_NAME} <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
           },
         });
       } else {
         ctx.status = 503;
         ctx.send({
           status: 'error',
-          message: 'Cannot connect to SMTP server. Please check your email configuration.',
+          message: 'Cannot connect to Resend API. Please check your email configuration.',
         });
       }
     } catch (error) {
@@ -44,7 +42,7 @@ export default {
   },
 
   /**
-   * Test email endpoint - sends a test email
+   * Test email endpoint - sends a test email via Resend
    * POST /api/email/test
    * Body: { to: string, subject?: string }
    */
@@ -68,7 +66,7 @@ export default {
         return;
       }
 
-      const emailService = EmailService.getInstance();
+      const emailService = ResendEmailService.getInstance();
 
       // Send test email
       const result = await emailService.sendEmail({
@@ -82,8 +80,8 @@ export default {
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
             <p style="color: #666; font-size: 12px;">
               Sent at: ${new Date().toISOString()}<br />
-              From: ${process.env.EMAIL_FROM_NAME} &lt;${process.env.EMAIL_FROM_ADDRESS}&gt;<br />
-              SMTP Host: ${process.env.SMTP_HOST}:${process.env.SMTP_PORT}
+              From: ${process.env.EMAIL_FROM_NAME} &lt;${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}&gt;<br />
+              Service: Resend API
             </p>
           </div>
         `,

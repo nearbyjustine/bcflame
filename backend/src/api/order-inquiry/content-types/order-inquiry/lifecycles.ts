@@ -1,5 +1,5 @@
 import { generateInquiryNumber } from '../../services/inquiry-number'
-import { getEmailService } from '../../../../services/email'
+import { getResendEmailService } from '../../../../services/resend-email'
 import {
   generateNewOrderEmailForAdmin,
   generateNewOrderEmailForCustomer,
@@ -172,7 +172,7 @@ export default {
       // Get email service - with defensive check for configuration
       let emailService
       try {
-        emailService = getEmailService()
+        emailService = getResendEmailService()
       } catch (emailConfigError) {
         strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
         return
@@ -285,7 +285,7 @@ export default {
         // Get email service - with defensive check for configuration
         let emailService
         try {
-          emailService = getEmailService()
+          emailService = getResendEmailService()
         } catch (emailConfigError) {
           strapi.log.warn('Email service not configured, skipping status update email:', emailConfigError)
           return

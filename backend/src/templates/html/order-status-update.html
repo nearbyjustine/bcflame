@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #dc2626;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 5px 5px 0 0;
+    }
+    .content {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 0 0 5px 5px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+      background-color: {{statusColor}};
+    }
+    .info-box {
+      background-color: #fff;
+      padding: 15px;
+      border-left: 4px solid {{statusColor}};
+      margin: 20px 0;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .footer {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Order Status Update</h1>
+    </div>
+    <div class="content">
+      <p>Dear {{customerName}},</p>
+      <p>Your order inquiry <strong>{{inquiryNumber}}</strong> has been updated.</p>
+
+      <div class="info-box">
+        <strong>Status:</strong> <span class="status-badge">{{status}}</span>
+      </div>
+
+      <div class="section">
+        <p><strong>Update Details:</strong></p>
+        <p>{{statusMessage}}</p>
+      </div>
+
+      <p>If you have any questions about this update, please contact us and reference your inquiry number <strong>{{inquiryNumber}}</strong>.</p>
+
+      <div class="footer">
+        <p><strong>BC Flame Premium Client Portal</strong></p>
+        <p>This is an automated notification email.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

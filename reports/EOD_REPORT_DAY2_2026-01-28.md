@@ -213,6 +213,37 @@
 
 ---
 
+---
+
+### 6. Email Infrastructure & Integration
+**Focus:** Reliability & Notification Fallbacks
+
+**What I did:**
+- **Email Service Integration:** (Integrated `Resend`)
+  - Set up Resend API client for transactional emails
+  - Configured secure API key management
+  - Created email templates for notifications
+  - Implemented logic to send emails for critical alerts
+
+- **Infrastructure Configuration:**
+  - Configured Cloudflare DNS records for domain authentication (DKIM/SPF/DMARC)
+  - Set up Cloudflare Email Routing for handling incoming domain emails
+  - Verified domain status to ensure high deliverability
+
+- **Verification & Testing:**
+  - Added test scripts to verify email sending functionality
+  - Validated email delivery to various providers
+  - Confirmed correct rendering of email templates
+
+**Why it matters:**
+- **Reliability:** Ensures usage notifications reach users even when offline
+- **Professionalism:** Emails come from verified domain (@bcflame.online)
+- **Deliverability:** Proper DNS setup prevents emails going to spam
+
+**Current status:** ✅ **Fully Configured & Tested**
+
+---
+
 ## Key Metrics
 
 - **Commits:** 5 major commits deployed
@@ -235,6 +266,8 @@
 ✅ Centralized notification service
 ✅ Admin conversation management
 ✅ Bulk notification operations
+✅ Transactional email service (Resend) integration
+✅ Cloudflare domain email routing
 
 ### Performance Metrics
 - **Conversation Page Load:** ~900ms
