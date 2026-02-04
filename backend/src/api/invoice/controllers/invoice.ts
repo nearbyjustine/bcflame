@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi';
 import invoiceService from '../../../services/invoice-service';
+import { getResendEmailService } from '../../../services/resend-email';
 import { WEIGHT_UNIT } from '../../../constants/units';
 
 export default factories.createCoreController('api::invoice.invoice' as any, ({ strapi }) => ({
@@ -326,12 +327,18 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         return ctx.badRequest('Customer email not found');
       }
 
-      // Send email using existing email service
-      await strapi.plugins['email'].services.email.send({
+      // Send email using Resend service
+      const emailService = getResendEmailService();
+      const result = await emailService.sendEmail({
         to: customer.email,
         subject: `Invoice ${invoice.invoiceNumber} from BC Flame`,
         html: await invoiceService.generateEmailHtml(invoice),
       });
+
+      if (!result.success) {
+        strapi.log.error('Invoice email send failed:', { error: result.error, invoiceId: id });
+        return ctx.internalServerError(`Failed to send invoice email: ${result.error}`);
+      }
 
       // Update invoice status to sent
       await strapi.entityService.update('api::invoice.invoice' as any, id, {
@@ -342,6 +349,7 @@ export default factories.createCoreController('api::invoice.invoice' as any, ({ 
         data: {
           message: 'Invoice sent successfully',
           invoiceId: invoice.id,
+          messageId: result.messageId,
         },
       };
     } catch (error) {

@@ -1,6 +1,16 @@
 export default [
   'strapi::logger',
   'strapi::errors',
+  {
+    name: 'global::correlation-id',
+    config: {},
+  },
+  {
+    name: 'global::logging',
+    config: {
+      skipPaths: ['/_health', '/admin'],
+    },
+  },
   'global::log-user-context',
   'global::rate-limit',
   {

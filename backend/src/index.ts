@@ -43,7 +43,7 @@ export default {
     // Store io instance globally for access in controllers
     strapi.io = io;
 
-    console.log('✅ Socket.IO server initialized');
+    strapi.log.info('✅ Socket.IO server initialized');
     // Set up permissions for authenticated users
     const authenticatedRole = await strapi.query('plugin::users-permissions.role').findOne({
       where: { type: 'authenticated' },

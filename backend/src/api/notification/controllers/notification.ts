@@ -42,7 +42,12 @@ export default factories.createCoreController('api::notification.notification' a
         },
       };
     } catch (error) {
-      console.error('Get unread count error:', error);
+      strapi.log.error('Get unread count error', {
+        error: error.message,
+        stack: error.stack,
+        userId: user.id,
+        correlationId: ctx.state.correlationId,
+      });
       return ctx.internalServerError('Failed to retrieve unread notifications');
     }
   },
@@ -99,7 +104,12 @@ export default factories.createCoreController('api::notification.notification' a
         },
       };
     } catch (error) {
-      console.error('Get unread notifications error:', error);
+      strapi.log.error('Get unread notifications error', {
+        error: error.message,
+        stack: error.stack,
+        userId: user.id,
+        correlationId: ctx.state.correlationId,
+      });
       return ctx.internalServerError('Failed to retrieve unread notifications');
     }
   },
@@ -159,7 +169,12 @@ export default factories.createCoreController('api::notification.notification' a
         },
       };
     } catch (error) {
-      console.error('Mark all notifications as read error:', error);
+      strapi.log.error('Mark all notifications as read error', {
+        error: error.message,
+        stack: error.stack,
+        userId: user.id,
+        correlationId: ctx.state.correlationId,
+      });
       return ctx.internalServerError('Failed to mark notifications as read');
     }
   },
@@ -229,7 +244,12 @@ export default factories.createCoreController('api::notification.notification' a
         },
       };
     } catch (error) {
-      console.error('Find notifications error:', error);
+      strapi.log.error('Find notifications error', {
+        error: error.message,
+        stack: error.stack,
+        userId: user.id,
+        correlationId: ctx.state.correlationId,
+      });
       return ctx.internalServerError('Failed to retrieve notifications');
     }
   },
@@ -273,7 +293,13 @@ export default factories.createCoreController('api::notification.notification' a
 
       return updated;
     } catch (error) {
-      console.error('Update notification error:', error);
+      strapi.log.error('Update notification error', {
+        error: error.message,
+        stack: error.stack,
+        notificationId: id,
+        userId: user.id,
+        correlationId: ctx.state.correlationId,
+      });
       return ctx.internalServerError('Failed to update notification');
     }
   },

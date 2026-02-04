@@ -45,7 +45,7 @@ function cleanupExpiredEntries(): void {
   }
 
   if (cleanedCount > 0) {
-    console.log(`[Rate Limit] Cleaned up ${cleanedCount} expired entries`);
+    strapi.log.debug(`[Rate Limit] Cleaned up ${cleanedCount} expired entries`, { cleanedCount });
   }
 }
 
@@ -188,9 +188,13 @@ export default (config: any, { strapi }: { strapi: any }) => {
         ctx.set('Retry-After', String(resetTime));
 
         // Log rate limit violation
-        console.warn(
-          `[Rate Limit] Blocked: ${clientId} exceeded ${ruleName} limit (${entry.count}/${ruleConfig.max}) on ${path}`
-        );
+        strapi.log.warn(`[Rate Limit] Blocked: ${clientId} exceeded ${ruleName} limit (${entry.count}/${ruleConfig.max}) on ${path}`, {
+          clientId,
+          ruleName,
+          count: entry.count,
+          limit: ruleConfig.max,
+          path,
+        });
 
         // Return 429 Too Many Requests
         ctx.status = 429;
@@ -212,7 +216,11 @@ export default (config: any, { strapi }: { strapi: any }) => {
       }
     } catch (error) {
       // Log error but don't block the request if rate limiting fails
-      console.error('[Rate Limit] Error in rate limit pre-processing:', error);
+      strapi.log.error('[Rate Limit] Error in rate limit pre-processing', {
+        error: error.message,
+        stack: error.stack,
+        path: ctx.request.path,
+      });
       // Ensure we call next() if we failed during pre-processing
       // But we are outside the try/catch logic for next() below
       return next();
@@ -236,7 +244,12 @@ export default (config: any, { strapi }: { strapi: any }) => {
         entry.count--;
       }
     } catch (error) {
-       console.error('[Rate Limit] Error in rate limit post-processing:', error);
+       strapi.log.error('[Rate Limit] Error in rate limit post-processing', {
+         error: error.message,
+         stack: error.stack,
+         path: ctx.request.path,
+         status: ctx.status,
+       });
     }
   };
 };

@@ -34,7 +34,11 @@ export const authenticateSocket = async (
 
     next();
   } catch (error) {
-    console.error('Socket authentication error:', error);
+    const strapiInstance = global.strapi as Strapi;
+    strapiInstance.log.error('Socket authentication error', {
+      error: error.message,
+      stack: error.stack,
+    });
     next(new Error('Authentication failed'));
   }
 };

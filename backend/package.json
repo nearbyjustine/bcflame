@@ -16,6 +16,8 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "@sentry/node": "^8.55.0",
+    "@sentry/profiling-node": "^8.55.0",
     "@strapi/plugin-i18n": "4.16.2",
     "@strapi/plugin-users-permissions": "4.16.2",
     "@strapi/strapi": "4.16.2",
@@ -35,6 +37,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@sentry/types": "^8.55.0",
     "@strapi/typescript-utils": "4.16.2",
     "@types/archiver": "^6.0.0",
     "@types/node": "20.10.6",

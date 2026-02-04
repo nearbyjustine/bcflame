@@ -21,19 +21,19 @@ export const initializeSocket = (httpServer: HTTPServer) => {
   // Connection handler
   io.on('connection', (socket) => {
     const userId = socket.data.userId;
-    console.log(`User connected: ${userId}`);
+    strapi.log.info(`User connected: ${userId}`, { userId, socketId: socket.id });
 
     // Join user-specific room for targeted notifications
     const userRoom = `user:${userId}`;
     socket.join(userRoom);
-    console.log(`User ${userId} joined personal room: ${userRoom}`);
+    strapi.log.info(`User ${userId} joined personal room: ${userRoom}`, { userId, userRoom, socketId: socket.id });
 
     // Register event handlers
     registerMessageHandlers(io, socket);
     registerConversationHandlers(io, socket);
 
     socket.on('disconnect', (reason) => {
-      console.log(`User disconnected: ${userId}, reason: ${reason}`);
+      strapi.log.info(`User disconnected: ${userId}, reason: ${reason}`, { userId, reason, socketId: socket.id });
     });
   });
 

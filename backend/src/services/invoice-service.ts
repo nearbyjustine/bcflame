@@ -107,7 +107,7 @@ const invoiceService = {
 
       const invoiceNumber = `INV-${dateStr}-${sequence.toString().padStart(4, '0')}`;
 
-      console.log('Generated invoice number:', invoiceNumber);
+      strapi.log.info('Generated invoice number', { invoiceNumber });
 
       // Create invoice with the generated number (still under lock)
       const invoice = await strapi.entityService.create('api::invoice.invoice' as any, {
@@ -156,7 +156,12 @@ const invoiceService = {
                 fs.unlinkSync(filePath);
               }
             } catch (cleanupError) {
-              console.error('Error during cleanup:', cleanupError);
+              strapi.log.error('Error during PDF cleanup', {
+                error: cleanupError.message,
+                stack: cleanupError.stack,
+                filePath,
+                invoiceNumber: invoice.invoiceNumber,
+              });
             }
             reject(error);
           }

@@ -97,10 +97,14 @@ export function createResendEmailService(config: ResendConfig): IEmailService {
                               errorMessage.toLowerCase().includes('unverified')
 
         if (isDomainError) {
-          console.warn(
-            `Resend: Primary domain ${primaryFrom} failed. Falling back to ${fallbackFrom}.` +
-            ` Error: ${errorMessage}`
-          )
+          const strapiInstance = global.strapi as any;
+          if (strapiInstance?.log) {
+            strapiInstance.log.warn(`Resend: Primary domain ${primaryFrom} failed. Falling back to ${fallbackFrom}`, {
+              primaryFrom,
+              fallbackFrom,
+              errorMessage,
+            });
+          }
 
           // Switch to fallback and retry
           currentFrom = fallbackFrom
