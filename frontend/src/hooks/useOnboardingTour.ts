@@ -121,7 +121,9 @@ export function useOnboardingTour({ moduleKey, steps, enabled = true }: UseOnboa
     initTour().catch(console.error);
 
     return () => {
-      if (tour) tour.destroy();
+      if (tour && typeof tour.destroy === 'function') {
+        tour.destroy();
+      }
     };
   }, [moduleKey, steps, enabled, userProfile, isLoading]);
 }
