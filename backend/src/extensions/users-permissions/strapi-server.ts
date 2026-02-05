@@ -178,56 +178,10 @@ export default (plugin: any) => {
   };
 
   // Add custom route for bulk update
-  plugin.routes['content-api'].routes.push({
+  plugin.routes['content-api'].routes.unshift({
     method: 'POST',
     path: '/users/bulk-update',
     handler: 'user.bulkUpdate',
-    config: {
-      policies: [],
-      middlewares: ['global::require-auth'],
-    },
-  });
-
-  // Onboarding progress controller
-  const VALID_MODULE_KEYS = [
-    'dashboard', 'products', 'orders', 'messages', 'media-hub',
-    'admin-dashboard', 'admin-orders', 'admin-products', 'admin-users', 'admin-media', 'admin-messages',
-  ];
-
-  plugin.controllers.user.updateOnboardingProgress = async (ctx: any) => {
-    const user = ctx.state.user;
-    const { moduleKey } = ctx.request.body;
-
-    if (!moduleKey || !VALID_MODULE_KEYS.includes(moduleKey)) {
-      return ctx.badRequest('moduleKey is required and must be a valid module key');
-    }
-
-    const currentProgress = user.onboarding_progress || {};
-
-    if (currentProgress[moduleKey]?.completed) {
-      return { success: true, onboarding_progress: currentProgress };
-    }
-
-    const updatedProgress = {
-      ...currentProgress,
-      [moduleKey]: {
-        completed: true,
-        completedAt: new Date().toISOString(),
-      },
-    };
-
-    await strapi.query('plugin::users-permissions.user').update({
-      where: { id: user.id },
-      data: { onboarding_progress: updatedProgress },
-    });
-
-    return { success: true, onboarding_progress: updatedProgress };
-  };
-
-  plugin.routes['content-api'].routes.push({
-    method: 'POST',
-    path: '/users/onboarding/complete',
-    handler: 'user.updateOnboardingProgress',
     config: {
       policies: [],
       middlewares: ['global::require-auth'],

@@ -25,6 +25,7 @@ interface AuthState {
   logout: () => void;
   checkAuth: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
+  setUserProfile: (profile: UserProfile) => void;
   uploadLogo: (file: File) => Promise<void>;
 }
 
@@ -117,6 +118,10 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
         }
+      },
+
+      setUserProfile: (profile) => {
+        set({ userProfile: profile });
       },
 
       uploadLogo: async (file: File) => {

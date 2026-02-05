@@ -36,6 +36,73 @@ export default {
       }
     }
 
+    // Register onboarding route directly on the Koa router.
+    // plugin.routes['content-api'] on users-permissions doesn't work because
+    // the plugin's internal router shadows /users/* paths, causing 405s.
+    const VALID_MODULE_KEYS = [
+      'dashboard', 'products', 'orders', 'messages', 'media-hub',
+      'admin-dashboard', 'admin-orders', 'admin-products', 'admin-users', 'admin-media', 'admin-messages',
+    ];
+
+    strapi.server.router.post('/api/users/onboarding/complete', async (ctx) => {
+      const authHeader = ctx.request.header.authorization;
+      if (!authHeader) {
+        ctx.status = 401;
+        ctx.body = { data: null, error: { status: 401, name: 'UnauthorizedError', message: 'No authorization token was found' } };
+        return;
+      }
+
+      const token = authHeader.replace('Bearer ', '');
+      let user;
+      try {
+        const jwtService = strapi.plugin('users-permissions').service('jwt');
+        const decoded = await jwtService.verify(token);
+        user = await strapi.query('plugin::users-permissions.user').findOne({
+          where: { id: decoded.id },
+        });
+      } catch {
+        ctx.status = 401;
+        ctx.body = { data: null, error: { status: 401, name: 'UnauthorizedError', message: 'Invalid token' } };
+        return;
+      }
+
+      if (!user) {
+        ctx.status = 401;
+        ctx.body = { data: null, error: { status: 401, name: 'UnauthorizedError', message: 'Invalid token: user not found' } };
+        return;
+      }
+
+      const { moduleKey } = ctx.request.body;
+
+      if (!moduleKey || !VALID_MODULE_KEYS.includes(moduleKey)) {
+        ctx.status = 400;
+        ctx.body = { data: null, error: { status: 400, name: 'BadRequestError', message: 'moduleKey is required and must be a valid module key' } };
+        return;
+      }
+
+      const currentProgress = user.onboarding_progress || {};
+
+      if (currentProgress[moduleKey]?.completed) {
+        ctx.body = { success: true, onboarding_progress: currentProgress };
+        return;
+      }
+
+      const updatedProgress = {
+        ...currentProgress,
+        [moduleKey]: {
+          completed: true,
+          completedAt: new Date().toISOString(),
+        },
+      };
+
+      await strapi.query('plugin::users-permissions.user').update({
+        where: { id: user.id },
+        data: { onboarding_progress: updatedProgress },
+      });
+
+      ctx.body = { success: true, onboarding_progress: updatedProgress };
+    });
+
     // Initialize Socket.IO when Strapi server starts
     const httpServer = strapi.server.httpServer;
     const io = initializeSocket(httpServer);

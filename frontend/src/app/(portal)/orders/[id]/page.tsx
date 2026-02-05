@@ -23,6 +23,10 @@ import type {
 import { getImageUrl } from '@/lib/utils/image';
 import { strapiApi } from '@/lib/api/strapi';
 import { WEIGHT_UNIT } from '@/lib/utils/units';
+import { hexToGradient } from '@/lib/utils/color';
+import { useGoogleFonts } from '@/hooks/useGoogleFonts';
+import PackagePreview from '@/components/products/PackagePreview';
+import { useAuthStore } from '@/stores/authStore';
 
 // Status badge variant mapping
 const getStatusVariant = (
@@ -78,6 +82,16 @@ export default function OrderDetailPage() {
   const [backgrounds, setBackgrounds] = useState<BackgroundStyle[]>([]);
   const [fonts, setFonts] = useState<FontStyle[]>([]);
   const [preBaggingOptions, setPreBaggingOptions] = useState<PreBaggingOption[]>([]);
+
+  const user = useAuthStore((state) => state.user);
+
+  // Load fonts for selected font chips
+  const selectedFontFamilies = order?.selected_fonts
+    ? order.selected_fonts
+        .map((id) => fonts.find((f) => f.id === id)?.attributes?.font_family)
+        .filter(Boolean) as string[]
+    : [];
+  useGoogleFonts(selectedFontFamilies);
 
   useEffect(() => {
     fetchOrder();
@@ -264,6 +278,17 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
 
+        {/* Package Preview */}
+        <Card>
+          <CardContent className="pt-6 flex justify-center">
+            <PackagePreview
+              background={order.selected_backgrounds?.[0] != null ? backgrounds.find((b) => b.id === order.selected_backgrounds![0]) ?? null : null}
+              font={order.selected_fonts?.[0] != null ? fonts.find((f) => f.id === order.selected_fonts![0]) ?? null : null}
+              companyName={user?.companyName}
+            />
+          </CardContent>
+        </Card>
+
         {/* Customization Details */}
         <Card>
           <CardHeader>
@@ -339,12 +364,19 @@ export default function OrderDetailPage() {
                           className="px-3 py-2 bg-muted rounded-lg text-sm"
                         >
                           <div className="flex items-center gap-2">
-                            {bg?.attributes.color_hex && (
-                              <div
-                                className="w-6 h-6 rounded border"
-                                style={{ backgroundColor: bg.attributes.color_hex }}
-                              />
-                            )}
+                            {(() => {
+                              const type = bg?.attributes?.type || 'solid_color';
+                              const previewUrl = bg?.attributes?.preview_image?.data
+                                ? getImageUrl(bg.attributes.preview_image.data)
+                                : null;
+                              if ((type === 'texture' || type === 'image') && previewUrl) {
+                                return <img src={previewUrl} alt={bg?.attributes?.name || ''} className="w-6 h-6 rounded border object-cover" />;
+                              }
+                              if (type === 'gradient') {
+                                return <div className="w-6 h-6 rounded border" style={{ background: hexToGradient(bg?.attributes?.color_hex) }} />;
+                              }
+                              return <div className="w-6 h-6 rounded border" style={{ backgroundColor: bg?.attributes?.color_hex || '#e5e7eb' }} />;
+                            })()}
                             <span className="font-medium">
                               {bg?.attributes.name || `Background #${bgId}`}
                             </span>
@@ -368,10 +400,10 @@ export default function OrderDetailPage() {
                         key={fontId}
                         className="px-3 py-2 bg-muted rounded-lg text-sm"
                       >
-                        <p className="font-medium">{font?.attributes.name || `Font #${fontId}`}</p>
+                        <p className="font-medium" style={{ fontFamily: font?.attributes?.font_family }}>{font?.attributes.name || `Font #${fontId}`}</p>
                         {font?.attributes.font_family && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {font.attributes.font_family}
+                          <p className="text-xs text-muted-foreground mt-1" style={{ fontFamily: font.attributes.font_family }}>
+                            Aa Bb Cc 123
                           </p>
                         )}
                       </div>

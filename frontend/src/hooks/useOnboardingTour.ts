@@ -44,6 +44,7 @@ function waitForElement(selector: string, timeout = 5000): Promise<void> {
 
 export function useOnboardingTour({ moduleKey, steps, enabled = true }: UseOnboardingTourOptions) {
   const userProfile = useAuthStore((state) => state.userProfile);
+  const setUserProfile = useAuthStore((state) => state.setUserProfile);
   const isLoading = useAuthStore((state) => state.isLoading);
   const hasAttemptedRef = useRef(false);
 
@@ -94,7 +95,14 @@ export function useOnboardingTour({ moduleKey, steps, enabled = true }: UseOnboa
       });
 
       const persist = () => {
-        markTourComplete(moduleKey).catch(console.error);
+        markTourComplete(moduleKey)
+          .then(({ onboarding_progress }) => {
+            const current = useAuthStore.getState().userProfile;
+            if (current && onboarding_progress) {
+              setUserProfile({ ...current, onboarding_progress });
+            }
+          })
+          .catch(console.error);
       };
 
       tour.on('complete', persist);

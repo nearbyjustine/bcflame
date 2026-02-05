@@ -12,7 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import type { Product } from '@/types/product';
-import type { CustomizationSelections } from '@/types/customization';
+import type { CustomizationSelections, BackgroundStyle, FontStyle } from '@/types/customization';
+import PackagePreview from './PackagePreview';
+import { hexToGradient } from '@/lib/utils/color';
+import { useGoogleFonts } from '@/hooks/useGoogleFonts';
 
 interface OrderConfirmationModalProps {
   isOpen: boolean;
@@ -25,6 +28,9 @@ interface OrderConfirmationModalProps {
   weight: number;
   weightUnit: string;
   quantity?: number;
+  backgrounds?: BackgroundStyle[];
+  fonts?: FontStyle[];
+  companyName?: string;
 }
 
 export function OrderConfirmationModal({
@@ -38,9 +44,19 @@ export function OrderConfirmationModal({
   weight,
   weightUnit,
   quantity = 1,
+  backgrounds,
+  fonts,
+  companyName,
 }: OrderConfirmationModalProps) {
   const totalPrice = unitPrice * quantity;
   const totalWeight = weight * quantity;
+
+  // Resolve selected background / font for the preview
+  const selectedBackground = backgrounds?.find((b) => selections.backgrounds.includes(b.id)) ?? null;
+  const selectedFont = fonts?.find((f) => selections.fonts.includes(f.id)) ?? null;
+
+  // Load fonts referenced by the selected chips
+  useGoogleFonts(fonts?.map((f) => f.attributes.font_family).filter(Boolean) ?? []);
 
   // Get product image URL
   const productImage = product.attributes.images?.data?.[0];
@@ -88,6 +104,15 @@ export function OrderConfirmationModal({
             </div>
           </div>
 
+          {/* Package Preview */}
+          <div className="flex justify-center">
+            <PackagePreview
+              background={selectedBackground}
+              font={selectedFont}
+              companyName={companyName}
+            />
+          </div>
+
           {/* Customization Summary */}
           <div className="space-y-4">
             <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
@@ -110,23 +135,54 @@ export function OrderConfirmationModal({
                   {selections.budStyles.length} selected
                 </p>
               </div>
-
-              {/* Backgrounds */}
-              <div className="p-3 border rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Backgrounds</p>
-                <p className="font-medium">
-                  {selections.backgrounds.length} selected
-                </p>
-              </div>
-
-              {/* Fonts */}
-              <div className="p-3 border rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Fonts</p>
-                <p className="font-medium">
-                  {selections.fonts.length} selected
-                </p>
-              </div>
             </div>
+
+            {/* Background chips */}
+            {backgrounds && selections.backgrounds.length > 0 && (
+              <div className="p-3 border rounded-lg">
+                <p className="text-xs text-muted-foreground mb-2">Backgrounds</p>
+                <div className="flex flex-wrap gap-2">
+                  {selections.backgrounds.map((bgId) => {
+                    const bg = backgrounds.find((b) => b.id === bgId);
+                    const type = bg?.attributes?.type || 'solid_color';
+                    return (
+                      <span key={bgId} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-muted rounded-full text-sm">
+                        <div
+                          className="w-4 h-4 rounded-sm border"
+                          style={
+                            type === 'gradient'
+                              ? { background: hexToGradient(bg?.attributes?.color_hex) }
+                              : { backgroundColor: bg?.attributes?.color_hex || '#e5e7eb' }
+                          }
+                        />
+                        {bg?.attributes?.name || `Background #${bgId}`}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Font chips */}
+            {fonts && selections.fonts.length > 0 && (
+              <div className="p-3 border rounded-lg">
+                <p className="text-xs text-muted-foreground mb-2">Fonts</p>
+                <div className="flex flex-wrap gap-2">
+                  {selections.fonts.map((fontId) => {
+                    const font = fonts.find((f) => f.id === fontId);
+                    return (
+                      <span
+                        key={fontId}
+                        className="inline-flex items-center px-2.5 py-1 bg-muted rounded-full text-sm"
+                        style={{ fontFamily: font?.attributes?.font_family }}
+                      >
+                        {font?.attributes?.name || `Font #${fontId}`}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Pre-Bagging */}
             {selections.preBagging.length > 0 && (

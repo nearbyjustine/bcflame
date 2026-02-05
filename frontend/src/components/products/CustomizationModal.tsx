@@ -103,9 +103,9 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
     const selectionLimits = product.attributes.selection_limits || []
 
     const parsedLimits = {
-      photos: { min: 0, max: 10 },
-      budStyles: { min: 0, max: 5 },
-      backgrounds: { min: 0, max: 2 },
+      photos: { min: 0, max: 7 },
+      budStyles: { min: 0, max: 4 },
+      backgrounds: { min: 0, max: 1 },
       fonts: { min: 0, max: 1 },
     }
 
@@ -141,7 +141,8 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
         getPreBaggingOptions(),
       ])
 
-      setBudStyles(budStylesRes)
+      const ALLOWED_BUD_STYLES = ['1 Bud Style', '2 Bud Style', '3 Bud Style', '4 Bud Style']
+      setBudStyles(budStylesRes.filter(s => ALLOWED_BUD_STYLES.includes(s.attributes.name)))
       setBackgrounds(backgroundsRes)
       setFonts(fontsRes)
       setPreBaggingOptions(preBaggingRes)
@@ -369,8 +370,6 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
               selectedFontIds={selectedFonts}
               onToggleBackground={toggleBackground}
               onToggleFont={toggleFont}
-              backgroundLimits={limits.backgrounds}
-              fontLimits={limits.fonts}
             />
           )}
 
@@ -440,6 +439,9 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
       unitPrice={unitPrice}
       weight={totalWeight}
       weightUnit={weightUnit}
+      backgrounds={backgrounds}
+      fonts={fonts}
+      companyName={user?.companyName}
     />
     </>
   )

@@ -35,6 +35,7 @@ export interface FontStyle {
     font_family: string;
     category: 'sans_serif' | 'serif' | 'display' | 'script';
     preview_image?: { data: ProductImage | null };
+    font_file?: { data: ProductImage | null };
     sort_order: number;
     createdAt: string;
     updatedAt: string;

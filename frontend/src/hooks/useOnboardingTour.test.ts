@@ -2,8 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useOnboardingTour, type TourStepConfig } from './useOnboardingTour';
 
+const mockSetUserProfile = vi.fn();
+
 vi.mock('@/stores/authStore', () => ({
-  useAuthStore: vi.fn(),
+  useAuthStore: Object.assign(vi.fn(), {
+    getState: vi.fn(() => ({ userProfile: { onboarding_progress: {} } })),
+  }),
 }));
 
 vi.mock('@/lib/api/onboarding', () => ({
@@ -54,6 +58,7 @@ describe('useOnboardingTour', () => {
           },
         },
         isLoading: false,
+        setUserProfile: mockSetUserProfile,
       };
       return selector(state);
     });
@@ -67,7 +72,7 @@ describe('useOnboardingTour', () => {
 
   it('does not start the tour while isLoading is true', async () => {
     (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: null, isLoading: true };
+      const state = { userProfile: null, isLoading: true, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 
@@ -80,7 +85,7 @@ describe('useOnboardingTour', () => {
 
   it('does not start the tour when enabled is false', async () => {
     (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: { onboarding_progress: {} }, isLoading: false };
+      const state = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 
@@ -93,7 +98,7 @@ describe('useOnboardingTour', () => {
 
   it('calls markTourComplete on tour complete event', async () => {
     (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: { onboarding_progress: {} }, isLoading: false };
+      const state = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 
@@ -110,7 +115,7 @@ describe('useOnboardingTour', () => {
 
   it('calls markTourComplete on tour cancel event', async () => {
     (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: { onboarding_progress: {} }, isLoading: false };
+      const state = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 

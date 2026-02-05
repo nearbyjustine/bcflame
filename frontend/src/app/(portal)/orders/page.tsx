@@ -2,14 +2,18 @@
 
 import { useEffect, useState } from 'react'
 import { Loader2, Clock, Package } from 'lucide-react'
-import { getMyOrderInquiries } from '@/lib/api/customization'
+import { getMyOrderInquiries, getBackgroundStyles, getFontStyles } from '@/lib/api/customization'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { OrderInquiry } from '@/types/customization'
+import type { OrderInquiry, BackgroundStyle, FontStyle } from '@/types/customization'
 import { getImageUrl } from '@/lib/utils/image'
 import { useOnboardingTour } from '@/hooks/useOnboardingTour'
 import { resellerOrdersSteps } from '@/hooks/tours/resellerTours'
+import { hexToGradient } from '@/lib/utils/color'
+import { useGoogleFonts } from '@/hooks/useGoogleFonts'
+import PackagePreview from '@/components/products/PackagePreview'
+import { useAuthStore } from '@/stores/authStore'
 
 // Status badge variant mapping
 const getStatusVariant = (
@@ -52,14 +56,34 @@ const formatStatusLabel = (status: string): string => {
 
 export default function OrdersPage() {
   useOnboardingTour({ moduleKey: 'orders', steps: resellerOrdersSteps })
+  const user = useAuthStore((state) => state.user)
   const [inquiries, setInquiries] = useState<OrderInquiry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedInquiry, setSelectedInquiry] = useState<OrderInquiry | null>(null)
+  const [backgrounds, setBackgrounds] = useState<BackgroundStyle[]>([])
+  const [fonts, setFonts] = useState<FontStyle[]>([])
+
+  // Load fonts for chips in the detail modal
+  useGoogleFonts(fonts.map((f) => f.attributes.font_family).filter(Boolean))
 
   useEffect(() => {
     fetchInquiries()
+    fetchStyles()
   }, [])
+
+  const fetchStyles = async () => {
+    try {
+      const [bgs, fts] = await Promise.all([
+        getBackgroundStyles().catch(() => []),
+        getFontStyles().catch(() => []),
+      ])
+      setBackgrounds(bgs)
+      setFonts(fts)
+    } catch {
+      // non-critical
+    }
+  }
 
   const fetchInquiries = async () => {
     try {
@@ -298,6 +322,21 @@ export default function OrdersPage() {
                 </div>
               </div>
 
+              {/* Package Preview */}
+              {(() => {
+                const selBgId = selectedInquiry.attributes.selected_backgrounds?.[0] ??
+                  selectedInquiry.attributes.selections?.backgrounds?.[0];
+                const selFontId = selectedInquiry.attributes.selected_fonts?.[0] ??
+                  selectedInquiry.attributes.selections?.fonts?.[0];
+                const previewBg = selBgId != null ? backgrounds.find((b) => b.id === selBgId) ?? null : null;
+                const previewFont = selFontId != null ? fonts.find((f) => f.id === selFontId) ?? null : null;
+                return (
+                  <div className="flex justify-center">
+                    <PackagePreview background={previewBg} font={previewFont} companyName={user?.companyName} />
+                  </div>
+                );
+              })()}
+
               {/* Customization Selections */}
               {selectedInquiry.attributes.selections && (
                 <div className="p-4 border rounded-xl">
@@ -307,7 +346,7 @@ export default function OrdersPage() {
                     </svg>
                     Customization Details
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 bg-muted/30 rounded-lg text-center">
                       <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.photos?.length || 0}</p>
                       <p className="text-xs text-muted-foreground">Photos</p>
@@ -316,15 +355,56 @@ export default function OrdersPage() {
                       <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.budStyles?.length || 0}</p>
                       <p className="text-xs text-muted-foreground">Bud Styles</p>
                     </div>
-                    <div className="p-3 bg-muted/30 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.backgrounds?.length || 0}</p>
-                      <p className="text-xs text-muted-foreground">Backgrounds</p>
-                    </div>
-                    <div className="p-3 bg-muted/30 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.fonts?.length || 0}</p>
-                      <p className="text-xs text-muted-foreground">Fonts</p>
-                    </div>
                   </div>
+
+                  {/* Background chips */}
+                  {selectedInquiry.attributes.selections.backgrounds &&
+                    selectedInquiry.attributes.selections.backgrounds.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-xs text-muted-foreground mb-1.5">Backgrounds</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedInquiry.attributes.selections.backgrounds.map((bgId) => {
+                            const bg = backgrounds.find((b) => b.id === bgId);
+                            const type = bg?.attributes?.type || 'solid_color';
+                            return (
+                              <span key={bgId} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-muted/30 rounded-full text-sm">
+                                <div
+                                  className="w-4 h-4 rounded-sm border"
+                                  style={
+                                    type === 'gradient'
+                                      ? { background: hexToGradient(bg?.attributes?.color_hex) }
+                                      : { backgroundColor: bg?.attributes?.color_hex || '#e5e7eb' }
+                                  }
+                                />
+                                {bg?.attributes?.name || `Background #${bgId}`}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Font chips */}
+                  {selectedInquiry.attributes.selections.fonts &&
+                    selectedInquiry.attributes.selections.fonts.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-xs text-muted-foreground mb-1.5">Fonts</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedInquiry.attributes.selections.fonts.map((fontId) => {
+                            const font = fonts.find((f) => f.id === fontId);
+                            return (
+                              <span
+                                key={fontId}
+                                className="inline-flex items-center px-2.5 py-1 bg-muted/30 rounded-full text-sm"
+                                style={{ fontFamily: font?.attributes?.font_family }}
+                              >
+                                {font?.attributes?.name || `Font #${fontId}`}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                   {/* Pre-Bagging Details */}
                   {selectedInquiry.attributes.selections.preBagging &&
