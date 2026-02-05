@@ -19,12 +19,15 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { resellerMessagesSteps } from '@/hooks/tours/resellerTours';
 
 export default function ResellerMessagesPage() {
   const { socket, isConnected } = useSocketContext();
   const user = useAuthStore((state) => state.user);
 
   const [conversation, setConversation] = useState<Conversation | null>(null);
+  useOnboardingTour({ moduleKey: 'messages', steps: resellerMessagesSteps, enabled: !!conversation });
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [typingUsers, setTypingUsers] = useState<Set<number>>(new Set());
@@ -135,7 +138,7 @@ export default function ResellerMessagesPage() {
   return (
     <div className="container mx-auto py-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6" data-tour="res-messages-header">
         <Avatar>
           <AvatarFallback>{adminUser.username.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
@@ -146,10 +149,12 @@ export default function ResellerMessagesPage() {
         </div>
       </div>
 
-      <ConnectionStatus isConnected={isConnected} className="mb-4" />
+      <div data-tour="res-messages-connection">
+        <ConnectionStatus isConnected={isConnected} className="mb-4" />
+      </div>
 
       {/* Chat Interface */}
-      <Card className="flex flex-col h-[calc(100vh-250px)]">
+      <Card className="flex flex-col h-[calc(100vh-250px)]" data-tour="res-messages-chat">
         <MessageThread messages={messages} currentUserId={user.id} userType="reseller" />
 
         {typingUsernames.length > 0 && (

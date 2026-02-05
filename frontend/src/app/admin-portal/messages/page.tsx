@@ -11,8 +11,11 @@ import { getConversations, type Conversation } from '@/lib/api/conversations';
 import { useAuthStore } from '@/stores/authStore';
 import { Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { adminMessagesSteps } from '@/hooks/tours/adminTours';
 
 export default function MessagesPage() {
+  useOnboardingTour({ moduleKey: 'admin-messages', steps: adminMessagesSteps });
   const { socket, isConnected } = useSocketContext();
   const user = useAuthStore((state) => state.user);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -86,7 +89,7 @@ export default function MessagesPage() {
 
   return (
     <div className="container mx-auto py-6">
-      <div className="mb-6">
+      <div className="mb-6" data-tour="adm-messages-header">
         <h1 className="text-3xl font-bold">Messages</h1>
         <p className="text-muted-foreground mt-2">
           {user.userType === 'admin'
@@ -97,9 +100,9 @@ export default function MessagesPage() {
 
       <ConnectionStatus isConnected={isConnected} className="mb-4" />
 
-      <Card>
+      <Card data-tour="adm-messages-list">
         {/* Search */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b" data-tour="adm-messages-search">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input

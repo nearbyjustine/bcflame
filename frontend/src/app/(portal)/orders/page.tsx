@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { OrderInquiry } from '@/types/customization'
 import { getImageUrl } from '@/lib/utils/image'
+import { useOnboardingTour } from '@/hooks/useOnboardingTour'
+import { resellerOrdersSteps } from '@/hooks/tours/resellerTours'
 
 // Status badge variant mapping
 const getStatusVariant = (
@@ -49,6 +51,7 @@ const formatStatusLabel = (status: string): string => {
 }
 
 export default function OrdersPage() {
+  useOnboardingTour({ moduleKey: 'orders', steps: resellerOrdersSteps })
   const [inquiries, setInquiries] = useState<OrderInquiry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -82,7 +85,7 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8" data-tour="res-orders-header">
         <h1 className="text-3xl font-bold mb-2">My Orders</h1>
         <p className="text-muted-foreground">View and track your custom product order inquiries</p>
       </div>
@@ -133,7 +136,7 @@ export default function OrdersPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-tour="res-orders-grid">
           {inquiries.map((inquiry) => {
             const product = inquiry.attributes.product?.data
             const productName = product?.attributes?.name || 'Unknown Product'

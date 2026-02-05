@@ -188,5 +188,51 @@ export default (plugin: any) => {
     },
   });
 
+  // Onboarding progress controller
+  const VALID_MODULE_KEYS = [
+    'dashboard', 'products', 'orders', 'messages', 'media-hub',
+    'admin-dashboard', 'admin-orders', 'admin-products', 'admin-users', 'admin-media', 'admin-messages',
+  ];
+
+  plugin.controllers.user.updateOnboardingProgress = async (ctx: any) => {
+    const user = ctx.state.user;
+    const { moduleKey } = ctx.request.body;
+
+    if (!moduleKey || !VALID_MODULE_KEYS.includes(moduleKey)) {
+      return ctx.badRequest('moduleKey is required and must be a valid module key');
+    }
+
+    const currentProgress = user.onboarding_progress || {};
+
+    if (currentProgress[moduleKey]?.completed) {
+      return { success: true, onboarding_progress: currentProgress };
+    }
+
+    const updatedProgress = {
+      ...currentProgress,
+      [moduleKey]: {
+        completed: true,
+        completedAt: new Date().toISOString(),
+      },
+    };
+
+    await strapi.query('plugin::users-permissions.user').update({
+      where: { id: user.id },
+      data: { onboarding_progress: updatedProgress },
+    });
+
+    return { success: true, onboarding_progress: updatedProgress };
+  };
+
+  plugin.routes['content-api'].routes.push({
+    method: 'POST',
+    path: '/users/onboarding/complete',
+    handler: 'user.updateOnboardingProgress',
+    config: {
+      policies: [],
+      middlewares: ['global::require-auth'],
+    },
+  });
+
   return plugin;
 };

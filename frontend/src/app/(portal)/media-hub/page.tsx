@@ -21,6 +21,8 @@ import { CampaignKitBuilder } from '@/components/media/CampaignKitBuilder';
 import { MediaAccessLocked } from '@/components/media/MediaAccessLocked';
 import { useMediaStore } from '@/stores/mediaStore';
 import { cn } from '@/lib/utils';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { resellerMediaHubSteps } from '@/hooks/tours/resellerTours';
 
 type Category = 'all' | 'product_photos' | 'marketing_materials' | 'packaging_templates' | 'brand_guidelines';
 
@@ -57,6 +59,7 @@ export default function MediaHubPage() {
     setFilters,
   } = useMediaStore();
 
+  useOnboardingTour({ moduleKey: 'media-hub', steps: resellerMediaHubSteps, enabled: accessStatus?.hasAccess === true });
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [selectedKit, setSelectedKit] = useState<any>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -146,7 +149,7 @@ export default function MediaHubPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-tour="res-mediahub-header">
         <div>
           <h1 className="text-2xl font-bold">Media Hub</h1>
           <p className="text-muted-foreground">
@@ -232,7 +235,7 @@ export default function MediaHubPage() {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 border-b pb-4">
+      <div className="flex flex-wrap gap-2 border-b pb-4" data-tour="res-mediahub-categories">
         {categories.map((category) => (
           <Button
             key={category.value}
@@ -250,7 +253,7 @@ export default function MediaHubPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-6">
+      <div className="flex gap-6" data-tour="res-mediahub-assets">
         {/* Sidebar Filters - Desktop */}
         <aside className={cn(
           'hidden lg:block w-64 shrink-0 space-y-6',

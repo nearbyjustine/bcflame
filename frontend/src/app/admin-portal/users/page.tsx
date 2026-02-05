@@ -48,8 +48,11 @@ import {
   type AdminUser,
 } from '@/lib/api/admin-users';
 import { strapiApi } from '@/lib/api/strapi';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { adminUsersSteps } from '@/hooks/tours/adminTours';
 
 export default function AdminUsersPage() {
+  useOnboardingTour({ moduleKey: 'admin-users', steps: adminUsersSteps });
   const router = useRouter();
   const searchParams = useSearchParams();
   const filterParam = searchParams.get('filter');
@@ -316,7 +319,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-tour="adm-users-header">
         <div>
           <h1 className="text-2xl font-bold ">Users</h1>
           <p className="text-sm text-muted-foreground">
@@ -330,7 +333,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3" data-tour="adm-users-stats">
         <Card
           className={`cursor-pointer transition-colors ${!filterParam ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/users')}
@@ -378,7 +381,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Users Table */}
-      <Card>
+      <Card data-tour="adm-users-table">
         <CardContent className="pt-6">
           {/* Bulk Action Toolbar */}
           {selectedUsers.length > 0 && (

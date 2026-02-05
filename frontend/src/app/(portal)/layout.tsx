@@ -58,7 +58,7 @@ export default function PortalLayout({
     <div className="min-h-screen bg-background">
       {/* CartDrawer hidden - code preserved for future use */}
       {/* <CartDrawer /> */}
-      <nav className="border-b">
+      <nav className="border-b" data-tour="res-nav">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-8">
             {/* Mobile Hamburger Menu */}

@@ -10,6 +10,7 @@ export interface UserProfile {
     name: string;
     formats?: any;
   };
+  onboarding_progress?: Record<string, { completed: boolean; completedAt: string }>;
 }
 
 /**

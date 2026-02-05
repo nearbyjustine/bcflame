@@ -54,6 +54,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { strapiApi } from '@/lib/api/strapi';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { adminMediaSteps } from '@/hooks/tours/adminTours';
 
 type MediaCategory = 'product_photos' | 'marketing_materials' | 'packaging_templates' | 'brand_guidelines';
 
@@ -121,6 +123,7 @@ function getFileIcon(mime?: string) {
 }
 
 export default function MediaManagementPage() {
+  useOnboardingTour({ moduleKey: 'admin-media', steps: adminMediaSteps });
   const router = useRouter();
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get('category');
@@ -454,7 +457,7 @@ export default function MediaManagementPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" data-tour="adm-media-header">
         <div>
           <h1 className="text-2xl font-bold">Media Management</h1>
           <p className="text-sm text-muted-foreground">
@@ -471,7 +474,7 @@ export default function MediaManagementPage() {
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button size="sm" onClick={() => setIsUploadOpen(true)}>
+          <Button size="sm" onClick={() => setIsUploadOpen(true)} data-tour="adm-media-upload-btn">
             <Upload className="mr-2 h-4 w-4" />
             Upload Asset
           </Button>
@@ -534,7 +537,7 @@ export default function MediaManagementPage() {
       </div>
 
       {/* Assets Table */}
-      <Card>
+      <Card data-tour="adm-media-table">
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

@@ -84,3 +84,80 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Shepherd.js custom theme — uses app CSS variables for dark mode support */
+.shepherd-theme-custom .shepherd-element {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.shepherd-theme-custom .shepherd-content {
+  padding: 1.25rem;
+}
+
+.shepherd-theme-custom .shepherd-title {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.shepherd-theme-custom .shepherd-text {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.shepherd-theme-custom .shepherd-cancel-icon {
+  color: hsl(var(--muted-foreground));
+  transition: color 0.15s;
+}
+
+.shepherd-theme-custom .shepherd-cancel-icon:hover {
+  color: hsl(var(--foreground));
+}
+
+.shepherd-theme-custom .shepherd-button-primary {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.shepherd-theme-custom .shepherd-button-primary:hover {
+  opacity: 0.9;
+}
+
+.shepherd-theme-custom .shepherd-button-secondary {
+  background-color: transparent;
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.shepherd-theme-custom .shepherd-button-secondary:hover {
+  background-color: hsl(var(--muted));
+}
+
+.shepherd-theme-custom .shepherd-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.shepherd-modal-overlay-container {
+  opacity: 0.6;
+}

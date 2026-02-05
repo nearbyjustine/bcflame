@@ -8,6 +8,8 @@ import { CustomizationModal } from '@/components/products/CustomizationModal';
 import { FilterPanel } from '@/components/products/FilterPanel';
 import type { Product } from '@/types/product';
 import type { Inventory } from '@/types/inventory';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { resellerProductsSteps } from '@/hooks/tours/resellerTours';
 
 function getStockStatus(productId: number, inventory: Inventory[]): StockStatus {
   const items = inventory.filter((i) => i.attributes.product?.data?.id === productId);
@@ -18,6 +20,7 @@ function getStockStatus(productId: number, inventory: Inventory[]): StockStatus 
 }
 
 export default function ProductsPage() {
+  useOnboardingTour({ moduleKey: 'products', steps: resellerProductsSteps });
   const [products, setProducts] = useState<Product[]>([]);
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +75,7 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8" data-tour="res-products-header">
         <h1 className="text-3xl font-bold mb-2">Product Catalog</h1>
         <p className="text-muted-foreground">
           Browse our premium cannabis products
@@ -81,12 +84,12 @@ export default function ProductsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filter Panel - Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1" data-tour="res-products-filter-panel">
           <FilterPanel filters={filters} onFilterChange={handleFilterChange} />
         </div>
 
         {/* Products Grid */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3" data-tour="res-products-grid">
           {isLoading ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">

@@ -17,8 +17,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { getResellerDashboardStats, type ResellerDashboardStats } from '@/lib/api/dashboard';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { resellerDashboardSteps } from '@/hooks/tours/resellerTours';
 
 export default function DashboardPage() {
+  useOnboardingTour({ moduleKey: 'dashboard', steps: resellerDashboardSteps });
   const { user } = useAuthStore();
   const [dashboardData, setDashboardData] = useState<ResellerDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +90,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-tour="res-dashboard-header">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Welcome back, {user?.companyName || user?.username}!
@@ -108,7 +111,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-tour="res-dashboard-stats">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -174,7 +177,7 @@ export default function DashboardPage() {
 
       {/* Recent Activity */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2" data-tour="res-dashboard-activity">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Activity</CardTitle>
@@ -232,7 +235,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card data-tour="res-dashboard-quick-actions">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>What would you like to do?</CardDescription>

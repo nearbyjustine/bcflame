@@ -20,6 +20,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { getAdminDashboardStats, type AdminDashboardStats } from '@/lib/api/dashboard';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { adminDashboardSteps } from '@/hooks/tours/adminTours';
 
 interface StatCard {
   title: string;
@@ -41,6 +43,7 @@ interface RecentOrder {
 }
 
 export default function AdminDashboardPage() {
+  useOnboardingTour({ moduleKey: 'admin-dashboard', steps: adminDashboardSteps });
   const [dashboardData, setDashboardData] = useState<AdminDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -150,7 +153,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-tour="adm-dashboard-header">
         <div>
           <h1 className="text-2xl font-bold ">Dashboard</h1>
           <p className="text-sm text-muted-foreground">
@@ -177,7 +180,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-tour="adm-dashboard-stats">
         {stats.map((stat, index) => (
           <Card key={index} className="relative overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -225,7 +228,7 @@ export default function AdminDashboardPage() {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Orders */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2" data-tour="adm-dashboard-orders">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Orders</CardTitle>
@@ -277,7 +280,7 @@ export default function AdminDashboardPage() {
         </Card>
 
         {/* Quick Stats & Actions */}
-        <div className="space-y-6">
+        <div className="space-y-6" data-tour="adm-dashboard-sidebar">
           {/* Quick Stats */}
           <Card>
             <CardHeader>

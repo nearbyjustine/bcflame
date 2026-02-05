@@ -48,6 +48,8 @@ import {
 } from '@/lib/api/admin-products';
 import { getImageUrl } from '@/lib/utils/image';
 import { WEIGHT_UNIT } from '@/lib/utils/units';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { adminProductsSteps } from '@/hooks/tours/adminTours';
 
 function getStockStatus(product: ProductWithInventory): 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown' {
   if (!product.inventory) {
@@ -67,6 +69,7 @@ function getStockStatus(product: ProductWithInventory): 'in_stock' | 'low_stock'
 }
 
 export default function AdminProductsPage() {
+  useOnboardingTour({ moduleKey: 'admin-products', steps: adminProductsSteps });
   const router = useRouter();
   const searchParams = useSearchParams();
   const filterParam = searchParams.get('filter');
@@ -330,14 +333,14 @@ export default function AdminProductsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-tour="adm-products-header">
         <div>
           <h1 className="text-2xl font-bold ">Products</h1>
           <p className="text-sm text-muted-foreground">
             Manage your product catalog and inventory
           </p>
         </div>
-        <Link href="/admin-portal/products/new">
+        <Link href="/admin-portal/products/new" data-tour="adm-products-add-btn">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Product
@@ -346,7 +349,7 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4" data-tour="adm-products-stats">
         <Card
           className={`cursor-pointer transition-colors ${!filterParam ? 'ring-2 ring-primary' : 'hover:bg-muted/30'}`}
           onClick={() => router.push('/admin-portal/products')}
@@ -403,7 +406,7 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Products Table */}
-      <Card>
+      <Card data-tour="adm-products-table">
         <CardContent className="pt-6">
           <DataTable
             columns={columns}

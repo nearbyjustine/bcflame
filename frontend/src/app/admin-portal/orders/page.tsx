@@ -40,6 +40,8 @@ import {
 } from '@/components/ui/select';
 import { strapiApi } from '@/lib/api/strapi';
 import { WEIGHT_UNIT } from '@/lib/utils/units';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { adminOrdersSteps } from '@/hooks/tours/adminTours';
 
 interface Order {
   id: number;
@@ -69,6 +71,7 @@ interface Order {
 }
 
 export default function OrdersPage() {
+  useOnboardingTour({ moduleKey: 'admin-orders', steps: adminOrdersSteps });
   const router = useRouter();
   const searchParams = useSearchParams();
   const statusFilter = searchParams.get('status');
@@ -381,7 +384,7 @@ export default function OrdersPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" data-tour="adm-orders-header">
         <div>
           <h1 className="text-2xl font-bold ">Order Management</h1>
           <p className="text-sm text-muted-foreground">
@@ -398,7 +401,7 @@ export default function OrdersPage() {
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)}>
+          <Button variant="outline" size="sm" onClick={() => setExportDialogOpen(true)} data-tour="adm-orders-export">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -406,7 +409,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5" data-tour="adm-orders-status-cards">
         <Card
           className={`cursor-pointer transition-colors ${selectedStatus === 'all' ? 'border-primary bg-primary/5' : 'hover:bg-muted/30'}`}
           onClick={() => handleStatusFilterChange('all')}
@@ -455,7 +458,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Filters & Table */}
-      <Card>
+      <Card data-tour="adm-orders-table">
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

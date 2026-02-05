@@ -110,6 +110,11 @@
       "enum": ["reseller", "admin"],
       "default": "reseller",
       "required": false
+    },
+    "onboarding_progress": {
+      "type": "json",
+      "required": false,
+      "default": null
     }
   }
 }
