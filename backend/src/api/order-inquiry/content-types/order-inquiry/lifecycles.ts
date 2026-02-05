@@ -169,17 +169,41 @@ export default {
       strapi.log.debug('Full inquiry object:', JSON.stringify(inquiry, null, 2))
       strapi.log.debug('Customer data:', JSON.stringify(inquiry.customer, null, 2))
 
+      // Format order data for email templates
+      const orderData = formatOrderDataForEmail(inquiry)
+
+      // Create admin notification for new order (do this FIRST, even if emails fail)
+      try {
+        await createNotification(strapi, {
+          type: 'new_order',
+          title: `New Order: ${inquiry.inquiry_number || `#${result.id}`}`,
+          message: `${orderData.customerCompany || orderData.customerName} placed a new order`,
+          relatedOrder: result.id,
+          link: `/admin-portal/orders/${result.id}`,
+        });
+        strapi.log.info(`Created admin notification for order ${inquiry.inquiry_number}`);
+      } catch (notifError) {
+        strapi.log.warn('Failed to create admin notification:', notifError);
+      }
+
+      // Create automated chat message for order placement (do this FIRST, even if emails fail)
+      const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer;
+      if (customerId) {
+        try {
+          await createOrderPlacedMessage(result.id, customerId);
+        } catch (msgError) {
+          strapi.log.warn('Failed to create order placed message:', msgError);
+        }
+      }
+
       // Get email service - with defensive check for configuration
       let emailService
       try {
         emailService = getResendEmailService()
       } catch (emailConfigError) {
         strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
-        return
+        return // OK to return now since notifications and messages are already created
       }
-
-      // Format order data
-      const orderData = formatOrderDataForEmail(inquiry)
 
       // Send email to admin
       const adminRecipients = strapi.config.get('email.adminRecipients', ['admin@bcflame.com'])
@@ -198,20 +222,6 @@ export default {
         strapi.log.info('Admin notification email sent successfully:', adminResult.messageId)
       }
 
-      // Create admin notification for new order
-      try {
-        await createNotification(strapi, {
-          type: 'new_order',
-          title: `New Order: ${inquiry.inquiry_number || `#${result.id}`}`,
-          message: `${orderData.customerCompany || orderData.customerName} placed a new order`,
-          relatedOrder: result.id,
-          link: `/admin-portal/orders/${result.id}`,
-        });
-        strapi.log.info(`Created admin notification for order ${inquiry.inquiry_number}`);
-      } catch (notifError) {
-        strapi.log.warn('Failed to create admin notification:', notifError);
-      }
-
       // Send confirmation email to customer
       if (inquiry.customer?.email) {
         const customerEmail = generateNewOrderEmailForCustomer(orderData)
@@ -228,12 +238,6 @@ export default {
         } else {
           strapi.log.info('Customer confirmation email sent successfully:', customerResult.messageId)
         }
-      }
-
-      // Create automated chat message for order placement
-      const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer;
-      if (customerId) {
-        await createOrderPlacedMessage(result.id, customerId);
       }
     } catch (error) {
       strapi.log.error('Error in afterCreate lifecycle:', error)

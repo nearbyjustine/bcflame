@@ -141,8 +141,8 @@ export function CustomizationModal({ isOpen, onClose, product }: CustomizationMo
         getPreBaggingOptions(),
       ])
 
-      const ALLOWED_BUD_STYLES = ['1 Bud Style', '2 Bud Style', '3 Bud Style', '4 Bud Style']
-      setBudStyles(budStylesRes.filter(s => ALLOWED_BUD_STYLES.includes(s.attributes.name)))
+      // const ALLOWED_BUD_STYLES = ['1 Bud Style', '2 Bud Style', '3 Bud Style', '4 Bud Style']
+      setBudStyles(budStylesRes)
       setBackgrounds(backgroundsRes)
       setFonts(fontsRes)
       setPreBaggingOptions(preBaggingRes)

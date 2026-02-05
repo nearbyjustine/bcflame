@@ -56,6 +56,8 @@ import type {
 } from '@/types/customization';
 import { getImageUrl } from '@/lib/utils/image';
 import { WEIGHT_UNIT } from '@/lib/utils/units';
+import PackagePreview from '@/components/products/PackagePreview';
+import { useGoogleFonts } from '@/hooks/useGoogleFonts';
 
 interface OrderDetail {
   id: number;
@@ -118,6 +120,14 @@ export default function OrderDetailPage() {
   const [backgrounds, setBackgrounds] = useState<BackgroundStyle[]>([]);
   const [fonts, setFonts] = useState<FontStyle[]>([]);
   const [preBaggingOptions, setPreBaggingOptions] = useState<PreBaggingOption[]>([]);
+
+  // Load fonts for the package preview
+  const selectedFontFamilies = order?.selected_fonts
+    ? order.selected_fonts
+        .map((id: number) => fonts.find((f) => f.id === id)?.attributes?.font_family)
+        .filter(Boolean) as string[]
+    : [];
+  useGoogleFonts(selectedFontFamilies);
 
   // Fetch customization data
   const fetchCustomizationData = async () => {
@@ -607,6 +617,21 @@ export default function OrderDetailPage() {
                   </>
                 )}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Package Preview */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Package Preview</CardTitle>
+              <CardDescription>Visual preview of selected background and font customizations</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <PackagePreview
+                background={order.selected_backgrounds?.[0] != null ? backgrounds.find((b) => b.id === order.selected_backgrounds![0]) ?? null : null}
+                font={order.selected_fonts?.[0] != null ? fonts.find((f) => f.id === order.selected_fonts![0]) ?? null : null}
+                companyName={order.customer?.company}
+              />
             </CardContent>
           </Card>
 
