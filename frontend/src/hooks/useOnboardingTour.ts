@@ -49,9 +49,16 @@ export function useOnboardingTour({ moduleKey, steps, enabled = true }: UseOnboa
   const hasAttemptedRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading || !enabled || hasAttemptedRef.current) return;
+    if (isLoading || !enabled) return;
 
-    if (userProfile?.onboarding_progress?.[moduleKey]?.completed) return;
+    // Check completion status first - if completed, mark as attempted to stop checking
+    if (userProfile?.onboarding_progress?.[moduleKey]?.completed) {
+      hasAttemptedRef.current = true;
+      return;
+    }
+
+    // Now check if we've already attempted to start the tour
+    if (hasAttemptedRef.current) return;
 
     hasAttemptedRef.current = true;
 
