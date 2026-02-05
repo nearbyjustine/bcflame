@@ -72,9 +72,6 @@ services:
       EMAIL_ADMIN_RECIPIENTS: ${EMAIL_ADMIN_RECIPIENTS}
       # Set to 'true' to seed database on first startup
       SEED_DATA: ${SEED_DATA:-false}
-      # Rate limiting configuration
-      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
-      RATE_LIMIT_STORE: ${RATE_LIMIT_STORE:-memory}
     volumes:
       - strapi_uploads:/app/public/uploads
     networks:
