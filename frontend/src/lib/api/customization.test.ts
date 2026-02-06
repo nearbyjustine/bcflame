@@ -176,7 +176,15 @@ describe('Customization API', () => {
         budStyles: [1, 2],
         backgrounds: [1],
         fonts: [1],
-        preBagging: [{ optionId: 1, weight: '3.5g', quantity: 100 }],
+        preBagging: [
+          {
+            optionId: 1,
+            quantity: 100,
+            unitSize: 3.5,
+            unitSizeUnit: 'g',
+            customText: 'Custom label',
+          },
+        ],
       };
 
       const result = await submitOrderInquiry(1, selections, 'Test notes');
@@ -188,7 +196,17 @@ describe('Customization API', () => {
           selected_bud_styles: [1, 2],
           selected_backgrounds: [1],
           selected_fonts: [1],
-          selected_prebagging: [{ optionId: 1, weight: '3.5g', quantity: 100 }],
+          selected_prebagging: [
+            {
+              option_id: 1,
+              quantity: 100,
+              unit_size: 3.5,
+              unit_size_unit: 'g',
+              custom_text: 'Custom label',
+            },
+          ],
+          total_weight: 350,
+          weight_unit: 'g',
           notes: 'Test notes',
         },
       });
@@ -230,6 +248,8 @@ describe('Customization API', () => {
           selected_backgrounds: [1],
           selected_fonts: [1],
           selected_prebagging: [],
+          total_weight: 0,
+          weight_unit: 'P',
           notes: undefined,
         },
       });
@@ -260,7 +280,7 @@ describe('Customization API', () => {
 
       expect(strapiModule.strapiApi.get).toHaveBeenCalledWith('/api/order-inquiries', {
         params: {
-          populate: ['product', 'customer'],
+          populate: ['product', 'product.images', 'customer'],
           sort: 'createdAt:desc',
         },
       });

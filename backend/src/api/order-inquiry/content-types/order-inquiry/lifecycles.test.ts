@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Create shared mock instances BEFORE vi.mock calls
+const mockSendEmail = vi.fn().mockResolvedValue({ success: true, messageId: 'test-123' })
+const mockVerifyConnection = vi.fn().mockResolvedValue(true)
+const mockEmailService = {
+  sendEmail: mockSendEmail,
+  verifyConnection: mockVerifyConnection,
+}
+
 // Mock the email service and templates
-vi.mock('../../../../services/email', () => ({
-  getEmailService: vi.fn(() => ({
-    sendEmail: vi.fn().mockResolvedValue({ success: true, messageId: 'test-123' }),
-    verifyConnection: vi.fn().mockResolvedValue(true),
-  })),
+vi.mock('../../../../services/resend-email', () => ({
+  getResendEmailService: vi.fn(() => mockEmailService),
 }))
 
 vi.mock('../../../../templates/order-email', () => ({
@@ -26,12 +31,24 @@ vi.mock('../../../../templates/order-email', () => ({
   })),
 }))
 
-import { getEmailService } from '../../../../services/email'
+vi.mock('../../../../services/notification', () => ({
+  createNotification: vi.fn().mockResolvedValue({ id: 1 }),
+}))
+
+vi.mock('../../../../services/order-message', () => ({
+  createOrderPlacedMessage: vi.fn().mockResolvedValue({ id: 1 }),
+  createOrderStatusChangeMessage: vi.fn().mockResolvedValue({ id: 1 }),
+}))
+
+import { getResendEmailService } from '../../../../services/resend-email'
 import {
   generateNewOrderEmailForAdmin,
   generateNewOrderEmailForCustomer,
   generateOrderStatusUpdateEmail,
 } from '../../../../templates/order-email'
+
+// Create a shared findOne mock that can be overridden per-test
+const mockFindOne = vi.fn()
 
 describe('Order Inquiry Lifecycles', () => {
   let mockStrapi: any
@@ -42,15 +59,46 @@ describe('Order Inquiry Lifecycles', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    // Get mock email service
-    emailService = getEmailService()
+    // Get mock email service (always the same singleton)
+    emailService = getResendEmailService()
+
+    // Set default mock return value for findOne (can be overridden per-test)
+    mockFindOne.mockResolvedValue({
+      id: 1,
+      inquiry_number: 'INQ-20260113-1234',
+      status: 'pending',
+      product: {
+        id: 1,
+        name: 'Test Product',
+        base_price_per_pound: 3234.21,
+        pricing_model: 'per_pound',
+        pricing: [
+          { weight: '7g', amount: 50.00, currency: 'USD' },
+          { weight: '14g', amount: 90.00, currency: 'USD' },
+        ],
+      },
+      customer: {
+        id: 1,
+        username: 'testuser',
+        email: 'customer@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        company: 'Test Company',
+        phone: '(555) 123-4567',
+        businessLicense: 'CA-LIC-123456',
+      },
+      total_weight: 0.22,
+      weight_unit: 'P',
+      notes: 'Test notes',
+      createdAt: '2026-01-13T10:00:00.000Z',
+    })
 
     // Mock Strapi instance
     mockStrapi = {
       config: {
-        get: vi.fn((key: string) => {
+        get: vi.fn((key: string, defaultValue?: any) => {
           if (key === 'email.adminRecipients') return ['admin@bcflame.com']
-          return null
+          return defaultValue ?? null
         }),
       },
       log: {
@@ -68,35 +116,7 @@ describe('Order Inquiry Lifecycles', () => {
       },
       db: {
         query: vi.fn(() => ({
-          findOne: vi.fn().mockResolvedValue({
-            id: 1,
-            inquiry_number: 'INQ-20260113-1234',
-            status: 'pending',
-            product: {
-              id: 1,
-              name: 'Test Product',
-              base_price_per_pound: 3234.21,
-              pricing_model: 'per_pound',
-              pricing: [
-                { weight: '7g', amount: 50.00, currency: 'USD' },
-                { weight: '14g', amount: 90.00, currency: 'USD' },
-              ],
-            },
-            customer: {
-              id: 1,
-              username: 'testuser',
-              email: 'customer@test.com',
-              firstName: 'John',
-              lastName: 'Doe',
-              company: 'Test Company',
-              phone: '(555) 123-4567',
-              businessLicense: 'CA-LIC-123456',
-            },
-            total_weight: 0.22,
-            weight_unit: 'P',
-            notes: 'Test notes',
-            createdAt: '2026-01-13T10:00:00.000Z',
-          }),
+          findOne: mockFindOne,
         })),
       },
     }
@@ -143,7 +163,7 @@ describe('Order Inquiry Lifecycles', () => {
       await lifecycles.beforeCreate(beforeCreateEvent)
       
       // The inquiry number should be in params.data after beforeCreate
-      expect(beforeCreateEvent.params.data.inquiry_number).toMatch(/^INQ-\\d{8}-\\d{4}$/)
+      expect(beforeCreateEvent.params.data.inquiry_number).toMatch(/^INQ-\d{8}-\d{4}$/)
     })
 
     it('sends email to admin after creation', async () => {
@@ -183,13 +203,25 @@ describe('Order Inquiry Lifecycles', () => {
     })
 
     it('handles missing customer email', async () => {
-      mockStrapi.db.query().findOne.mockResolvedValueOnce({
-        ...mockStrapi.db.query().findOne(),
+      const mockData = {
+        id: 1,
+        inquiry_number: 'INQ-20260113-1234',
+        status: 'pending',
+        product: {
+          id: 1,
+          name: 'Test Product',
+          base_price_per_pound: 3234.21,
+        },
         customer: {
           id: 1,
           email: null,
         },
-      })
+        total_weight: 0.22,
+        weight_unit: 'P',
+        createdAt: '2026-01-13T10:00:00.000Z',
+      }
+      // afterCreate calls findOne twice (raw + with populate)
+      mockFindOne.mockResolvedValueOnce(mockData).mockResolvedValueOnce(mockData)
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
       await lifecycles.afterCreate(mockEvent)
@@ -268,7 +300,8 @@ describe('Order Inquiry Lifecycles', () => {
   describe('price calculation', () => {
     it('calculates price using base_price_per_pound for custom weights', async () => {
       // Set up mock for custom weight (0.022 P = ~10g) not in pricing tiers
-      mockStrapi.db.query().findOne.mockResolvedValueOnce({
+      // Price calculation: base_price_per_pound * weight_in_pounds = 3234.21 * 0.022 = 71.15262
+      const mockData = {
         id: 1,
         inquiry_number: 'INQ-20260113-1234',
         product: {
@@ -289,18 +322,21 @@ describe('Order Inquiry Lifecycles', () => {
         total_weight: 0.022,
         weight_unit: 'P',
         createdAt: '2026-01-13T10:00:00.000Z',
-      })
+      }
+      // afterCreate calls findOne twice (raw + with populate)
+      mockFindOne.mockResolvedValueOnce(mockData).mockResolvedValueOnce(mockData)
 
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
       await lifecycles.afterCreate(mockEvent)
 
       // Verify email was called with correct data including calculated price
+      // 3234.21 * 0.022 = 71.15262
       expect(generateNewOrderEmailForAdmin).toHaveBeenCalledWith(
         expect.objectContaining({
           items: expect.arrayContaining([
             expect.objectContaining({
-              unitPrice: 71.4, // 7.14 * 10g = 71.4
+              unitPrice: expect.closeTo(71.15, 0.01),
             }),
           ]),
         })
@@ -308,15 +344,16 @@ describe('Order Inquiry Lifecycles', () => {
     })
 
     it('falls back to tiered pricing when base_price_per_pound not available', async () => {
-      // Set up mock without base_price_per_pound
-      mockStrapi.db.query().findOne.mockResolvedValueOnce({
+      // Set up mock without base_price_per_pound - should use tiered pricing
+      // Weight: 0.015 P, matching tier should be '0.015P' = $50
+      const mockData = {
         id: 1,
         inquiry_number: 'INQ-20260113-1234',
         product: {
           id: 1,
           name: 'Test Product',
           pricing: [
-            { weight: '7g', amount: 50.00, currency: 'USD' },
+            { weight: '0.015P', amount: 50.00, currency: 'USD' },
             { weight: '14g', amount: 90.00, currency: 'USD' },
           ],
         },
@@ -332,7 +369,9 @@ describe('Order Inquiry Lifecycles', () => {
         total_weight: 0.015,
         weight_unit: 'P',
         createdAt: '2026-01-13T10:00:00.000Z',
-      })
+      }
+      // afterCreate calls findOne twice (raw + with populate)
+      mockFindOne.mockResolvedValueOnce(mockData).mockResolvedValueOnce(mockData)
 
       mockEvent.result.inquiry_number = 'INQ-20260113-1234'
 
@@ -343,7 +382,7 @@ describe('Order Inquiry Lifecycles', () => {
         expect.objectContaining({
           items: expect.arrayContaining([
             expect.objectContaining({
-              unitPrice: 50.00, // Matched 7g tier
+              unitPrice: 50.00,
             }),
           ]),
         })

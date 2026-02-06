@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ProductImageGallery } from './ProductImageGallery';
 import type { ProductImage } from '@/types/product';
 
@@ -128,13 +128,32 @@ describe('ProductImageGallery', () => {
     const mainImage = screen.getAllByAltText(/Product image 1|Test Product/i)[0];
     fireEvent.click(mainImage);
 
-    // Simulate right arrow key
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(screen.getByText('2 / 3')).toBeInTheDocument();
+    // Verify lightbox is open
+    expect(screen.getByTestId('lightbox')).toBeInTheDocument();
+
+    // Get all counters - there will be 2: one in gallery, one in lightbox
+    let counters = screen.getAllByText('1 / 3');
+    expect(counters).toHaveLength(2);
+
+    // Create and dispatch keyboard events on window wrapped in act
+    act(() => {
+      const rightArrowEvent = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true });
+      window.dispatchEvent(rightArrowEvent);
+    });
+
+    // Both counters should now show 2 / 3
+    counters = screen.getAllByText('2 / 3');
+    expect(counters).toHaveLength(2);
 
     // Simulate left arrow key
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    act(() => {
+      const leftArrowEvent = new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true });
+      window.dispatchEvent(leftArrowEvent);
+    });
+
+    // Both counters should be back to 1 / 3
+    counters = screen.getAllByText('1 / 3');
+    expect(counters).toHaveLength(2);
   });
 
   it('shows placeholder when no images provided', () => {

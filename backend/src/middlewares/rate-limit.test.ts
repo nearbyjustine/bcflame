@@ -27,6 +27,20 @@ afterEach(() => {
 });
 
 /**
+ * Create a mock Strapi instance
+ */
+function createMockStrapi(): any {
+  return {
+    log: {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    },
+  };
+}
+
+/**
  * Create a mock Koa context
  */
 function createMockContext(overrides: Partial<Context> = {}): Context {
@@ -56,7 +70,8 @@ function createMockNext(): Next {
 describe('Rate Limit Middleware', () => {
   describe('Basic Functionality', () => {
     it('should allow requests under the rate limit', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({ request: { path: '/api/products', ip: '127.0.0.1', headers: {} } });
       const next = createMockNext();
 
@@ -67,19 +82,23 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should block requests that exceed the rate limit', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/auth/local', ip: '127.0.0.1', headers: {} },
       });
 
-      // Make 5 requests (login limit is 5)
-      for (let i = 0; i < 5; i++) {
+      // Make 50 FAILED login requests (login limit is 50 per 15 minutes)
+      // Use status 401 so they count (skipSuccessfulRequests only skips status < 400)
+      for (let i = 0; i < 50; i++) {
         const next = createMockNext();
+        ctx.status = 401; // Failed login
         await middleware(ctx as any, next);
       }
 
-      // 6th request should be blocked
+      // 51st request should be blocked
       const next = createMockNext();
+      ctx.status = 401;
       await middleware(ctx as any, next);
 
       expect(next).not.toHaveBeenCalled();
@@ -93,7 +112,8 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should set rate limit headers', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext();
       const next = createMockNext();
 
@@ -107,7 +127,8 @@ describe('Rate Limit Middleware', () => {
 
   describe('Client Identification', () => {
     it('should identify clients by IP address', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx1 = createMockContext({ request: { path: '/api/test', ip: '192.168.1.1', headers: {} } });
       const ctx2 = createMockContext({ request: { path: '/api/test', ip: '192.168.1.2', headers: {} } });
       const next = createMockNext();
@@ -119,7 +140,8 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should use X-Forwarded-For header when present', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: {
           path: '/api/test',
@@ -136,7 +158,8 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should use X-Real-IP header when present', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: {
           path: '/api/test',
@@ -152,7 +175,8 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should identify authenticated users by user ID', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/test', ip: '127.0.0.1', headers: {} },
         state: { user: { id: 123 } },
@@ -168,27 +192,32 @@ describe('Rate Limit Middleware', () => {
 
   describe('Rate Limit Rules', () => {
     it('should apply stricter limits to login endpoints', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/auth/local', ip: '127.0.0.1', headers: {} },
       });
 
-      // Login limit is 5 requests per 15 minutes
-      for (let i = 0; i < 5; i++) {
+      // Login limit is 50 requests per 15 minutes
+      // Use failed status so they count against the limit
+      for (let i = 0; i < 50; i++) {
         const next = createMockNext();
+        ctx.status = 401; // Failed login
         await middleware(ctx as any, next);
         expect(next).toHaveBeenCalled();
       }
 
-      // 6th request should be blocked
+      // 51st request should be blocked
       const next = createMockNext();
+      ctx.status = 401;
       await middleware(ctx as any, next);
       expect(next).not.toHaveBeenCalled();
       expect(ctx.status).toBe(429);
     });
 
     it('should apply higher limits to authenticated users', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/products', ip: '127.0.0.1', headers: {} },
         state: { user: { id: 1 } },
@@ -204,7 +233,8 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should apply admin limits to admin users', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/admin/content-manager', ip: '127.0.0.1', headers: {} },
         state: { user: { id: 1, role: { type: 'admin' } } },
@@ -219,7 +249,8 @@ describe('Rate Limit Middleware', () => {
 
   describe('Skip Options', () => {
     it('should skip rate limiting for health check endpoints', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({ request: { path: '/_health', ip: '127.0.0.1', headers: {} } });
       const next = createMockNext();
 
@@ -230,13 +261,14 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should not count successful login attempts against the limit', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/auth/local', ip: '127.0.0.1', headers: {} },
       });
 
-      // Make 5 successful login requests (status 200)
-      for (let i = 0; i < 5; i++) {
+      // Make 50 successful login requests (status 200)
+      for (let i = 0; i < 50; i++) {
         const next = createMockNext();
         ctx.status = 200;
         await middleware(ctx as any, next);
@@ -253,7 +285,8 @@ describe('Rate Limit Middleware', () => {
 
   describe('Error Handling', () => {
     it('should not block requests if rate limiting fails', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/test', ip: null as any, headers: {} },
       });
@@ -267,14 +300,17 @@ describe('Rate Limit Middleware', () => {
 
   describe('Response Headers', () => {
     it('should include Retry-After header when rate limit exceeded', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/auth/local', ip: '127.0.0.1', headers: {} },
       });
 
-      // Exceed rate limit
-      for (let i = 0; i < 6; i++) {
+      // Exceed rate limit (login limit is 50)
+      // Use failed status so they count against the limit
+      for (let i = 0; i < 51; i++) {
         const next = createMockNext();
+        ctx.status = 401; // Failed login
         await middleware(ctx as any, next);
       }
 
@@ -282,14 +318,17 @@ describe('Rate Limit Middleware', () => {
     });
 
     it('should include rate limit details in error response', async () => {
-      const middleware = rateLimitMiddleware({}, { strapi: {} as any });
+      const mockStrapi = createMockStrapi();
+      const middleware = rateLimitMiddleware({}, { strapi: mockStrapi });
       const ctx = createMockContext({
         request: { path: '/api/auth/local', ip: '127.0.0.1', headers: {} },
       });
 
-      // Exceed rate limit
-      for (let i = 0; i < 6; i++) {
+      // Exceed rate limit (login limit is 50)
+      // Use failed status so they count against the limit
+      for (let i = 0; i < 51; i++) {
         const next = createMockNext();
+        ctx.status = 401; // Failed login
         await middleware(ctx as any, next);
       }
 

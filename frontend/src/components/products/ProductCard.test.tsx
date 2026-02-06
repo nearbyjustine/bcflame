@@ -218,6 +218,6 @@ describe('ProductCard', () => {
     };
     const onCustomizeMock = vi.fn();
     render(<ProductCard product={customizableProduct} onCustomize={onCustomizeMock} />);
-    expect(screen.getByText('Customize & Order')).toBeInTheDocument();
+    expect(screen.getByText('Customize')).toBeInTheDocument();
   });
 });

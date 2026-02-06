@@ -89,20 +89,20 @@ export default {
 
     // Auto-set customer from authenticated user if not provided
     // In Strapi 4 lifecycles, use requestContext to access HTTP context
-    if (!data.customer) {
+    if (!data.customer && event.strapi) {
       // Try getting user from Strapi's request context (populated by middleware)
-      const requestContext = strapi.requestContext?.get?.()
+      const requestContext = event.strapi.requestContext?.get?.()
       const user = requestContext?.state?.user
-      
+
       if (user?.id) {
         data.customer = user.id
-        strapi.log.info(`beforeCreate - Customer set from requestContext: ${user.id}`)
+        event.strapi.log?.info(`beforeCreate - Customer set from requestContext: ${user.id}`)
       } else {
-        strapi.log.warn('beforeCreate - No user found in requestContext')
+        event.strapi.log?.warn('beforeCreate - No user found in requestContext')
       }
     }
 
-    strapi.log.debug(`beforeCreate - Final customer ID: ${data.customer || 'NOT SET'}`)
+    event.strapi?.log?.debug(`beforeCreate - Final customer ID: ${data.customer || 'NOT SET'}`)
   },
 
   /**
@@ -111,9 +111,9 @@ export default {
   async beforeUpdate(event: any) {
     const { id } = event.params?.where || {}
 
-    if (id) {
+    if (id && event.strapi) {
       // Fetch current record to get previous status
-      const currentRecord = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+      const currentRecord = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id },
         select: ['status'],
       })
@@ -132,16 +132,16 @@ export default {
     const { result } = event
 
     try {
-      strapi.log.debug('afterCreate - result object:', JSON.stringify(result, null, 2))
+      event.strapi.log.debug('afterCreate - result object:', JSON.stringify(result, null, 2))
 
       // First fetch without populate to see the raw customer ID
-      const rawInquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+      const rawInquiry = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id: result.id },
       })
-      strapi.log.debug('Raw inquiry (no populate):', JSON.stringify(rawInquiry, null, 2))
+      event.strapi.log.debug('Raw inquiry (no populate):', JSON.stringify(rawInquiry, null, 2))
 
       // Fetch full inquiry data with relations using db.query for better control
-      const inquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+      const inquiry = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
         where: { id: result.id },
         populate: {
           customer: true,
@@ -152,38 +152,38 @@ export default {
       })
 
       if (!inquiry) {
-        strapi.log.warn('Order inquiry not found after creation:', result.id)
+        event.strapi.log.warn('Order inquiry not found after creation:', result.id)
         return
       }
 
       // If customer wasn't populated, fetch it separately using the raw customer ID
       if (!inquiry.customer && rawInquiry.customer) {
         const customerId = typeof rawInquiry.customer === 'object' ? rawInquiry.customer.id : rawInquiry.customer
-        strapi.log.debug('Fetching customer separately with ID:', customerId)
-        inquiry.customer = await strapi.db.query('plugin::users-permissions.user').findOne({
+        event.strapi.log.debug('Fetching customer separately with ID:', customerId)
+        inquiry.customer = await event.strapi.db.query('plugin::users-permissions.user').findOne({
           where: { id: customerId },
         })
       }
 
-      strapi.log.info(`Order inquiry created: ${inquiry.inquiry_number}`)
-      strapi.log.debug('Full inquiry object:', JSON.stringify(inquiry, null, 2))
-      strapi.log.debug('Customer data:', JSON.stringify(inquiry.customer, null, 2))
+      event.strapi.log.info(`Order inquiry created: ${inquiry.inquiry_number}`)
+      event.strapi.log.debug('Full inquiry object:', JSON.stringify(inquiry, null, 2))
+      event.strapi.log.debug('Customer data:', JSON.stringify(inquiry.customer, null, 2))
 
       // Format order data for email templates
       const orderData = formatOrderDataForEmail(inquiry)
 
       // Create admin notification for new order (do this FIRST, even if emails fail)
       try {
-        await createNotification(strapi, {
+        await createNotification(event.strapi, {
           type: 'new_order',
           title: `New Order: ${inquiry.inquiry_number || `#${result.id}`}`,
           message: `${orderData.customerCompany || orderData.customerName} placed a new order`,
           relatedOrder: result.id,
           link: `/admin-portal/orders/${result.id}`,
         });
-        strapi.log.info(`Created admin notification for order ${inquiry.inquiry_number}`);
+        event.strapi.log.info(`Created admin notification for order ${inquiry.inquiry_number}`);
       } catch (notifError) {
-        strapi.log.warn('Failed to create admin notification:', notifError);
+        event.strapi.log.warn('Failed to create admin notification:', notifError);
       }
 
       // Create automated chat message for order placement (do this FIRST, even if emails fail)
@@ -192,7 +192,7 @@ export default {
         try {
           await createOrderPlacedMessage(result.id, customerId);
         } catch (msgError) {
-          strapi.log.warn('Failed to create order placed message:', msgError);
+          event.strapi.log.warn('Failed to create order placed message:', msgError);
         }
       }
 
@@ -201,12 +201,12 @@ export default {
       try {
         emailService = getResendEmailService()
       } catch (emailConfigError) {
-        strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
+        event.strapi.log.warn('Email service not configured, skipping email notifications:', emailConfigError)
         return // OK to return now since notifications and messages are already created
       }
 
       // Send email to admin
-      const adminRecipients = strapi.config.get('email.adminRecipients', ['admin@bcflame.com'])
+      const adminRecipients = event.strapi.config.get('email.adminRecipients', ['admin@bcflame.com'])
       const adminEmail = generateNewOrderEmailForAdmin(orderData)
 
       const adminResult = await emailService.sendEmail({
@@ -217,9 +217,9 @@ export default {
       })
 
       if (!adminResult.success) {
-        strapi.log.error('Failed to send admin notification email:', adminResult.error)
+        event.strapi.log.error('Failed to send admin notification email:', adminResult.error)
       } else {
-        strapi.log.info('Admin notification email sent successfully:', adminResult.messageId)
+        event.strapi.log.info('Admin notification email sent successfully:', adminResult.messageId)
       }
 
       // Send confirmation email to customer
@@ -234,13 +234,13 @@ export default {
         })
 
         if (!customerResult.success) {
-          strapi.log.error('Failed to send customer confirmation email:', customerResult.error)
+          event.strapi.log.error('Failed to send customer confirmation email:', customerResult.error)
         } else {
-          strapi.log.info('Customer confirmation email sent successfully:', customerResult.messageId)
+          event.strapi.log.info('Customer confirmation email sent successfully:', customerResult.messageId)
         }
       }
     } catch (error) {
-      strapi.log.error('Error in afterCreate lifecycle:', error)
+      event.strapi.log.error('Error in afterCreate lifecycle:', error)
       // Don't throw - we don't want to fail the creation if email fails
     }
   },
@@ -258,7 +258,7 @@ export default {
       // Only send email if status changed
       if (previousStatus && newStatus && previousStatus !== newStatus) {
         // Fetch full inquiry data with relations using db.query for better control
-        const inquiry = await strapi.db.query('api::order-inquiry.order-inquiry').findOne({
+        const inquiry = await event.strapi.db.query('api::order-inquiry.order-inquiry').findOne({
           where: { id: result.id },
           populate: {
             customer: true,
@@ -269,20 +269,20 @@ export default {
         })
 
         if (!inquiry) {
-          strapi.log.warn('Order inquiry not found:', result.id)
+          event.strapi.log.warn('Order inquiry not found:', result.id)
           return
         }
 
         // If customer wasn't populated, fetch it separately
         if (!inquiry.customer && result.customer) {
           const customerId = typeof result.customer === 'object' ? result.customer.id : result.customer
-          inquiry.customer = await strapi.db.query('plugin::users-permissions.user').findOne({
+          inquiry.customer = await event.strapi.db.query('plugin::users-permissions.user').findOne({
             where: { id: customerId },
           })
         }
 
         if (!inquiry.customer?.email) {
-          strapi.log.warn('Cannot send status update email - customer email not found')
+          event.strapi.log.warn('Cannot send status update email - customer email not found')
           return
         }
 
@@ -291,7 +291,7 @@ export default {
         try {
           emailService = getResendEmailService()
         } catch (emailConfigError) {
-          strapi.log.warn('Email service not configured, skipping status update email:', emailConfigError)
+          event.strapi.log.warn('Email service not configured, skipping status update email:', emailConfigError)
           return
         }
 
@@ -314,15 +314,15 @@ export default {
         })
 
         if (!emailResult.success) {
-          strapi.log.error('Failed to send status update email:', emailResult.error)
+          event.strapi.log.error('Failed to send status update email:', emailResult.error)
         } else {
-          strapi.log.info('Status update email sent successfully:', emailResult.messageId)
+          event.strapi.log.info('Status update email sent successfully:', emailResult.messageId)
         }
 
         // Create reseller notification for status change
         try {
           const customerId = typeof inquiry.customer === 'object' ? inquiry.customer.id : inquiry.customer
-          await createNotification(strapi, {
+          await createNotification(event.strapi, {
             type: 'order_status_changed',
             title: `Order ${inquiry.inquiry_number} - Status Updated`,
             message: `Your order status has been updated to: ${newStatus}`,
@@ -330,16 +330,16 @@ export default {
             recipient: customerId,
             link: `/orders/${result.id}`,
           });
-          strapi.log.info(`Created reseller notification for order ${inquiry.inquiry_number} status change`);
+          event.strapi.log.info(`Created reseller notification for order ${inquiry.inquiry_number} status change`);
         } catch (notifError) {
-          strapi.log.warn('Failed to create reseller notification:', notifError);
+          event.strapi.log.warn('Failed to create reseller notification:', notifError);
         }
 
         // Create automated chat message for status update
         await createOrderStatusChangeMessage(result.id, previousStatus, newStatus);
       }
     } catch (error) {
-      strapi.log.error('Error in afterUpdate lifecycle:', error)
+      event.strapi.log.error('Error in afterUpdate lifecycle:', error)
       // Don't throw - we don't want to fail the update if email fails
     }
   },
