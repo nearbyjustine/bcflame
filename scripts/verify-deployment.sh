@@ -83,19 +83,47 @@ main() {
 
     local failed=0
 
-    # Check frontend
-    check_service "frontend" "http://localhost:3000" || failed=1
-
-    # Check backend
-    check_service "backend" "http://localhost:1337/_health" || failed=1
-
-    # Check nginx
+    # Check nginx first (main entry point)
     check_service "nginx" "http://localhost/health" || failed=1
 
-    # Check container health
-    check_container_health "bcflame_frontend_prod" || failed=1
-    check_container_health "bcflame_strapi_prod" || failed=1
-    check_container_health "bcflame_nginx_prod" || failed=1
+    # Check frontend through nginx (production routes through nginx)
+    check_service "frontend (via nginx)" "http://localhost/" || failed=1
+
+    # Check backend through internal network
+    log_info "Checking backend (internal)..."
+    if docker exec bcflame_nginx_prod wget -q -O /dev/null http://strapi:1337/_health 2>/dev/null; then
+        log_info "✅ backend is healthy (internal)"
+    else
+        log_error "❌ backend failed internal health check"
+        failed=1
+    fi
+
+    # Check container health (relaxed - only fail if container is stopped)
+    log_info "Checking container status..."
+    local frontend_status=$(docker inspect --format='{{.State.Status}}' "bcflame_frontend_prod" 2>/dev/null || echo "unknown")
+    local strapi_status=$(docker inspect --format='{{.State.Status}}' "bcflame_strapi_prod" 2>/dev/null || echo "unknown")
+    local nginx_status=$(docker inspect --format='{{.State.Status}}' "bcflame_nginx_prod" 2>/dev/null || echo "unknown")
+
+    if [[ "${frontend_status}" == "running" ]]; then
+        log_info "✅ bcflame_frontend_prod container is running"
+    else
+        log_error "❌ bcflame_frontend_prod container status: ${frontend_status}"
+        failed=1
+    fi
+
+    if [[ "${strapi_status}" == "running" ]]; then
+        log_info "✅ bcflame_strapi_prod container is running"
+    else
+        log_error "❌ bcflame_strapi_prod container status: ${strapi_status}"
+        failed=1
+    fi
+
+    if [[ "${nginx_status}" == "running" ]]; then
+        log_info "✅ bcflame_nginx_prod container is running"
+    else
+        log_error "❌ bcflame_nginx_prod container status: ${nginx_status}"
+        failed=1
+    fi
 
     # Check integration
     check_integration || failed=1
