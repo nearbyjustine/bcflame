@@ -312,9 +312,12 @@ jobs:
     name: Notify Discord
     runs-on: ubuntu-latest
     needs: [deploy]
-    if: always() && secrets.DISCORD_WEBHOOK != ''
+    if: always()
     steps:
       - name: Send Discord notification
+        if: env.DISCORD_WEBHOOK != ''
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           if [ "${{ needs.deploy.result }}" = "success" ]; then
             COLOR="3066993"
@@ -326,7 +329,7 @@ jobs:
             DESCRIPTION="Deployment to production failed. Check logs for details."
           fi
 
-          curl -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
+          curl -X POST "$DISCORD_WEBHOOK" \
             -H "Content-Type: application/json" \
             -d "{
               \"embeds\": [{
