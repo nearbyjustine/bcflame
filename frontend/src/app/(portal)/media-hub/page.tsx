@@ -43,9 +43,11 @@ const sortOptions = [
 export default function MediaHubPage() {
   const {
     assets,
+    productPhotos,
     tags,
     campaignKits,
     isLoading,
+    isLoadingProductPhotos,
     accessStatus,
     isCheckingAccess,
     selectedCategory,
@@ -53,6 +55,7 @@ export default function MediaHubPage() {
     selectedTags,
     sortBy,
     fetchAssets,
+    fetchProductPhotos,
     fetchTags,
     fetchCampaignKits,
     checkAccess,
@@ -72,17 +75,20 @@ export default function MediaHubPage() {
   useEffect(() => {
     if (accessStatus?.hasAccess) {
       fetchAssets();
+      fetchProductPhotos();
       fetchTags();
       fetchCampaignKits();
     }
-  }, [accessStatus?.hasAccess, fetchAssets, fetchTags, fetchCampaignKits]);
+  }, [accessStatus?.hasAccess, fetchAssets, fetchProductPhotos, fetchTags, fetchCampaignKits]);
 
   // Filter and sort assets
   const filteredAssets = useMemo(() => {
-    let result = [...assets];
+    // Use product photos for product_photos category, otherwise use media assets
+    const sourceAssets = selectedCategory === 'product_photos' ? productPhotos : assets;
+    let result = [...sourceAssets];
 
-    // Filter by category
-    if (selectedCategory !== 'all') {
+    // Filter by category (skip for product_photos since they're already filtered)
+    if (selectedCategory !== 'all' && selectedCategory !== 'product_photos') {
       result = result.filter((asset) => asset.category === selectedCategory);
     }
 
@@ -118,7 +124,7 @@ export default function MediaHubPage() {
     }
 
     return result;
-  }, [assets, selectedCategory, searchQuery, selectedTags, sortBy]);
+  }, [assets, productPhotos, selectedCategory, searchQuery, selectedTags, sortBy]);
 
   const handleTagToggle = (tagSlug: string) => {
     const newTags = selectedTags.includes(tagSlug)
@@ -128,7 +134,8 @@ export default function MediaHubPage() {
   };
 
   const getCategoryCount = (category: Category) => {
-    if (category === 'all') return assets.length;
+    if (category === 'all') return assets.length + productPhotos.length;
+    if (category === 'product_photos') return productPhotos.length;
     return assets.filter((a) => a.category === category).length;
   };
 

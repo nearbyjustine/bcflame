@@ -5,6 +5,15 @@
 export default {
   routes: [
     {
+      method: 'GET',
+      path: '/media-assets/statistics',
+      handler: 'media-asset.statistics',
+      config: {
+        policies: [],
+        middlewares: ['global::require-auth'],
+      },
+    },
+    {
       method: 'POST',
       path: '/media-assets/:id/download',
       handler: 'media-asset.download',

@@ -107,4 +107,71 @@ export default factories.createCoreController('api::media-asset.media-asset' as 
       return ctx.internalServerError('Failed to upload media asset');
     }
   },
+
+  // Get media statistics for admin dashboard
+  async statistics(ctx) {
+    const user = ctx.state.user;
+
+    // Verify admin role
+    if (!user || user.userType !== 'admin') {
+      return ctx.forbidden('Only admins can view media statistics');
+    }
+
+    try {
+      // Count media assets by category
+      const marketing_materials = await strapi.db.query('api::media-asset.media-asset').count({
+        where: { category: 'marketing_materials', publishedAt: { $notNull: true } },
+      });
+
+      const packaging_templates = await strapi.db.query('api::media-asset.media-asset').count({
+        where: { category: 'packaging_templates', publishedAt: { $notNull: true } },
+      });
+
+      const brand_guidelines = await strapi.db.query('api::media-asset.media-asset').count({
+        where: { category: 'brand_guidelines', publishedAt: { $notNull: true } },
+      });
+
+      // Count product photos from products with images
+      const productsWithImages = await strapi.entityService.findMany('api::product.product' as any, {
+        filters: {
+          publishedAt: { $notNull: true },
+          images: { id: { $notNull: true } },
+        },
+        populate: ['images'],
+      });
+
+      let product_photos = 0;
+      (productsWithImages as any[]).forEach((product: any) => {
+        if (product.images && Array.isArray(product.images)) {
+          product_photos += product.images.length;
+        }
+      });
+
+      // Calculate total downloads from media assets
+      const allAssets = await strapi.entityService.findMany('api::media-asset.media-asset' as any, {
+        filters: { publishedAt: { $notNull: true } },
+        fields: ['downloadCount'],
+      });
+
+      const totalDownloads = (allAssets as any[]).reduce((sum, a) => sum + (a.downloadCount || 0), 0);
+
+      const total = marketing_materials + packaging_templates + brand_guidelines + product_photos;
+
+      return {
+        data: {
+          total,
+          byCategory: {
+            product_photos,
+            marketing_materials,
+            packaging_templates,
+            brand_guidelines,
+          },
+          totalDownloads,
+        },
+      };
+    } catch (error) {
+      strapi.log.error('Media statistics error:', { error: error.message, stack: error.stack });
+      return ctx.internalServerError('Failed to fetch media statistics');
+    }
+  },
 }));

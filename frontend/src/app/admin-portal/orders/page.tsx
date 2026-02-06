@@ -89,6 +89,16 @@ export default function OrdersPage() {
   // Export state
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
+  // Stats from API
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    reviewing: 0,
+    approved: 0,
+    fulfilled: 0,
+    rejected: 0,
+  });
+
   // Fetch orders from API
   const fetchOrders = async () => {
     setIsLoading(true);
@@ -132,6 +142,28 @@ export default function OrdersPage() {
       setIsLoading(false);
     }
   };
+
+  // Fetch stats from API (once on mount)
+  const fetchStats = async () => {
+    try {
+      const response = await strapiApi.get('/api/order-inquiries/statistics');
+      const data = response.data.data;
+      setStats({
+        total: data.total || 0,
+        pending: data.byStatus?.pending || 0,
+        reviewing: data.byStatus?.reviewing || 0,
+        approved: data.byStatus?.approved || 0,
+        fulfilled: data.byStatus?.fulfilled || 0,
+        rejected: data.byStatus?.rejected || 0,
+      });
+    } catch (error) {
+      console.error('Failed to fetch order stats:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     fetchOrders();
@@ -370,16 +402,7 @@ export default function OrdersPage() {
     }
   };
 
-  // Calculate summary stats
-  const stats = useMemo(() => {
-    return {
-      total: orders.length,
-      pending: orders.filter((o) => o.status === 'pending').length,
-      reviewing: orders.filter((o) => o.status === 'reviewing').length,
-      approved: orders.filter((o) => o.status === 'approved').length,
-      fulfilled: orders.filter((o) => o.status === 'fulfilled').length,
-    };
-  }, [orders]);
+  // Stats are now fetched from API
 
   return (
     <div className="space-y-6">

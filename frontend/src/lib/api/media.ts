@@ -211,3 +211,17 @@ export async function getMediaAccessStatus(): Promise<{
     throw error;
   }
 }
+
+/**
+ * Fetch product photos from products (filtered based on user role)
+ * For resellers: only shows photos from purchased products
+ */
+export async function getProductPhotos(): Promise<MediaAsset[]> {
+  try {
+    const response = await strapiApi.get('/api/products/photos');
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Error fetching product photos:', error);
+    throw error;
+  }
+}

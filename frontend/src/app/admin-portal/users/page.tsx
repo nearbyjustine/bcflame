@@ -89,16 +89,6 @@ export default function AdminUsersPage() {
       });
 
       setUsers(result.users);
-
-      // Calculate stats
-      const active = result.users.filter((u) => !u.blocked).length;
-      const blockedCount = result.users.filter((u) => u.blocked).length;
-
-      setStats({
-        total: result.users.length,
-        active,
-        blocked: blockedCount,
-      });
     } catch (error) {
       console.error('Failed to fetch users:', error);
       toast.error('Failed to load users');
@@ -106,6 +96,25 @@ export default function AdminUsersPage() {
       setIsLoading(false);
     }
   }, [filterParam]);
+
+  // Fetch stats from API (once on mount)
+  const fetchStats = async () => {
+    try {
+      const response = await strapiApi.get('/api/users/statistics');
+      const data = response.data.data;
+      setStats({
+        total: data.total || 0,
+        active: data.byStatus?.confirmed || 0,
+        blocked: data.byStatus?.blocked || 0,
+      });
+    } catch (error) {
+      console.error('Failed to fetch user stats:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     fetchUsers();

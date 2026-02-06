@@ -197,15 +197,15 @@ export default factories.createCoreController('api::order-inquiry.order-inquiry'
 
       // Orders by payment status
       const unpaid = await strapi.db.query('api::order-inquiry.order-inquiry').count({
-        where: { payment_status: 'unpaid' },
+        where: { paymentStatus: 'unpaid' },
       });
 
       const partial = await strapi.db.query('api::order-inquiry.order-inquiry').count({
-        where: { payment_status: 'partial' },
+        where: { paymentStatus: 'partial' },
       });
 
       const paid = await strapi.db.query('api::order-inquiry.order-inquiry').count({
-        where: { payment_status: 'paid' },
+        where: { paymentStatus: 'paid' },
       });
 
       return {

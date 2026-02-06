@@ -8,6 +8,7 @@ import {
   getCampaignKits,
   downloadCampaignKit as downloadCampaignKitApi,
   getMediaAccessStatus,
+  getProductPhotos,
 } from '@/lib/api/media';
 
 interface MediaAsset {
@@ -67,6 +68,7 @@ interface MediaAccessStatus {
 
 interface MediaState {
   assets: MediaAsset[];
+  productPhotos: MediaAsset[];
   tags: Tag[];
   campaignKits: CampaignKit[];
   selectedCategory: Category;
@@ -74,12 +76,14 @@ interface MediaState {
   selectedTags: string[];
   sortBy: SortBy;
   isLoading: boolean;
+  isLoadingProductPhotos: boolean;
   error: string | null;
   accessStatus: MediaAccessStatus | null;
   isCheckingAccess: boolean;
 
   // Actions
   fetchAssets: () => Promise<void>;
+  fetchProductPhotos: () => Promise<void>;
   fetchTags: () => Promise<void>;
   fetchCampaignKits: () => Promise<void>;
   checkAccess: () => Promise<void>;
@@ -91,6 +95,7 @@ interface MediaState {
 
 export const useMediaStore = create<MediaState>((set, get) => ({
   assets: [],
+  productPhotos: [],
   tags: [],
   campaignKits: [],
   selectedCategory: 'all',
@@ -98,6 +103,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   selectedTags: [],
   sortBy: 'newest',
   isLoading: false,
+  isLoadingProductPhotos: false,
   error: null,
   accessStatus: null,
   isCheckingAccess: false,
@@ -122,6 +128,17 @@ export const useMediaStore = create<MediaState>((set, get) => ({
       console.error('Failed to fetch assets:', error);
       set({ error: 'Failed to load media assets', isLoading: false });
       toast.error('Failed to load media assets');
+    }
+  },
+
+  fetchProductPhotos: async () => {
+    set({ isLoadingProductPhotos: true });
+    try {
+      const productPhotos = await getProductPhotos();
+      set({ productPhotos, isLoadingProductPhotos: false });
+    } catch (error) {
+      console.error('Failed to fetch product photos:', error);
+      set({ isLoadingProductPhotos: false });
     }
   },
 

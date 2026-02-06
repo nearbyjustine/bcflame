@@ -177,6 +177,72 @@ export default (plugin: any) => {
     }
   };
 
+  // Add user statistics controller
+  plugin.controllers.user.statistics = async (ctx: any) => {
+    const user = ctx.state.user;
+
+    // Verify admin role
+    if (user?.userType !== 'admin') {
+      return ctx.forbidden('Only admins can view user statistics');
+    }
+
+    try {
+      // Total users
+      const total = await strapi.db.query('plugin::users-permissions.user').count();
+
+      // Users by type
+      const admins = await strapi.db.query('plugin::users-permissions.user').count({
+        where: { userType: 'admin' },
+      });
+
+      const resellers = await strapi.db.query('plugin::users-permissions.user').count({
+        where: { userType: 'reseller' },
+      });
+
+      // Users by status
+      const confirmed = await strapi.db.query('plugin::users-permissions.user').count({
+        where: { confirmed: true },
+      });
+
+      const blocked = await strapi.db.query('plugin::users-permissions.user').count({
+        where: { blocked: true },
+      });
+
+      const pending = await strapi.db.query('plugin::users-permissions.user').count({
+        where: { confirmed: false, blocked: false },
+      });
+
+      return {
+        data: {
+          total,
+          byType: {
+            admins,
+            resellers,
+          },
+          byStatus: {
+            confirmed,
+            blocked,
+            pending,
+          },
+        },
+      };
+    } catch (error) {
+      strapi.log.error('User statistics error:', error);
+      return ctx.internalServerError('Failed to fetch user statistics');
+    }
+  };
+
+  // Add custom route for user statistics
+  plugin.routes['content-api'].routes.unshift({
+    method: 'GET',
+    path: '/users/statistics',
+    handler: 'user.statistics',
+    config: {
+      policies: [],
+      middlewares: ['global::require-auth'],
+    },
+  });
+
   // Add custom route for bulk update
   plugin.routes['content-api'].routes.unshift({
     method: 'POST',

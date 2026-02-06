@@ -129,8 +129,10 @@ export default function MediaManagementPage() {
   const categoryFilter = searchParams.get('category');
 
   const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [productPhotos, setProductPhotos] = useState<MediaAsset[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProductPhotos, setIsLoadingProductPhotos] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryFilter || 'all');
 
   // Upload modal state
@@ -145,6 +147,16 @@ export default function MediaManagementPage() {
   // Delete modal state
   const [deleteTarget, setDeleteTarget] = useState<MediaAsset | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Stats from API
+  const [stats, setStats] = useState({
+    total: 0,
+    product_photos: 0,
+    marketing_materials: 0,
+    packaging_templates: 0,
+    brand_guidelines: 0,
+    totalDownloads: 0,
+  });
 
   // Fetch assets
   const fetchAssets = async () => {
@@ -158,7 +170,7 @@ export default function MediaManagementPage() {
         'pagination[pageSize]': '100',
       };
 
-      if (selectedCategory && selectedCategory !== 'all') {
+      if (selectedCategory && selectedCategory !== 'all' && selectedCategory !== 'product_photos') {
         params['filters[category][$eq]'] = selectedCategory;
       }
 
@@ -206,9 +218,49 @@ export default function MediaManagementPage() {
     }
   };
 
+  // Fetch product photos from products
+  const fetchProductPhotos = async () => {
+    setIsLoadingProductPhotos(true);
+    try {
+      const response = await strapiApi.get('/api/products/photos');
+      setProductPhotos(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch product photos:', error);
+    } finally {
+      setIsLoadingProductPhotos(false);
+    }
+  };
+
+  // Fetch stats from API (called once on mount)
+  const fetchStats = async () => {
+    try {
+      const response = await strapiApi.get('/api/media-assets/statistics');
+      const data = response.data.data;
+      setStats({
+        total: data.total || 0,
+        product_photos: data.byCategory?.product_photos || 0,
+        marketing_materials: data.byCategory?.marketing_materials || 0,
+        packaging_templates: data.byCategory?.packaging_templates || 0,
+        brand_guidelines: data.byCategory?.brand_guidelines || 0,
+        totalDownloads: data.totalDownloads || 0,
+      });
+    } catch (error) {
+      console.error('Failed to fetch media stats:', error);
+    }
+  };
+
   useEffect(() => {
-    fetchAssets();
+    // Fetch stats once on mount
+    fetchStats();
     fetchTags();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory === 'product_photos') {
+      fetchProductPhotos();
+    } else {
+      fetchAssets();
+    }
   }, [selectedCategory]);
 
   // Handle category filter change
@@ -444,15 +496,9 @@ export default function MediaManagementPage() {
     []
   );
 
-  // Calculate stats
-  const stats = useMemo(() => ({
-    total: assets.length,
-    product_photos: assets.filter((a) => a.category === 'product_photos').length,
-    marketing_materials: assets.filter((a) => a.category === 'marketing_materials').length,
-    packaging_templates: assets.filter((a) => a.category === 'packaging_templates').length,
-    brand_guidelines: assets.filter((a) => a.category === 'brand_guidelines').length,
-    totalDownloads: assets.reduce((sum, a) => sum + (a.downloadCount || 0), 0),
-  }), [assets]);
+  // Get current display data based on selected category
+  const displayAssets = selectedCategory === 'product_photos' ? productPhotos : assets;
+  const displayLoading = selectedCategory === 'product_photos' ? isLoadingProductPhotos : isLoading;
 
   return (
     <div className="space-y-6">
@@ -568,10 +614,10 @@ export default function MediaManagementPage() {
         <CardContent>
           <DataTable
             columns={columns}
-            data={assets}
+            data={displayAssets}
             searchKey="title"
             searchPlaceholder="Search assets..."
-            isLoading={isLoading}
+            isLoading={displayLoading}
             showColumnVisibility={true}
             pageSize={10}
           />
