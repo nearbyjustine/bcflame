@@ -13,7 +13,8 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev": "npm run dev:backend & npm run dev:frontend",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "build:all": "cd backend && npm run build && cd ../frontend && npm run build"
+    "build:all": "cd backend && npm run build && cd ../frontend && npm run build",
+    "test:all": "set -e && cd backend && npm run test -- --run && cd ../frontend && npm run test -- --run"
   },
   "engines": {
     "node": ">=18.0.0 <=20.x.x"

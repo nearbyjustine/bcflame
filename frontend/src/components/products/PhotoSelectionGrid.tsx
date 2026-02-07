@@ -29,11 +29,8 @@ export default function PhotoSelectionGrid({
     const isSelected = selectedPhotoIds.includes(id);
     const isAtMax = selectedPhotoIds.length >= limits.max;
 
-    console.log('Photo clicked:', { id, isSelected, isAtMax, selectedPhotoIds });
-
     // Allow deselection even when at max, but prevent new selection
     if (!isSelected && isAtMax) {
-      console.log('Cannot select - at max limit');
       return;
     }
 

@@ -50,138 +50,141 @@ describe('PreBaggingConfig', () => {
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={null}
-        totalWeight={0}
-        onOptionChange={onOptionChange}
-        onWeightChange={vi.fn()}
+        selections={[]}
+        onUpdate={onUpdate}
+        onRemove={vi.fn()}
       />
     );
 
-    fireEvent.click(screen.getByText('3.5g Bags'));
-    expect(onOptionChange).toHaveBeenCalledWith(2);
+    // Click increment button for 3.5g Bags option
+    const buttons = screen.getAllByRole('button');
+    const incrementButtons = buttons.filter(btn => btn.textContent === '+');
+    fireEvent.click(incrementButtons[1]!); // Second option (3.5g)
+
+    expect(onUpdate).toHaveBeenCalledWith(2, 1, 3.5, 'g');
   });
 
   it('displays selected option with active styling', () => {
     const { container } = render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={2}
-        totalWeight={100}
-        onOptionChange={vi.fn()}
-        onWeightChange={vi.fn()}
+        selections={[{ optionId: 2, quantity: 10, unitSize: 3.5, unitSizeUnit: 'g' }]}
+        onUpdate={vi.fn()}
+        onRemove={vi.fn()}
       />
     );
 
-    const selectedBorder = container.querySelectorAll('.border-orange-500');
-    expect(selectedBorder.length).toBeGreaterThanOrEqual(1);
+    // Should show quantity 10 in the input for option 2
+    const inputs = screen.getAllByRole('spinbutton');
+    const option2Input = inputs[1]; // Second option
+    expect(option2Input).toHaveValue(10);
   });
 
-  it('allows incrementing weight', () => {
-    const onWeightChange = vi.fn();
+  it('allows incrementing quantity', () => {
+    const onUpdate = vi.fn();
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={2}
-        totalWeight={100}
-        onOptionChange={vi.fn()}
-        onWeightChange={onWeightChange}
+        selections={[{ optionId: 2, quantity: 5, unitSize: 3.5, unitSizeUnit: 'g' }]}
+        onUpdate={onUpdate}
+        onRemove={vi.fn()}
       />
     );
 
-    // Find and click the + button
+    // Find and click the + button for option 2
     const buttons = screen.getAllByRole('button');
-    const incrementButton = buttons.find(btn => btn.textContent === '+');
-    fireEvent.click(incrementButton!);
+    const incrementButtons = buttons.filter(btn => btn.textContent === '+');
+    fireEvent.click(incrementButtons[1]!); // Second option
 
-    expect(onWeightChange).toHaveBeenCalledWith(110);
+    expect(onUpdate).toHaveBeenCalledWith(2, 6, 3.5, 'g');
   });
 
-  it('allows decrementing weight', () => {
-    const onWeightChange = vi.fn();
+  it('allows decrementing quantity', () => {
+    const onUpdate = vi.fn();
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={2}
-        totalWeight={100}
-        onOptionChange={vi.fn()}
-        onWeightChange={onWeightChange}
+        selections={[{ optionId: 2, quantity: 5, unitSize: 3.5, unitSizeUnit: 'g' }]}
+        onUpdate={onUpdate}
+        onRemove={vi.fn()}
       />
     );
 
-    // Find and click the - button
+    // Find and click the - button for option 2
     const buttons = screen.getAllByRole('button');
-    const decrementButton = buttons.find(btn => btn.textContent === '-');
-    fireEvent.click(decrementButton!);
+    const decrementButtons = buttons.filter(btn => btn.textContent === '-');
+    fireEvent.click(decrementButtons[1]!); // Second option
 
-    expect(onWeightChange).toHaveBeenCalledWith(90);
+    expect(onUpdate).toHaveBeenCalledWith(2, 4, 3.5, 'g');
   });
 
-  it('prevents weight from going below zero', () => {
-    const onWeightChange = vi.fn();
+  it('prevents quantity from going below zero', () => {
+    const onRemove = vi.fn();
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={2}
-        totalWeight={5}
-        onOptionChange={vi.fn()}
-        onWeightChange={onWeightChange}
+        selections={[{ optionId: 2, quantity: 1, unitSize: 3.5, unitSizeUnit: 'g' }]}
+        onUpdate={vi.fn()}
+        onRemove={onRemove}
       />
     );
 
-    // Click - button which should go to 0, not negative
+    // Click - button when quantity is 1, should call onRemove
     const buttons = screen.getAllByRole('button');
-    const decrementButton = buttons.find(btn => btn.textContent === '-');
-    fireEvent.click(decrementButton!);
+    const decrementButtons = buttons.filter(btn => btn.textContent === '-');
+    fireEvent.click(decrementButtons[1]!); // Second option
 
-    expect(onWeightChange).toHaveBeenCalledWith(0);
+    expect(onRemove).toHaveBeenCalledWith(2);
   });
 
-  it('calculates and displays estimated bag count', () => {
+  it('displays summary when selections exist', () => {
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={2} // 3.5g bags
-        totalWeight={350} // 350g
-        onOptionChange={vi.fn()}
-        onWeightChange={vi.fn()}
+        selections={[
+          { optionId: 2, quantity: 10, unitSize: 3.5, unitSizeUnit: 'g' },
+          { optionId: 3, quantity: 5, unitSize: 7, unitSizeUnit: 'g' }
+        ]}
+        onUpdate={vi.fn()}
+        onRemove={vi.fn()}
       />
     );
 
-    // Should show: 350g / 3.5g = 100 bags
-    expect(screen.getByText(/100 bags/i)).toBeInTheDocument();
-    expect(screen.getByText(/3.5g each/i)).toBeInTheDocument();
+    // Should show summary section
+    expect(screen.getByText('Pre-Bagging Summary:')).toBeInTheDocument();
+    expect(screen.getByText('10x 3.5g Bags')).toBeInTheDocument();
+    expect(screen.getByText('5x 7g Bags')).toBeInTheDocument();
   });
 
-  it('does not show bag count if option has no unit_size', () => {
+  it('does not show summary when selections are empty', () => {
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={1} // No Pre-Bagging (no unit_size)
-        totalWeight={100}
-        onOptionChange={vi.fn()}
-        onWeightChange={vi.fn()}
+        selections={[]}
+        onUpdate={vi.fn()}
+        onRemove={vi.fn()}
       />
     );
 
-    // Should not show "Estimated X bags" message
-    expect(screen.queryByText(/estimated/i)).not.toBeInTheDocument();
+    // Should not show summary section
+    expect(screen.queryByText('Pre-Bagging Summary:')).not.toBeInTheDocument();
   });
 
-  it('allows manual weight input', () => {
-    const onWeightChange = vi.fn();
+  it('allows manual quantity input', () => {
+    const onUpdate = vi.fn();
     render(
       <PreBaggingConfig
         options={mockOptions}
-        selectedId={2}
-        totalWeight={100}
-        onOptionChange={vi.fn()}
-        onWeightChange={onWeightChange}
+        selections={[{ optionId: 2, quantity: 5, unitSize: 3.5, unitSizeUnit: 'g' }]}
+        onUpdate={onUpdate}
+        onRemove={vi.fn()}
       />
     );
 
-    const input = screen.getByRole('spinbutton');
-    fireEvent.change(input, { target: { value: '250' } });
+    const inputs = screen.getAllByRole('spinbutton');
+    const option2Input = inputs[1]; // Second option
+    fireEvent.change(option2Input, { target: { value: '25' } });
 
-    expect(onWeightChange).toHaveBeenCalledWith(250);
+    expect(onUpdate).toHaveBeenCalledWith(2, 25, 3.5, 'g');
   });
 });

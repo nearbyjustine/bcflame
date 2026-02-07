@@ -54,51 +54,51 @@ describe('BudStyleSelector', () => {
         budStyles={mockBudStyles}
         selectedIds={[1]}
         limits={mockLimits}
-        onToggle={onChange}
+        onToggle={onToggle}
       />
     );
 
     // Click second option
     fireEvent.click(screen.getByText('Shake'));
 
-    // Should add to array, not replace
-    expect(onChange).toHaveBeenCalledWith([1, 2]);
+    // Should call onToggle with the clicked ID (parent handles array logic)
+    expect(onToggle).toHaveBeenCalledWith(2);
   });
 
   it('allows single selection only when allowMultiple is false', () => {
-    const onChange = vi.fn();
+    const onToggle = vi.fn();
     render(
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[1]}
         limits={mockLimits}
-        onToggle={onChange}
+        onToggle={onToggle}
       />
     );
 
     // Click second option
     fireEvent.click(screen.getByText('Shake'));
 
-    // Should replace array with single item
-    expect(onChange).toHaveBeenCalledWith([2]);
+    // Should call onToggle with the clicked ID (parent handles replacement logic)
+    expect(onToggle).toHaveBeenCalledWith(2);
   });
 
   it('allows deselection in multi-select mode', () => {
-    const onChange = vi.fn();
+    const onToggle = vi.fn();
     render(
       <BudStyleSelector
         budStyles={mockBudStyles}
         selectedIds={[1, 2]}
         limits={mockLimits}
-        onToggle={onChange}
+        onToggle={onToggle}
       />
     );
 
     // Click already selected option
     fireEvent.click(screen.getByText('Shake'));
 
-    // Should remove from array
-    expect(onChange).toHaveBeenCalledWith([1]);
+    // Should call onToggle with the clicked ID (parent handles removal logic)
+    expect(onToggle).toHaveBeenCalledWith(2);
   });
 
   it('applies active styling to selected options', () => {

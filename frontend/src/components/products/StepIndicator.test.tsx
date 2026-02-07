@@ -24,8 +24,8 @@ describe('StepIndicator', () => {
   it('applies active styling to current and completed steps', () => {
     const { container } = render(<StepIndicator currentStep={2} totalSteps={4} />);
 
-    // Steps 0, 1, 2 should have orange background
-    const activeSteps = container.querySelectorAll('.bg-orange-600');
+    // Steps 0, 1, 2 should have primary background (completed + current)
+    const activeSteps = container.querySelectorAll('.bg-primary');
     expect(activeSteps.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -40,8 +40,8 @@ describe('StepIndicator', () => {
   it('highlights completed progress bars', () => {
     const { container } = render(<StepIndicator currentStep={2} totalSteps={4} />);
 
-    // First 2 progress bars should be orange (completed)
-    const completedBars = container.querySelectorAll('.flex-1.h-0\\.5.bg-orange-600');
+    // First 2 progress bars should be primary (completed)
+    const completedBars = container.querySelectorAll('.flex-1.h-0\\.5.bg-primary');
     expect(completedBars.length).toBeGreaterThanOrEqual(2);
   });
 });

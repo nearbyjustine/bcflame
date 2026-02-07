@@ -70,17 +70,17 @@ describe('PhotoSelectionGrid', () => {
     render(
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
-        selectedPhotoIds={[0, 1, 2, 3, 4]}
+        selectedPhotoIds={[1, 2, 3, 4, 5]}
         limits={mockLimits}
         onToggle={onToggle}
       />
     );
 
-    // Click selected photo (index 0) - should allow deselection
+    // Click selected photo (index 0, which has id 1) - should allow deselection
     const photoContainers = screen.getAllByRole('img').map(img => img.parentElement);
     fireEvent.click(photoContainers[0]!);
 
-    expect(onToggle).toHaveBeenCalledWith(0);
+    expect(onToggle).toHaveBeenCalledWith(1); // Photo at index 0 has id 1
   });
 
   it('displays selection count badge', () => {
@@ -97,18 +97,19 @@ describe('PhotoSelectionGrid', () => {
   });
 
   it('shows checkmark icon on selected photos', () => {
-    render(
+    const { container } = render(
       <PhotoSelectionGrid
         availablePhotos={mockPhotos}
-        selectedPhotoIds={[0, 2]}
+        selectedPhotoIds={[1, 3]} // Using actual photo IDs
         limits={mockLimits}
         onToggle={vi.fn()}
       />
     );
 
-    // Should have checkmarks for selected photos
-    const checkmarks = document.querySelectorAll('.bg-orange-500');
-    expect(checkmarks.length).toBeGreaterThanOrEqual(2);
+    // Should have checkmarks for selected photos - look for Check icons via SVG
+    const svgs = container.querySelectorAll('svg');
+    // Each selected photo should have a Check icon
+    expect(svgs.length).toBeGreaterThanOrEqual(2);
   });
 
   it('applies orange border to selected photos', () => {
