@@ -112,11 +112,11 @@ services:
     depends_on:
       - strapi
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 45s
+      start_period: 60s
     # Do not expose port externally
     # nginx will proxy to this service
 
