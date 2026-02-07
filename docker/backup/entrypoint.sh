@@ -14,7 +14,7 @@ echo "==========================================="
 echo "Starting backup service..."
 echo ""
 
-# Configuration
+# Configuration - ensure schedule is properly quoted
 BACKUP_SCHEDULE="${BACKUP_SCHEDULE:-0 2 * * *}"
 BACKUP_SCRIPT="/usr/local/bin/backup.sh"
 
@@ -29,9 +29,9 @@ echo "  Retention (days): ${BACKUP_RETENTION_DAYS:-7}"
 echo "  S3 upload: ${BACKUP_S3_ENABLED:-false}"
 echo ""
 
-# Create cron job
+# Create cron job - use printf to avoid word splitting issues
 echo "Setting up cron job..."
-echo "${BACKUP_SCHEDULE} ${BACKUP_SCRIPT} >> /var/log/backups/cron.log 2>&1" > /etc/crontabs/root
+printf '%s %s >> /var/log/backups/cron.log 2>&1\n' "${BACKUP_SCHEDULE}" "${BACKUP_SCRIPT}" > /etc/crontabs/root
 
 # Verify cron job
 echo "Cron job configured:"
