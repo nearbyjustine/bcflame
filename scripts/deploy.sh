@@ -198,15 +198,15 @@ deploy_service() {
 
     # Stop old container
     log_info "Stopping old ${service} container..."
-    docker-compose -f "${COMPOSE_FILE}" stop "${service}"
+    docker compose -f "${COMPOSE_FILE}" stop "${service}"
 
     # Remove old container
     log_info "Removing old ${service} container..."
-    docker-compose -f "${COMPOSE_FILE}" rm -f "${service}"
+    docker compose -f "${COMPOSE_FILE}" rm -f "${service}"
 
     # Start new container with new image
     log_info "Starting new ${service} container with image tag: ${COMMIT_SHA}..."
-    if docker-compose -f "${COMPOSE_FILE}" up -d "${service}"; then
+    if docker compose -f "${COMPOSE_FILE}" up -d "${service}"; then
         log_info "✅ ${service} deployed successfully"
     else
         log_error "❌ Failed to deploy ${service}"
