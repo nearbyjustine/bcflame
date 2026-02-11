@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { getProducts, type GetProductsParams } from '@/lib/api/products';
 import { getInventory } from '@/lib/api/inventory';
 import { ProductCard, type StockStatus } from '@/components/products/ProductCard';
@@ -10,6 +11,7 @@ import type { Product } from '@/types/product';
 import type { Inventory } from '@/types/inventory';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { resellerProductsSteps } from '@/hooks/tours/resellerTours';
+import { Button } from '@/components/ui/button';
 
 function getStockStatus(productId: number, inventory: Inventory[]): StockStatus {
   const items = inventory.filter((i) => i.attributes.product?.data?.id === productId);
@@ -75,11 +77,18 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="mb-8" data-tour="res-products-header">
-        <h1 className="text-3xl font-bold mb-2">Product Catalog</h1>
-        <p className="text-muted-foreground">
-          Browse our premium cannabis products
-        </p>
+      <div className="mb-8 flex items-center justify-between" data-tour="res-products-header">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Product Catalog</h1>
+          <p className="text-muted-foreground">
+            Browse our premium cannabis products
+          </p>
+        </div>
+        <Link href="/products/demo/customize">
+          <Button className="bg-orange-600 hover:bg-orange-700">
+            View Image Customization Demo
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

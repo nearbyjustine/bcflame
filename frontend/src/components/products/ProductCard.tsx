@@ -84,7 +84,7 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
             <img
               src={imageUrl}
               alt={getImageAlt(currentImage, attributes.name)}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
 
             {/* Carousel Navigation - Only show if multiple images */}
