@@ -122,7 +122,7 @@ export function DemoCustomizationStudio() {
         <div
           className={className}
           style={{
-            backgroundImage: `url(${preview_image.data.attributes.url})`,
+            backgroundImage: `url(${preview_image.data.url})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -159,12 +159,12 @@ export function DemoCustomizationStudio() {
 
         {/* Text Layer */}
         {selectedProduct && (
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full px-4">
             <div
-              className="px-6 py-3 rounded-lg"
+              className="px-6 py-3 rounded-lg mx-auto w-fit"
               style={{
-                backgroundColor: activeBackground.attributes.text_background_color,
-                color: activeBackground.attributes.text_color,
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                color: 'white',
                 opacity: 0.95
               }}
             >
@@ -174,7 +174,8 @@ export function DemoCustomizationStudio() {
                   ...textSizeStyle,
                   fontWeight: 700,
                   letterSpacing: '0.05em',
-                  textTransform: 'uppercase'
+                  textTransform: 'uppercase',
+                  textAlign: 'center'
                 }}
               >
                 {selectedProduct.attributes.name}

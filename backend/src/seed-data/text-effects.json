@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Bubbly Shadow",
+    "description": "Multi-layered 3D text shadow with customizable colors creating a bubbly depth effect",
+    "css_code": ".text {\n  position: relative;\n  margin: 0;\n  padding: 0;\n  font-family: \"Cubano\", monaco, courier;\n  font-size: var(--font-size, 120px);\n  font-weight: 400;\n  text-align: center;\n  font-style: normal;\n  color: aquamarine;\n  text-shadow: \n    -1px 0 #4b6b00, 0 1px #4b6b00, 1px 0 #4b6b00, 0 -1px #4b6b00,\n    -8px 8px #4b6b00, -7px 7px #4b6b00, -6px 6px #4b6b00, -5px 5px #4b6b00,\n    -4px 4px #4b6b00, -3px 3px #4b6b00, -2px 2px #4b6b00, -1px 1px #4b6b00;\n}",
+    "html_structure": "<h1 class=\"text\">Your Text</h1>",
+    "font_dependencies": {
+      "google_fonts": [],
+      "custom_fonts": [{
+        "family": "Cubano",
+        "note": "Commercial font - may require license"
+      }]
+    },
+    "browser_support": "98%",
+    "sort_order": 1
+  },
+  {
+    "name": "Colorfun Line",
+    "description": "Vibrant multi-color layered shadows with text stroke for a playful 3D effect",
+    "css_code": ".colorfun-text {\n  transition: all 0.5s;\n  -webkit-text-stroke: 4px #d6f4f4;\n  font-variation-settings: \"wght\" 900, \"ital\" 1;\n  font-size: 15rem;\n  text-align: center;\n  color: transparent;\n  font-family: \"Meta\", sans-serif;\n  text-shadow: \n    10px 10px 0px #07bccc,\n    15px 15px 0px #e601c0,\n    20px 20px 0px #e9019a,\n    25px 25px 0px #f40468,\n    45px 45px 10px #482896;\n  cursor: pointer;\n}",
+    "html_structure": "<h1 class=\"colorfun-text\">Your Text</h1>",
+    "font_dependencies": {
+      "google_fonts": [],
+      "custom_fonts": [{
+        "family": "Meta",
+        "note": "Variable font with weight and italic settings"
+      }]
+    },
+    "browser_support": "95% (variable fonts)",
+    "sort_order": 2
+  },
+  {
+    "name": "Sweet Stuff",
+    "description": "Skewed typography with cyan and blue layered shadows plus pink/purple pseudo-element shadow",
+    "css_code": ".sweet-title {\n  order: 2;\n  color: #fde9ff;\n  font-weight: 900;\n  text-transform: uppercase;\n  font-size: clamp(3rem, 10vw, 6rem);\n  line-height: 0.75em;\n  text-align: center;\n  text-shadow: \n    3px 1px 1px #4af7ff, 2px 2px 1px #165bfb, 4px 2px 1px #4af7ff,\n    3px 3px 1px #165bfb, 5px 3px 1px #4af7ff, 4px 4px 1px #165bfb,\n    6px 4px 1px #4af7ff, 5px 5px 1px #165bfb, 7px 5px 1px #4af7ff,\n    6px 6px 1px #165bfb, 8px 6px 1px #4af7ff, 7px 7px 1px #165bfb,\n    9px 7px 1px #4af7ff;\n}\n\n.sweet-title span {\n  display: block;\n  position: relative;\n}\n\n.sweet-title span:before {\n  content: attr(data-text);\n  position: absolute;\n  text-shadow: \n    2px 2px 1px #e94aa1, -1px -1px 1px #c736f9,\n    -2px 2px 1px #e94aa1, 1px -1px 1px #f736f9;\n  z-index: 1;\n}",
+    "html_structure": "<h1 class=\"sweet-title\">\n  <span data-text=\"Sweet\">Sweet</span>\n  <span data-text=\"Stuff\">Stuff</span>\n</h1>",
+    "font_dependencies": {
+      "google_fonts": ["Exo+2:wght@300;700;900"]
+    },
+    "browser_support": "98%",
+    "sort_order": 3
+  },
+  {
+    "name": "Color Fonts Palette",
+    "description": "Uses font palette variations for multi-color text (requires color fonts)",
+    "css_code": "@font-face {\n  font-family: 'Rocher';\n  src: url(https://assets.codepen.io/9632/RocherColorGX.woff2);\n}\n\n.color-font {\n  font-family: 'Rocher';\n  text-align: center;\n  font-size: 50px;\n}\n\n@font-palette-values --Grays {\n  font-family: Rocher;\n  base-palette: 9;\n}\n\n@font-palette-values --Purples {\n  font-family: Rocher;\n  base-palette: 6;\n}\n\n@font-palette-values --Mint {\n  font-family: Rocher;\n  base-palette: 7;\n}\n\n.grays {\n  font-palette: --Grays;\n}\n\n.purples {\n  font-palette: --Purples;\n}\n\n.mint {\n  font-palette: --Mint;\n}",
+    "html_structure": "<h1 class=\"color-font grays\">Grays Palette</h1>\n<h1 class=\"color-font purples\">Purples Palette</h1>\n<h1 class=\"color-font mint\">Mint Palette</h1>",
+    "font_dependencies": {
+      "custom_fonts": [{
+        "family": "Rocher",
+        "url": "https://assets.codepen.io/9632/RocherColorGX.woff2"
+      }]
+    },
+    "browser_support": "75% (modern browsers only, font-palette support)",
+    "sort_order": 4
+  },
+  {
+    "name": "Retro 80s Neon",
+    "description": "80s-style neon text with gradient fill, glow, and optional lens flare effect",
+    "css_code": ".retro-neon {\n  position: relative;\n  font-family: 'Exo', sans-serif;\n  font-size: 9em;\n  margin: 0;\n  transform: skew(-15deg);\n  letter-spacing: 0.03em;\n}\n\n.retro-neon::after {\n  content: '';\n  position: absolute;\n  top: -0.1em;\n  right: 0.05em;\n  width: 0.4em;\n  height: 0.4em;\n  background: \n    radial-gradient(white 3%, rgba(255, 255, 255, 0.3) 15%, rgba(255, 255, 255, 0.05) 60%, transparent 80%),\n    radial-gradient(rgba(255, 255, 255, 0.2) 50%, transparent 60%) 50% 50% / 5% 100%,\n    radial-gradient(rgba(255, 255, 255, 0.2) 50%, transparent 60%) 50% 50% / 70% 5%;\n  background-repeat: no-repeat;\n}\n\n.retro-neon-stroke {\n  display: block;\n  text-shadow: 0 0 0.1em #8ba2d0, 0 0 0.2em black, 0 0 5em #165ff3;\n  -webkit-text-stroke: 0.06em rgba(0, 0, 0, 0.5);\n}\n\n.retro-neon-fill {\n  position: absolute;\n  left: 0;\n  top: 0;\n  background-image: linear-gradient(\n    #032d50 25%, #00a1ef 35%, white 50%,\n    #20125f 50%, #8313e7 55%, #ff61af 75%\n  );\n  -webkit-text-stroke: 0.01em #94a0b9;\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n}",
+    "html_structure": "<h1 class=\"retro-neon\">\n  <span class=\"retro-neon-stroke\">RETRO</span>\n  <span class=\"retro-neon-fill\">RETRO</span>\n</h1>",
+    "font_dependencies": {
+      "google_fonts": ["Exo:wght@900"]
+    },
+    "browser_support": "95%",
+    "sort_order": 5
+  }
+]

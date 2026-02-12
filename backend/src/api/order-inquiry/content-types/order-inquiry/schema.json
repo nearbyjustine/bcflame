@@ -45,6 +45,9 @@
     "selected_fonts": {
       "type": "json"
     },
+    "selected_text_effects": {
+      "type": "json"
+    },
     "selected_prebagging": {
       "type": "json"
     },

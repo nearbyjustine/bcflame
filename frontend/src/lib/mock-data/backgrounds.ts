@@ -7,10 +7,12 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Midnight Fire",
       type: "gradient",
       color_hex: "#1a1a1a",
-      text_background_color: "#7f1d1d",
+      text_background: "#7f1d1d",
       text_color: "#ffffff",
       preview_image: { data: null },
-      sort_order: 1
+      sort_order: 1,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -19,10 +21,12 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Cool Ice",
       type: "gradient",
       color_hex: "#1e3a8a",
-      text_background_color: "#1e3a8a",
+      text_background: "#1e3a8a",
       text_color: "#ffffff",
       preview_image: { data: null },
-      sort_order: 2
+      sort_order: 2,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -31,10 +35,12 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Forest Green",
       type: "solid_color",
       color_hex: "#065f46",
-      text_background_color: "#064e3b",
+      text_background: "#064e3b",
       text_color: "#ffffff",
       preview_image: { data: null },
-      sort_order: 3
+      sort_order: 3,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -43,7 +49,7 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Smoke Texture",
       type: "image",
       color_hex: null,
-      text_background_color: "#1f2937",
+      text_background: "#1f2937",
       text_color: "#ffffff",
       preview_image: {
         data: {
@@ -55,7 +61,9 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
           }
         }
       },
-      sort_order: 4
+      sort_order: 4,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -64,7 +72,7 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Fire Texture",
       type: "image",
       color_hex: null,
-      text_background_color: "#7c2d12",
+      text_background: "#7c2d12",
       text_color: "#ffffff",
       preview_image: {
         data: {
@@ -76,7 +84,9 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
           }
         }
       },
-      sort_order: 5
+      sort_order: 5,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -85,10 +95,12 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Light Gray",
       type: "solid_color",
       color_hex: "#f3f4f6",
-      text_background_color: "#374151",
+      text_background: "#374151",
       text_color: "#111827",
       preview_image: { data: null },
-      sort_order: 6
+      sort_order: 6,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -97,10 +109,12 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Sunset Orange",
       type: "gradient",
       color_hex: "#ea580c",
-      text_background_color: "#9a3412",
+      text_background: "#9a3412",
       text_color: "#ffffff",
       preview_image: { data: null },
-      sort_order: 7
+      sort_order: 7,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -109,10 +123,12 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
       name: "Purple Dream",
       type: "gradient",
       color_hex: "#7c3aed",
-      text_background_color: "#5b21b6",
+      text_background: "#5b21b6",
       text_color: "#ffffff",
       preview_image: { data: null },
-      sort_order: 8
+      sort_order: 8,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   }
 ];

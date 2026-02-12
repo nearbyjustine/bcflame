@@ -206,7 +206,7 @@ export default function OrdersPage() {
                       <div className="text-muted-foreground">
                         <p className="text-xs">
                           {inquiry.attributes.selections.photos?.length || 0} photos •{' '}
-                          {inquiry.attributes.selections.budStyles?.length || 0} bud styles •{' '}
+                          {inquiry.attributes.selections.bud_images?.length || 0} bud styles •{' '}
                           {inquiry.attributes.selections.backgrounds?.length || 0} backgrounds
                         </p>
                       </div>
@@ -352,7 +352,7 @@ export default function OrdersPage() {
                       <p className="text-xs text-muted-foreground">Photos</p>
                     </div>
                     <div className="p-3 bg-muted/30 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.budStyles?.length || 0}</p>
+                      <p className="text-2xl font-bold text-primary">{selectedInquiry.attributes.selections.bud_images?.length || 0}</p>
                       <p className="text-xs text-muted-foreground">Bud Styles</p>
                     </div>
                   </div>

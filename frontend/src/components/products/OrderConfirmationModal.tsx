@@ -132,7 +132,7 @@ export function OrderConfirmationModal({
               <div className="p-3 border rounded-lg">
                 <p className="text-xs text-muted-foreground mb-1">Bud Styles</p>
                 <p className="font-medium">
-                  {selections.budStyles.length} selected
+                  {selections.bud_images.length} selected
                 </p>
               </div>
             </div>

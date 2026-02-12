@@ -295,7 +295,7 @@ export async function updateProductInventory(
 export async function uploadProductImages(
   productId: number,
   files: File[],
-  field: 'images' | 'available_photos' = 'images'
+  field: 'images' | 'bud_images' | 'available_photos' = 'images'
 ): Promise<Product> {
   const formData = new FormData();
   files.forEach((file) => {

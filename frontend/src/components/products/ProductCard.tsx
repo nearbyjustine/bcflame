@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Settings } from 'lucide-react';
 import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,13 @@ interface ProductCardProps {
   product: Product;
   onCustomize?: () => void;
   stockStatus?: StockStatus;
+}
+
+function useProductCustomize(productId: number) {
+  const router = useRouter();
+  return useCallback(() => {
+    router.push(`/products/${productId}/customize`);
+  }, [router, productId]);
 }
 
 const getCategoryStyles = (category: 'Indica' | 'Hybrid') => {
@@ -53,6 +61,7 @@ const getStockBadge = (status?: StockStatus) => {
 };
 
 export function ProductCard({ product, onCustomize, stockStatus }: ProductCardProps) {
+  const navigateToCustomize = useProductCustomize(product.id);
   const { attributes } = product;
   const images = attributes.images?.data || [];
 
@@ -228,13 +237,17 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
         ) : null}
 
         {/* Customize button - only show if customization is enabled */}
-        {attributes.customization_enabled && onCustomize && (
+        {attributes.customization_enabled && (
           <div className="mt-4 pt-4 border-t">
             <Button
               onClick={(e) => {
                 e.preventDefault(); // Prevent Link navigation
                 e.stopPropagation(); // Stop event bubbling
-                onCustomize();
+                if (onCustomize) {
+                  onCustomize();
+                } else {
+                  navigateToCustomize();
+                }
               }}
               className="w-full bg-gradient-to-r from-primary to-destructive hover:opacity-90 transition-opacity"
             >
