@@ -3,7 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getProducts, type GetProductsParams } from '@/lib/api/products';
 import { getInventory } from '@/lib/api/inventory';
-import { ProductCard, type StockStatus } from '@/components/products/ProductCard';
+import { type StockStatus } from '@/components/products/ProductCard';
+import { AnimatedProductCard } from '@/components/products/AnimatedProductCard';
+import { VideoHero } from '@/components/products/VideoHero';
 import { FilterPanel } from '@/components/products/FilterPanel';
 import type { Product } from '@/types/product';
 import type { Inventory } from '@/types/inventory';
@@ -63,14 +65,23 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="mb-8" data-tour="res-products-header">
-        <h1 className="text-3xl font-bold mb-2">Product Catalog</h1>
-        <p className="text-muted-foreground">
-          Browse our premium cannabis products
-        </p>
-      </div>
+      {/* Full-screen video hero */}
+      <VideoHero
+        videoSrc="/logo-bg.mp4"
+        title="Premium Cannabis Products"
+        subtitle="Explore our curated collection of premium strains"
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* Products content section */}
+      <section id="products-content" className="py-8">
+        <div className="mb-8" data-tour="res-products-header">
+          <h1 className="text-3xl font-bold mb-2">Product Catalog</h1>
+          <p className="text-muted-foreground">
+            Browse our premium cannabis products
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filter Panel - Sidebar */}
         <div className="lg:col-span-1" data-tour="res-products-filter-panel">
           <FilterPanel filters={filters} onFilterChange={handleFilterChange} />
@@ -112,11 +123,12 @@ export default function ProductsPage() {
                 Showing {products.length} product{products.length !== 1 ? 's' : ''}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <ProductCard
+                {products.map((product, index) => (
+                  <AnimatedProductCard
                     key={product.id}
                     product={product}
                     stockStatus={getStockStatus(product.id, inventory)}
+                    index={index}
                   />
                 ))}
               </div>
@@ -124,7 +136,7 @@ export default function ProductsPage() {
           )}
         </div>
       </div>
-
+      </section>
     </div>
   );
 }
