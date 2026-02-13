@@ -21,6 +21,8 @@ export interface BackgroundStyle {
     type: 'solid_color' | 'gradient' | 'texture' | 'image';
     color_hex?: string;
     preview_image?: { data: ProductImage | null };
+    text_color?: string;
+    text_background?: string;
     sort_order: number;
     createdAt: string;
     updatedAt: string;
@@ -36,6 +38,7 @@ export interface FontStyle {
     category: 'sans_serif' | 'serif' | 'display' | 'script';
     preview_image?: { data: ProductImage | null };
     font_file?: { data: ProductImage | null };
+    google_fonts_url?: string;
     sort_order: number;
     createdAt: string;
     updatedAt: string;
@@ -98,9 +101,10 @@ export interface PreBaggingSelectionResponse {
 
 export interface CustomizationSelections {
   photos: number[];
-  budStyles: number[];
+  bud_images: number[];  // Product-specific bud images for customization slots
   backgrounds: number[];
   fonts: number[];
+  text_effects: number[];  // Text effect selections
   preBagging: PreBaggingSelection[];
 }
 
@@ -142,15 +146,17 @@ export interface OrderInquiry {
     customer_phone?: string;
     selections?: {
       photos?: number[];
-      budStyles?: number[];
+      bud_images?: number[];
       backgrounds?: number[];
       fonts?: number[];
+      text_effects?: number[];
       preBagging?: PreBaggingSelection[];
     };
     selected_photos?: number[];
     selected_bud_styles?: number[];
     selected_backgrounds?: number[];
     selected_fonts?: number[];
+    selected_text_effects?: number[];
     selected_prebagging?: PreBaggingSelectionResponse[];
     additional_notes?: string;
     notes?: string;
@@ -198,6 +204,7 @@ export interface FlatOrderInquiry {
   selected_bud_styles?: number[];
   selected_backgrounds?: number[];
   selected_fonts?: number[];
+  selected_text_effects?: number[];
   selected_prebagging?: PreBaggingSelectionResponse[];
   notes?: string;
   total_weight?: number;
@@ -269,4 +276,48 @@ export interface PreBaggingOptionsResponse {
       total: number;
     };
   };
+}
+
+export interface FontDependencies {
+  google_fonts?: string[]; // e.g., ["Exo:wght@900", "Mr+Dafoe"]
+  custom_fonts?: Array<{
+    family: string;
+    url?: string;
+    note?: string;
+  }>;
+}
+
+export interface TextEffect {
+  id: number;
+  attributes: {
+    name: string;
+    description?: string;
+    css_code: string;
+    html_structure?: string;
+    font_dependencies?: FontDependencies;
+    browser_support?: string;
+    preview_image?: { data: ProductImage | null };
+    sort_order: number;
+    is_default: boolean;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt?: string;
+  };
+}
+
+export interface TextEffectsResponse {
+  data: TextEffect[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
+
+export interface SingleTextEffectResponse {
+  data: TextEffect;
+  meta: Record<string, never>;
 }

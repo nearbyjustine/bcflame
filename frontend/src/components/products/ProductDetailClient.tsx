@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
 import { Settings } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductCard, type StockStatus } from './ProductCard';
-import { CustomizationModal } from './CustomizationModal';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,8 +55,8 @@ export function ProductDetailClient({
 }: ProductDetailClientProps) {
   const { attributes } = product;
   const images = attributes.images?.data || [];
+  const router = useRouter();
 
-  const [customizingProductId, setCustomizingProductId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'features' | 'specs'>('details');
 
   // Filter out current product from related products (belt-and-suspenders)
@@ -186,7 +186,7 @@ export function ProductDetailClient({
           {/* Customize Button */}
           {showCustomizeButton ? (
             <Button
-              onClick={() => setCustomizingProductId(product.id)}
+              onClick={() => router.push(`/products/${product.id}/customize`)}
               className="w-full bg-gradient-to-r from-primary to-destructive hover:opacity-90 transition-opacity"
               size="lg"
             >
@@ -357,24 +357,10 @@ export function ProductDetailClient({
                   relatedProduct.id,
                   relatedProductsInventory
                 )}
-                onCustomize={() => setCustomizingProductId(relatedProduct.id)}
               />
             ))}
           </div>
         </div>
-      )}
-
-      {/* Customization Modal */}
-      {customizingProductId && (
-        <CustomizationModal
-          isOpen={!!customizingProductId}
-          onClose={() => setCustomizingProductId(null)}
-          product={
-            customizingProductId === product.id
-              ? product
-              : filteredRelatedProducts.find((p) => p.id === customizingProductId)!
-          }
-        />
       )}
     </div>
   );

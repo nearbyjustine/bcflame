@@ -201,12 +201,12 @@ export default function AdminProductDetailPage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'images' | 'bud_images' = 'images') => {
     if (!product || !e.target.files?.length) return;
 
     try {
-      await uploadProductImages(product.id, Array.from(e.target.files));
-      toast.success('Images uploaded');
+      await uploadProductImages(product.id, Array.from(e.target.files), field);
+      toast.success(`${field === 'bud_images' ? 'Bud images' : 'Images'} uploaded`);
       fetchProduct();
     } catch (error) {
       console.error('Failed to upload images:', error);
@@ -248,6 +248,7 @@ export default function AdminProductDetailPage() {
   const isPublished = !!product.attributes.publishedAt;
   const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
   const images = product.attributes.images?.data || [];
+  const budImages = product.attributes.bud_images?.data || [];
 
   const stockStatus = !product.inventory
     ? 'unknown'
@@ -450,11 +451,11 @@ export default function AdminProductDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Images */}
+          {/* Product Images */}
           <Card>
             <CardHeader>
               <CardTitle>Product Images</CardTitle>
-              <CardDescription>Upload product photos</CardDescription>
+              <CardDescription>Upload product photos for display</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
@@ -481,13 +482,57 @@ export default function AdminProductDetailPage() {
                   id="image-upload"
                   multiple
                   accept="image/*"
-                  onChange={handleImageUpload}
+                  onChange={(e) => handleImageUpload(e, 'images')}
                   className="hidden"
                 />
                 <label htmlFor="image-upload" className="cursor-pointer">
                   <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm text-muted-foreground">
                     Click to upload or drag and drop
+                  </p>
+                </label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bud Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Bud Images (Customization)</CardTitle>
+              <CardDescription>Upload bud images for customization slots (1-10 unique images per product)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                {budImages.map((image: any) => (
+                  <div key={image.id} className="relative group">
+                    <img
+                      src={`${strapiUrl}${image.attributes?.formats?.thumbnail?.url || image.attributes?.url}`}
+                      alt={image.attributes?.name}
+                      className="w-full aspect-square object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => handleImageDelete(image.id)}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
+                <input
+                  type="file"
+                  id="bud-image-upload"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, 'bud_images')}
+                  className="hidden"
+                />
+                <label htmlFor="bud-image-upload" className="cursor-pointer">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    Click to upload bud images (max 10)
                   </p>
                 </label>
               </div>

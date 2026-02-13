@@ -97,7 +97,7 @@ export async function getProducts(params?: GetProductsParams): Promise<ProductsR
 
   const response = await strapiApi.get<ProductsResponse>('/api/products', {
     params: {
-      populate: '*',
+      populate: 'images,bud_images,pricing,features',
       pagination: {
         page,
         pageSize,
@@ -115,7 +115,7 @@ export async function getProducts(params?: GetProductsParams): Promise<ProductsR
 export async function getProductById(id: number): Promise<SingleProductResponse> {
   const response = await strapiApi.get<SingleProductResponse>(`/api/products/${id}`, {
     params: {
-      populate: '*',
+      populate: 'images,bud_images,pricing,features,selection_limits',
     },
   });
 

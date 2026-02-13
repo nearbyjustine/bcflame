@@ -41,6 +41,10 @@
       "multiple": false,
       "required": false,
       "allowedTypes": ["files"]
+    },
+    "google_fonts_url": {
+      "type": "string",
+      "required": false
     }
   }
 }

@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "text_effects",
+  "info": {
+    "singularName": "text-effect",
+    "pluralName": "text-effects",
+    "displayName": "Text Effect",
+    "description": "CSS-based text effects for product customization"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "css_code": {
+      "type": "text",
+      "required": true
+    },
+    "html_structure": {
+      "type": "text",
+      "required": false
+    },
+    "font_dependencies": {
+      "type": "json",
+      "required": false
+    },
+    "browser_support": {
+      "type": "string",
+      "required": false
+    },
+    "preview_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

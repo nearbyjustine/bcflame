@@ -37,7 +37,7 @@ export function CartDrawer() {
       const inquiries = items.map((item) => ({
         product: item.product.id,
         selected_photos: item.selections.photos,
-        selected_bud_styles: item.selections.budStyles,
+        selected_bud_styles: item.selections.bud_images,
         selected_backgrounds: item.selections.backgrounds,
         selected_fonts: item.selections.fonts,
         selected_prebagging: item.selections.preBagging.map((pb) => pb.optionId),

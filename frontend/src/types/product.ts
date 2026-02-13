@@ -86,6 +86,9 @@ export interface ProductAttributes {
   images?: {
     data: ProductImage[];
   };
+  bud_images?: {
+    data: ProductImage[];
+  };
   customization_enabled?: boolean;
   selection_limits?: SelectionLimit[];
   createdAt: string;

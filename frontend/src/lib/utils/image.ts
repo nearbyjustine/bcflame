@@ -33,7 +33,7 @@ interface SimplifiedImage {
 function isStrapiWrappedImage(
   image: ProductImage | StrapiMediaWrapper | SimplifiedImage
 ): image is StrapiMediaWrapper {
-  return 'attributes' in image && typeof image.attributes === 'object';
+  return typeof image === 'object' && image !== null && 'attributes' in image && typeof image.attributes === 'object';
 }
 
 /**

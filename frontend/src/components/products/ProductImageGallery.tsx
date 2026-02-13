@@ -72,7 +72,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
         <img
           src={imageUrl || ''}
           alt={getImageAlt(currentImage, productName)}
-          className="w-full h-full object-cover cursor-zoom-in"
+          className="w-full h-full object-contain cursor-zoom-in"
           onClick={handleMainImageClick}
         />
 
@@ -138,12 +138,12 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
       {/* Lightbox Modal */}
       <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-        <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black/95">
-          <div className="relative w-full h-full flex items-center justify-center">
+        <DialogContent className="max-w-[95vw] w-fit h-auto max-h-[95vh] p-0 bg-black/95 overflow-hidden border-none [&>button:last-child]:hidden">
+          <div className="relative flex items-center justify-center p-4">
             {/* Close Button */}
             <button
               onClick={() => setIsLightboxOpen(false)}
-              className="absolute top-4 right-4 z-50 bg-background/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+              className="absolute top-2 right-2 z-50 bg-black/50 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
               aria-label="Close lightbox"
             >
               <X className="w-6 h-6" />
@@ -153,7 +153,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
             <img
               src={imageUrl || ''}
               alt={getImageAlt(currentImage, productName)}
-              className="max-w-full max-h-full object-contain"
+              className="max-w-[90vw] max-h-[85vh] object-contain"
             />
 
             {/* Lightbox Navigation */}

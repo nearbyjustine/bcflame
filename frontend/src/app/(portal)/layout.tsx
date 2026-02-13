@@ -99,13 +99,14 @@ export default function PortalLayout({
                   >
                     Messages
                   </a>
-                  <a
+                  {/* Media Hub hidden per requirements */}
+                  {/* <a
                     href="/media-hub"
                     className="text-sm hover:text-primary py-2 border-b border-border"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Media Hub
-                  </a>
+                  </a> */}
                   <a
                     href="/orders"
                     className="text-sm hover:text-primary py-2 border-b border-border"
@@ -149,7 +150,8 @@ export default function PortalLayout({
               <a href="/dashboard" className="text-sm hover:text-primary">Dashboard</a>
               <a href="/products" className="text-sm hover:text-primary">Products</a>
               <a href="/messages" className="text-sm hover:text-primary">Messages</a>
-              <a href="/media-hub" className="text-sm hover:text-primary">Media Hub</a>
+              {/* Media Hub hidden per requirements */}
+              {/* <a href="/media-hub" className="text-sm hover:text-primary">Media Hub</a> */}
               <a href="/orders" className="text-sm hover:text-primary">Orders</a>
               {/* Inventory hidden - will be admin-only feature */}
               {/* <a href="/inventory" className="text-sm hover:text-primary">Inventory</a> */}

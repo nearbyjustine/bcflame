@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Package, DollarSign } from 'lucide-react';
+import { ArrowLeft, Save, Package, DollarSign, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import {
 import {
   createProduct,
   updateProductInventory,
+  uploadProductImages,
   type CreateProductData,
   type InventoryUpdateData,
 } from '@/lib/api/admin-products';
@@ -64,12 +65,62 @@ export default function NewProductPage() {
     notes: '',
   });
 
+  // Image upload state
+  const [productImages, setProductImages] = useState<File[]>([]);
+  const [budImages, setBudImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [budImagePreviews, setBudImagePreviews] = useState<string[]>([]);
+
   const handleFormChange = (field: keyof CreateProductData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleInventoryChange = (field: keyof InventoryUpdateData, value: any) => {
     setInventoryData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'product' | 'bud') => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const fileArray = Array.from(files);
+
+    if (type === 'product') {
+      setProductImages(fileArray);
+      // Create previews
+      const previews = fileArray.map((file) => URL.createObjectURL(file));
+      setImagePreviews(previews);
+    } else {
+      // Limit bud images to 10
+      const limitedFiles = fileArray.slice(0, 10);
+      if (fileArray.length > 10) {
+        toast.warning('Maximum 10 bud images allowed. Only first 10 will be used.');
+      }
+      setBudImages(limitedFiles);
+      // Create previews
+      const previews = limitedFiles.map((file) => URL.createObjectURL(file));
+      setBudImagePreviews(previews);
+    }
+  };
+
+  const handleRemoveImage = (index: number, type: 'product' | 'bud') => {
+    if (type === 'product') {
+      const newImages = [...productImages];
+      const newPreviews = [...imagePreviews];
+      URL.revokeObjectURL(newPreviews[index]);
+      newImages.splice(index, 1);
+      newPreviews.splice(index, 1);
+      setProductImages(newImages);
+      setImagePreviews(newPreviews);
+    } else {
+      const newImages = [...budImages];
+      const newPreviews = [...budImagePreviews];
+      URL.revokeObjectURL(newPreviews[index]);
+      newImages.splice(index, 1);
+      newPreviews.splice(index, 1);
+      setBudImages(newImages);
+      setBudImagePreviews(newPreviews);
+    }
   };
 
   const handleSave = async (publish: boolean = false) => {
@@ -88,19 +139,60 @@ export default function NewProductPage() {
     }
 
     setIsSaving(true);
-    try {
-      // Create product
-      const product = await createProduct(formData);
+    let createdProductId: number | null = null;
 
-      // Create inventory
-      await updateProductInventory(product.id, inventoryData);
+    try {
+      // Step 1: Create product
+      const product = await createProduct(formData);
+      createdProductId = product.id;
+
+      // Step 2: Create inventory (with fallback)
+      try {
+        await updateProductInventory(product.id, inventoryData);
+      } catch (invError) {
+        console.error('Failed to create inventory:', invError);
+        toast.warning('Product created, but inventory setup failed. You can update it later.');
+      }
+
+      // Step 3: Upload product images (with fallback)
+      if (productImages.length > 0) {
+        try {
+          await uploadProductImages(product.id, productImages, 'images');
+          toast.success(`Uploaded ${productImages.length} product image(s)`);
+        } catch (imgError) {
+          console.error('Failed to upload product images:', imgError);
+          toast.warning('Product created, but image upload failed. You can add images later.');
+        }
+      }
+
+      // Step 4: Upload bud images (with fallback)
+      if (budImages.length > 0) {
+        try {
+          await uploadProductImages(product.id, budImages, 'bud_images');
+          toast.success(`Uploaded ${budImages.length} bud image(s)`);
+        } catch (budImgError) {
+          console.error('Failed to upload bud images:', budImgError);
+          toast.warning('Product created, but bud image upload failed. You can add images later.');
+        }
+      }
 
       toast.success('Product created successfully');
+
+      // Clean up preview URLs
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      budImagePreviews.forEach((url) => URL.revokeObjectURL(url));
+
       router.push(`/admin-portal/products/${product.id}`);
     } catch (error: any) {
       console.error('Failed to create product:', error);
       const message = error.response?.data?.error?.message || 'Failed to create product';
       toast.error(message);
+
+      // If product was created but subsequent steps failed, still navigate to edit page
+      if (createdProductId) {
+        toast.info('Navigating to product edit page...');
+        router.push(`/admin-portal/products/${createdProductId}`);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -286,6 +378,104 @@ export default function NewProductPage() {
                   rows={2}
                   placeholder="Any warnings or cautions"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Product Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Images</CardTitle>
+              <CardDescription>Upload product photos for display</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Product preview ${index + 1}`}
+                        className="w-full aspect-square object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index, 'product')}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
+                <input
+                  type="file"
+                  id="product-image-upload"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleImageSelect(e, 'product')}
+                  className="hidden"
+                />
+                <label htmlFor="product-image-upload" className="cursor-pointer">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    {imagePreviews.length > 0
+                      ? `${imagePreviews.length} image(s) selected - Click to change`
+                      : 'Click to select product images'}
+                  </p>
+                </label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bud Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Bud Images (Customization)</CardTitle>
+              <CardDescription>Upload bud images for customization slots (max 10 images)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {budImagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                  {budImagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Bud preview ${index + 1}`}
+                        className="w-full aspect-square object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index, 'bud')}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
+                <input
+                  type="file"
+                  id="bud-image-upload"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleImageSelect(e, 'bud')}
+                  className="hidden"
+                />
+                <label htmlFor="bud-image-upload" className="cursor-pointer">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    {budImagePreviews.length > 0
+                      ? `${budImagePreviews.length} of 10 image(s) selected - Click to change`
+                      : 'Click to select bud images (max 10)'}
+                  </p>
+                </label>
               </div>
             </CardContent>
           </Card>
