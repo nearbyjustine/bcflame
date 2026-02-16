@@ -142,6 +142,9 @@ describe('Order Inquiry Lifecycles', () => {
       },
     }
 
+    // Set global strapi for lifecycle code
+    global.strapi = mockStrapi
+
     // Import lifecycles module
     const lifecyclesModule = await import('./lifecycles')
     lifecycles = lifecyclesModule.default

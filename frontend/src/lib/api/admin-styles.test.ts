@@ -55,7 +55,7 @@ describe('Text Effects API', () => {
 
       const result = await getAdminTextEffects();
 
-      expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects', {
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/text-effects', {
         params: {
           populate: 'preview_image',
           pagination: { page: 1, pageSize: 25 },
@@ -87,7 +87,7 @@ describe('Text Effects API', () => {
 
       await getAdminTextEffects({ search: 'glass' });
 
-      expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects', {
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/text-effects', {
         params: {
           populate: 'preview_image',
           pagination: { page: 1, pageSize: 25 },
@@ -122,7 +122,7 @@ describe('Text Effects API', () => {
 
       await getAdminTextEffects({ search: 'glow' });
 
-      expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects', {
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/text-effects', {
         params: {
           populate: 'preview_image',
           pagination: { page: 1, pageSize: 25 },
@@ -164,7 +164,7 @@ describe('Text Effects API', () => {
 
       const result = await getTextEffectById(1);
 
-      expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects/1', {
+      expect(strapiApi.get).toHaveBeenCalledWith('/api/text-effects/1', {
         params: { populate: 'preview_image' },
       });
 
@@ -203,7 +203,7 @@ describe('Text Effects API', () => {
 
       const result = await createTextEffect(data);
 
-      expect(strapiApi.post).toHaveBeenCalledWith('/api/visual-effects', {
+      expect(strapiApi.post).toHaveBeenCalledWith('/api/text-effects', {
         data: { ...data, sort_order: 0 },
       });
 
@@ -294,7 +294,7 @@ describe('Text Effects API', () => {
 
       const result = await updateTextEffect(1, data);
 
-      expect(strapiApi.put).toHaveBeenCalledWith('/api/visual-effects/1', {
+      expect(strapiApi.put).toHaveBeenCalledWith('/api/text-effects/1', {
         data,
       });
 
@@ -308,7 +308,7 @@ describe('Text Effects API', () => {
 
       await deleteTextEffect(1);
 
-      expect(strapiApi.delete).toHaveBeenCalledWith('/api/visual-effects/1');
+      expect(strapiApi.delete).toHaveBeenCalledWith('/api/text-effects/1');
     });
   });
 
@@ -338,7 +338,7 @@ describe('Text Effects API', () => {
 
       const result = await publishTextEffect(1);
 
-      expect(strapiApi.put).toHaveBeenCalledWith('/api/visual-effects/1', {
+      expect(strapiApi.put).toHaveBeenCalledWith('/api/text-effects/1', {
         data: { publishedAt: expect.any(String) },
       });
 
@@ -371,7 +371,7 @@ describe('Text Effects API', () => {
 
       const result = await unpublishTextEffect(1);
 
-      expect(strapiApi.put).toHaveBeenCalledWith('/api/visual-effects/1', {
+      expect(strapiApi.put).toHaveBeenCalledWith('/api/text-effects/1', {
         data: { publishedAt: null },
       });
 
