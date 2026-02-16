@@ -211,9 +211,10 @@ export const useCustomizationStore = create<CustomizationStore>((set, get) => ({
     const state = get()
     return {
       photos: state.selectedPhotos,
-      budStyles: state.selectedBudStyles,
+      bud_images: state.selectedBudStyles,
       backgrounds: state.selectedBackgrounds,
       fonts: state.selectedFonts,
+      text_effects: [],
       preBagging: state.preBaggingSelections,
     }
   },

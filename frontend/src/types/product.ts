@@ -15,8 +15,7 @@ export interface ProductFeature {
   text: string;
 }
 
-export interface ProductImage {
-  id: number;
+export interface ProductImageAttributes {
   name: string;
   alternativeText?: string;
   caption?: string;
@@ -27,7 +26,7 @@ export interface ProductImage {
     small?: ImageFormat;
     medium?: ImageFormat;
     large?: ImageFormat;
-  };
+  } | null;
   hash: string;
   ext: string;
   mime: string;
@@ -35,9 +34,14 @@ export interface ProductImage {
   url: string;
   previewUrl?: string;
   provider: string;
-  provider_metadata?: any;
+  provider_metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProductImage {
+  id: number;
+  attributes: ProductImageAttributes;
 }
 
 export interface ImageFormat {
@@ -115,5 +119,5 @@ export interface ProductsResponse {
 
 export interface SingleProductResponse {
   data: Product;
-  meta: Record<string, any>;
+  meta: Record<string, unknown>;
 }

@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Save } from 'lucide-react';
-import { createVisualEffect } from '@/lib/api/admin-styles';
+import { createTextEffect } from '@/lib/api/admin-styles';
 import { CSSCodeEditor } from '@/components/admin/styles/CSSCodeEditor';
 import { EffectPreview } from '@/components/admin/styles/EffectPreview';
 import { ImageUpload } from '@/components/admin/styles/ImageUpload';
@@ -21,7 +21,6 @@ export default function NewVisualEffectPage() {
   const [previewImage, setPreviewImage] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    category: 'text_effect' as 'text_effect' | 'background_effect' | 'image_filter' | 'ui_enhancement',
     description: '',
     css_code: '',
     html_structure: '',
@@ -50,7 +49,6 @@ export default function NewVisualEffectPage() {
 
       const data = {
         name: formData.name,
-        category: formData.category,
         description: formData.description || undefined,
         css_code: formData.css_code,
         html_structure: formData.html_structure || undefined,
@@ -60,7 +58,7 @@ export default function NewVisualEffectPage() {
         is_default: formData.is_default,
       };
 
-      await createVisualEffect(data, previewImage || undefined);
+      await createTextEffect(data, previewImage ?? undefined);
       router.push('/admin-portal/styles/effects');
     } catch (error) {
       console.error('Failed to create visual effect:', error);
@@ -102,22 +100,6 @@ export default function NewVisualEffectPage() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g., Glassmorphism"
                   />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <select
-                    id="category"
-                    required
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                    className="w-full px-3 py-2 border rounded-md"
-                  >
-                    <option value="text_effect">Text Effect</option>
-                    <option value="background_effect">Background Effect</option>
-                    <option value="image_filter">Image Filter</option>
-                    <option value="ui_enhancement">UI Enhancement</option>
-                  </select>
                 </div>
 
                 <div>
@@ -178,7 +160,7 @@ export default function NewVisualEffectPage() {
                       id="sort_order"
                       type="number"
                       value={formData.sort_order}
-                      onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, sort_order: Number.parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="flex items-end pb-2">
@@ -200,9 +182,8 @@ export default function NewVisualEffectPage() {
                 <div>
                   <Label>Preview Image</Label>
                   <ImageUpload
-                    currentImage={null}
-                    onImageChange={setPreviewImage}
-                    aspectRatio="square"
+                    value={undefined}
+                    onChange={setPreviewImage}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     Recommended for text effects (1:1 ratio)
@@ -225,7 +206,6 @@ export default function NewVisualEffectPage() {
 
             <EffectPreview
               cssCode={formData.css_code}
-              category={formData.category}
             />
 
             <div className="flex gap-4">

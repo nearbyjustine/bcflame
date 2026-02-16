@@ -327,7 +327,7 @@ export default function FontStylesListPage() {
           <DialogHeader>
             <DialogTitle>Delete Font Style</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{styleToDelete?.attributes.name}"? This action
+              Are you sure you want to delete &quot;{styleToDelete?.attributes.name}&quot;? This action
               cannot be undone.
             </DialogDescription>
           </DialogHeader>

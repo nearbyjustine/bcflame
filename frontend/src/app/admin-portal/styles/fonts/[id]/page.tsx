@@ -52,7 +52,7 @@ type FontStyleFormData = z.infer<typeof fontStyleSchema>;
 export default function EditFontStylePage() {
   const router = useRouter();
   const params = useParams();
-  const styleId = parseInt(params.id as string);
+  const styleId = Number.parseInt(params.id as string);
 
   const [style, setStyle] = useState<FontStyle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,7 +132,7 @@ export default function EditFontStylePage() {
           sort_order: data.sort_order,
         },
         previewImage instanceof File ? previewImage : undefined,
-        fontFile || undefined
+        fontFile ?? undefined
       );
 
       toast.success('Font style updated successfully');
@@ -370,7 +370,7 @@ export default function EditFontStylePage() {
           <DialogHeader>
             <DialogTitle>Delete Font Style</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{style.attributes.name}"? This action cannot be
+              Are you sure you want to delete &quot;{style.attributes.name}&quot;? This action cannot be
               undone.
             </DialogDescription>
           </DialogHeader>

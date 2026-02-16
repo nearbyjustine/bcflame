@@ -90,10 +90,10 @@ export function CartDrawer() {
             <div className="space-y-4">
               {items.map((item) => {
                 const productImage = item.product.attributes.images?.data?.[0];
-                const imageUrl = productImage?.url
-                  ? productImage.url.startsWith('http')
-                    ? productImage.url
-                    : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${productImage.url}`
+                const imageUrl = productImage?.attributes.url
+                  ? productImage.attributes.url.startsWith('http')
+                    ? productImage.attributes.url
+                    : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${productImage.attributes.url}`
                   : null;
 
                 return (

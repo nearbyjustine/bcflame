@@ -5,25 +5,25 @@ import type { Product } from '@/types/product';
 
 // Mock the components
 vi.mock('./ProductImageGallery', () => ({
-  ProductImageGallery: ({ productName }: any) => (
+  ProductImageGallery: ({ productName }: { productName: string }) => (
     <div data-testid="image-gallery">{productName} Gallery</div>
   ),
 }));
 
 vi.mock('./ProductCard', () => ({
-  ProductCard: ({ product }: any) => (
+  ProductCard: ({ product }: { product: Product }) => (
     <div data-testid={`product-card-${product.id}`}>{product.attributes.name}</div>
   ),
 }));
 
 vi.mock('./CustomizationModal', () => ({
-  CustomizationModal: ({ isOpen, product }: any) =>
+  CustomizationModal: ({ isOpen, product }: { isOpen: boolean; product: Product }) =>
     isOpen ? <div data-testid="customization-modal">{product.attributes.name}</div> : null,
 }));
 
 vi.mock('@/components/ui/breadcrumb', () => ({
-  Breadcrumb: ({ items }: any) => (
-    <nav data-testid="breadcrumb">{items.map((i: any) => i.label).join(' > ')}</nav>
+  Breadcrumb: ({ items }: { items: Array<{ label: string }> }) => (
+    <nav data-testid="breadcrumb">{items.map((i) => i.label).join(' > ')}</nav>
   ),
 }));
 
@@ -40,7 +40,7 @@ const mockProduct: Product = {
     warning: 'Keep away from children',
     thc_content: '22-25%',
     flavor_profile: 'Earthy, Pine',
-    product_url: null,
+    product_url: undefined,
     on_sale: true,
     featured: true,
     sort_order: 1,
@@ -48,7 +48,7 @@ const mockProduct: Product = {
       { id: 1, weight: '1 P', amount: 1000, currency: 'USD' },
       { id: 2, weight: '5 P', amount: 4500, currency: 'USD' },
     ],
-    base_price_per_pound: null,
+    base_price_per_pound: undefined,
     pricing_model: 'tiered',
     features: [
       { id: 1, text: 'Organic cultivation' },
@@ -58,18 +58,20 @@ const mockProduct: Product = {
       data: [
         {
           id: 1,
-          name: 'product.jpg',
-          alternativeText: 'Product image',
-          width: 800,
-          height: 800,
-          url: '/uploads/product.jpg',
-          hash: 'hash',
-          ext: '.jpg',
-          mime: 'image/jpeg',
-          size: 100,
-          provider: 'local',
-          createdAt: '2024-01-01',
-          updatedAt: '2024-01-01',
+          attributes: {
+            name: 'product.jpg',
+            alternativeText: 'Product image',
+            width: 800,
+            height: 800,
+            url: '/uploads/product.jpg',
+            hash: 'hash',
+            ext: '.jpg',
+            mime: 'image/jpeg',
+            size: 100,
+            provider: 'local',
+            createdAt: '2024-01-01',
+            updatedAt: '2024-01-01',
+          },
         },
       ],
     },

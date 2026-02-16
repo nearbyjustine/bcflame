@@ -9,7 +9,9 @@ export const MOCK_FONTS: FontStyle[] = [
       category: "display",
       preview_image: { data: null },
       font_file: { data: null },
-      sort_order: 1
+      sort_order: 1,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -20,7 +22,9 @@ export const MOCK_FONTS: FontStyle[] = [
       category: "sans_serif",
       preview_image: { data: null },
       font_file: { data: null },
-      sort_order: 2
+      sort_order: 2,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -31,7 +35,9 @@ export const MOCK_FONTS: FontStyle[] = [
       category: "sans_serif",
       preview_image: { data: null },
       font_file: { data: null },
-      sort_order: 3
+      sort_order: 3,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -42,7 +48,9 @@ export const MOCK_FONTS: FontStyle[] = [
       category: "display",
       preview_image: { data: null },
       font_file: { data: null },
-      sort_order: 4
+      sort_order: 4,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   },
   {
@@ -53,7 +61,9 @@ export const MOCK_FONTS: FontStyle[] = [
       category: "display",
       preview_image: { data: null },
       font_file: { data: null },
-      sort_order: 5
+      sort_order: 5,
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z"
     }
   }
 ];

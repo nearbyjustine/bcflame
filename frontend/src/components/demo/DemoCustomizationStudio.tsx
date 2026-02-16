@@ -122,7 +122,7 @@ export function DemoCustomizationStudio() {
         <div
           className={className}
           style={{
-            backgroundImage: `url(${preview_image.data.url})`,
+            backgroundImage: `url(${preview_image.data.attributes.url})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}

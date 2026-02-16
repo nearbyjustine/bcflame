@@ -96,7 +96,7 @@ export function TextEffectSelector({
                 {effect.attributes.preview_image?.data ? (
                   <div className="relative aspect-video rounded-md overflow-hidden bg-muted">
                     <img
-                      src={getImageUrl(effect.attributes.preview_image.data.attributes.url)}
+                      src={getImageUrl(effect.attributes.preview_image.data) || ''}
                       alt={effect.attributes.name}
                       className="w-full h-full object-cover"
                     />
@@ -134,9 +134,11 @@ export function TextEffectSelector({
 
       {/* Preview Modal */}
       {previewEffect && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        <button
+          type="button"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 border-0 text-left cursor-default"
           onClick={() => setPreviewEffect(null)}
+          aria-label="Close preview"
         >
           <Card
             className="max-w-2xl w-full max-h-[80vh] overflow-y-auto"
@@ -185,8 +187,8 @@ export function TextEffectSelector({
                           <span className="font-medium">Custom Fonts:</span>
                           <ul className="list-disc list-inside ml-2">
                             {previewEffect.attributes.font_dependencies.custom_fonts.map(
-                              (font, i) => (
-                                <li key={i}>
+                              (font) => (
+                                <li key={`${font.family}-${font.note || 'default'}`}>
                                   {font.family} {font.note && `(${font.note})`}
                                 </li>
                               )
@@ -203,7 +205,7 @@ export function TextEffectSelector({
               </Button>
             </CardContent>
           </Card>
-        </div>
+        </button>
       )}
     </div>
   );

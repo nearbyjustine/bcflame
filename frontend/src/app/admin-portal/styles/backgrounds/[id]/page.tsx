@@ -424,7 +424,7 @@ export default function EditBackgroundStylePage() {
           <DialogHeader>
             <DialogTitle>Delete Background Style</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{style.attributes.name}"? This action cannot be
+              Are you sure you want to delete &quot;{style.attributes.name}&quot;? This action cannot be
               undone.
             </DialogDescription>
           </DialogHeader>

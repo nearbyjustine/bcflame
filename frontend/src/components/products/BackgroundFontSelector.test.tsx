@@ -42,17 +42,19 @@ const mockBackgrounds: BackgroundStyle[] = [
       preview_image: {
         data: {
           id: 10,
-          name: 'leaf.png',
-          url: '/uploads/leaf.png',
-          width: 512,
-          height: 512,
-          hash: 'abc',
-          ext: '.png',
-          mime: 'image/png',
-          size: 50000,
-          provider: 'local',
-          createdAt: '2024-01-01T00:00:00.000Z',
-          updatedAt: '2024-01-01T00:00:00.000Z',
+          attributes: {
+            name: 'leaf.png',
+            url: '/uploads/leaf.png',
+            width: 512,
+            height: 512,
+            hash: 'abc',
+            ext: '.png',
+            mime: 'image/png',
+            size: 50000,
+            provider: 'local',
+            createdAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+          },
         },
       },
       sort_order: 2,
@@ -109,8 +111,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -128,8 +128,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -149,8 +147,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[1]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={onToggleBackground}
         onToggleFont={vi.fn()}
       />
@@ -168,8 +164,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[1]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={onToggleBackground}
         onToggleFont={vi.fn()}
       />
@@ -187,8 +181,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[1]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={onToggleFont}
       />
@@ -206,8 +198,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[1, 2, 3]} // at max (3)
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits} // max: 3
-        fontLimits={mockFontLimits}
         onToggleBackground={onToggleBackground}
         onToggleFont={vi.fn()}
       />
@@ -227,8 +217,6 @@ describe('BackgroundFontSelector', () => {
         fonts={[]}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -249,8 +237,6 @@ describe('BackgroundFontSelector', () => {
         fonts={[]}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -270,8 +256,6 @@ describe('BackgroundFontSelector', () => {
         fonts={[]}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -290,8 +274,6 @@ describe('BackgroundFontSelector', () => {
         fonts={[mockFonts[0]]}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -313,8 +295,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
         onLogoUpload={onLogoUpload}
@@ -347,8 +327,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
         onLogoUpload={onLogoUpload}
@@ -380,8 +358,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
         onLogoUpload={onLogoUpload}
@@ -408,8 +384,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
         userLogo="https://example.com/logo.png"
@@ -429,8 +403,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[1, 3]}
         selectedFontIds={[]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />
@@ -447,8 +419,6 @@ describe('BackgroundFontSelector', () => {
         fonts={mockFonts}
         selectedBackgroundIds={[]}
         selectedFontIds={[1, 2]}
-        backgroundLimits={mockBackgroundLimits}
-        fontLimits={mockFontLimits}
         onToggleBackground={vi.fn()}
         onToggleFont={vi.fn()}
       />

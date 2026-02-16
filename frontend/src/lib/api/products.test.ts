@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getProducts, getProductById, getRelatedProducts } from './products';
 import { strapiApi } from './strapi';
-import type { ProductsResponse, SingleProductResponse } from '@/types/product';
+import type { ProductsResponse, SingleProductResponse, ProductAttributes } from '@/types/product';
 
 // Mock the strapiApi
 vi.mock('./strapi', () => ({
@@ -32,9 +32,9 @@ describe('Product API Service', () => {
               pricing: [
                 {
                   id: 1,
-                  quantity: '1g',
-                  price: 10.0,
-                  unit: 'gram',
+                  weight: '1g',
+                  amount: 10.0,
+                  currency: 'USD',
                 },
               ],
               createdAt: '2024-01-01T00:00:00.000Z',
@@ -58,7 +58,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -87,7 +87,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 2,
             pageSize: 10,
@@ -115,7 +115,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -148,7 +148,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -181,7 +181,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -216,7 +216,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -249,7 +249,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -285,7 +285,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -326,7 +326,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 25,
@@ -372,9 +372,9 @@ describe('Product API Service', () => {
             pricing: [
               {
                 id: 1,
-                quantity: '1g',
-                price: 10.0,
-                unit: 'gram',
+                weight: '1g',
+                amount: 10.0,
+                currency: 'USD',
               },
             ],
             createdAt: '2024-01-01T00:00:00.000Z',
@@ -390,7 +390,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products/1', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features,selection_limits',
         },
       });
       expect(result).toEqual(mockResponse);
@@ -455,7 +455,7 @@ describe('Product API Service', () => {
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 5, // limit + 1 for filtering
@@ -526,11 +526,11 @@ describe('Product API Service', () => {
     it('should respect limit parameter', async () => {
       const mockResponse: ProductsResponse = {
         data: [
-          { id: 2, attributes: {} as any },
-          { id: 3, attributes: {} as any },
-          { id: 4, attributes: {} as any },
-          { id: 5, attributes: {} as any },
-          { id: 6, attributes: {} as any },
+          { id: 2, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 3, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 4, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 5, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 6, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
         ],
         meta: {
           pagination: {
@@ -553,11 +553,11 @@ describe('Product API Service', () => {
     it('should use default limit of 4 when not specified', async () => {
       const mockResponse: ProductsResponse = {
         data: [
-          { id: 2, attributes: {} as any },
-          { id: 3, attributes: {} as any },
-          { id: 4, attributes: {} as any },
-          { id: 5, attributes: {} as any },
-          { id: 6, attributes: {} as any },
+          { id: 2, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 3, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 4, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 5, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
+          { id: 6, attributes: {} as Partial<ProductAttributes> as ProductAttributes },
         ],
         meta: {
           pagination: {
@@ -576,7 +576,7 @@ describe('Product API Service', () => {
       // Should call with default limit + 1
       expect(strapiApi.get).toHaveBeenCalledWith('/api/products', {
         params: {
-          populate: '*',
+          populate: 'images,bud_images,pricing,features',
           pagination: {
             page: 1,
             pageSize: 5, // default 4 + 1

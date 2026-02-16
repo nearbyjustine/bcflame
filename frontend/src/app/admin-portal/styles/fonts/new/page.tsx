@@ -80,8 +80,8 @@ export default function NewFontStylePage() {
           google_fonts_url: data.google_fonts_url || undefined,
           sort_order: data.sort_order,
         },
-        previewImage || undefined,
-        fontFile || undefined
+        previewImage ?? undefined,
+        fontFile ?? undefined
       );
 
       toast.success('Font style created successfully');

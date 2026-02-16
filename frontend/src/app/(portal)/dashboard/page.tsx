@@ -96,7 +96,7 @@ export default function DashboardPage() {
             Welcome back, {user?.companyName || user?.username}!
           </h1>
           <p className="text-muted-foreground mt-2">
-            Here's what's happening with your account today.
+            Here&apos;s what&apos;s happening with your account today.
           </p>
         </div>
         <Button
@@ -299,7 +299,7 @@ export default function DashboardPage() {
             <div>
               <h3 className="font-semibold">Submit Inquiry</h3>
               <p className="text-sm text-muted-foreground">
-                Send us your requirements and we'll get back to you with a custom quote
+                Send us your requirements and we&apos;ll get back to you with a custom quote
               </p>
             </div>
           </div>

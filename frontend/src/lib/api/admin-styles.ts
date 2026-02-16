@@ -33,6 +33,9 @@ export interface FontStyleFormData {
   name: string;
   font_family: string;
   category: 'sans_serif' | 'serif' | 'display' | 'script';
+  preview_image?: File;
+  font_file?: File;
+  google_fonts_url?: string;
   sort_order?: number;
 }
 

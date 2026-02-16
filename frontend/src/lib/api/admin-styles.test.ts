@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  getAdminVisualEffects,
-  getVisualEffectById,
-  createVisualEffect,
-  updateVisualEffect,
-  deleteVisualEffect,
-  publishVisualEffect,
-  unpublishVisualEffect,
+  getAdminTextEffects,
+  getTextEffectById,
+  createTextEffect,
+  updateTextEffect,
+  deleteTextEffect,
+  publishTextEffect,
+  unpublishTextEffect,
 } from './admin-styles';
 import { strapiApi } from './strapi';
 
@@ -19,12 +19,12 @@ vi.mock('./strapi', () => ({
   },
 }));
 
-describe('Visual Effects API', () => {
+describe('Text Effects API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('getAdminVisualEffects', () => {
+  describe('getAdminTextEffects', () => {
     it('should fetch visual effects with default params', async () => {
       const mockResponse = {
         data: {
@@ -53,7 +53,7 @@ describe('Visual Effects API', () => {
 
       vi.mocked(strapiApi.get).mockResolvedValue(mockResponse);
 
-      const result = await getAdminVisualEffects();
+      const result = await getAdminTextEffects();
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects', {
         params: {
@@ -85,7 +85,7 @@ describe('Visual Effects API', () => {
 
       vi.mocked(strapiApi.get).mockResolvedValue(mockResponse);
 
-      await getAdminVisualEffects({ search: 'glass' });
+      await getAdminTextEffects({ search: 'glass' });
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects', {
         params: {
@@ -103,7 +103,7 @@ describe('Visual Effects API', () => {
       });
     });
 
-    it('should fetch visual effects with category filter', async () => {
+    it('should fetch visual effects with search', async () => {
       const mockResponse = {
         data: {
           data: [],
@@ -120,14 +120,17 @@ describe('Visual Effects API', () => {
 
       vi.mocked(strapiApi.get).mockResolvedValue(mockResponse);
 
-      await getAdminVisualEffects({ category: 'text_effect' as any });
+      await getAdminTextEffects({ search: 'glow' });
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects', {
         params: {
           populate: 'preview_image',
           pagination: { page: 1, pageSize: 25 },
           filters: {
-            category: { $eq: 'text_effect' },
+            $or: [
+              { name: { $containsi: 'glow' } },
+              { description: { $containsi: 'glow' } },
+            ],
           },
           publicationState: 'preview',
           sort: ['sort_order:asc', 'name:asc'],
@@ -136,7 +139,7 @@ describe('Visual Effects API', () => {
     });
   });
 
-  describe('getVisualEffectById', () => {
+  describe('getTextEffectById', () => {
     it('should fetch a single visual effect by ID', async () => {
       const mockEffect = {
         id: 1,
@@ -159,7 +162,7 @@ describe('Visual Effects API', () => {
 
       vi.mocked(strapiApi.get).mockResolvedValue(mockResponse);
 
-      const result = await getVisualEffectById(1);
+      const result = await getTextEffectById(1);
 
       expect(strapiApi.get).toHaveBeenCalledWith('/api/visual-effects/1', {
         params: { populate: 'preview_image' },
@@ -169,7 +172,7 @@ describe('Visual Effects API', () => {
     });
   });
 
-  describe('createVisualEffect', () => {
+  describe('createTextEffect', () => {
     it('should create a visual effect without preview image', async () => {
       const mockEffect = {
         id: 1,
@@ -198,7 +201,7 @@ describe('Visual Effects API', () => {
         css_code: '.glass { backdrop-filter: blur(10px); }',
       };
 
-      const result = await createVisualEffect(data);
+      const result = await createTextEffect(data);
 
       expect(strapiApi.post).toHaveBeenCalledWith('/api/visual-effects', {
         data: { ...data, sort_order: 0 },
@@ -255,14 +258,14 @@ describe('Visual Effects API', () => {
 
       const file = new File([''], 'preview.jpg', { type: 'image/jpeg' });
 
-      const result = await createVisualEffect(data, file);
+      const result = await createTextEffect(data, file);
 
       expect(strapiApi.post).toHaveBeenCalledTimes(2);
       expect(result).toEqual(mockEffectWithImage);
     });
   });
 
-  describe('updateVisualEffect', () => {
+  describe('updateTextEffect', () => {
     it('should update a visual effect without preview image', async () => {
       const mockEffect = {
         id: 1,
@@ -289,7 +292,7 @@ describe('Visual Effects API', () => {
         css_code: '.glass { backdrop-filter: blur(20px); }',
       };
 
-      const result = await updateVisualEffect(1, data);
+      const result = await updateTextEffect(1, data);
 
       expect(strapiApi.put).toHaveBeenCalledWith('/api/visual-effects/1', {
         data,
@@ -299,17 +302,17 @@ describe('Visual Effects API', () => {
     });
   });
 
-  describe('deleteVisualEffect', () => {
+  describe('deleteTextEffect', () => {
     it('should delete a visual effect', async () => {
       vi.mocked(strapiApi.delete).mockResolvedValue({});
 
-      await deleteVisualEffect(1);
+      await deleteTextEffect(1);
 
       expect(strapiApi.delete).toHaveBeenCalledWith('/api/visual-effects/1');
     });
   });
 
-  describe('publishVisualEffect', () => {
+  describe('publishTextEffect', () => {
     it('should publish a visual effect', async () => {
       const mockEffect = {
         id: 1,
@@ -333,7 +336,7 @@ describe('Visual Effects API', () => {
 
       vi.mocked(strapiApi.put).mockResolvedValue(mockResponse);
 
-      const result = await publishVisualEffect(1);
+      const result = await publishTextEffect(1);
 
       expect(strapiApi.put).toHaveBeenCalledWith('/api/visual-effects/1', {
         data: { publishedAt: expect.any(String) },
@@ -343,7 +346,7 @@ describe('Visual Effects API', () => {
     });
   });
 
-  describe('unpublishVisualEffect', () => {
+  describe('unpublishTextEffect', () => {
     it('should unpublish a visual effect', async () => {
       const mockEffect = {
         id: 1,
@@ -366,7 +369,7 @@ describe('Visual Effects API', () => {
 
       vi.mocked(strapiApi.put).mockResolvedValue(mockResponse);
 
-      const result = await unpublishVisualEffect(1);
+      const result = await unpublishTextEffect(1);
 
       expect(strapiApi.put).toHaveBeenCalledWith('/api/visual-effects/1', {
         data: { publishedAt: null },

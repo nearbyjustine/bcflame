@@ -11,25 +11,24 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import {
-  getVisualEffectById,
-  updateVisualEffect,
-  deleteVisualEffect,
+  getTextEffectById,
+  updateTextEffect,
+  deleteTextEffect,
 } from '@/lib/api/admin-styles';
 import { CSSCodeEditor } from '@/components/admin/styles/CSSCodeEditor';
 import { EffectPreview } from '@/components/admin/styles/EffectPreview';
 import { ImageUpload } from '@/components/admin/styles/ImageUpload';
 import { getImageUrl } from '@/lib/utils/image';
-import type { VisualEffect } from '@/types/customization';
+import type { TextEffect } from '@/types/customization';
 
 export default function EditVisualEffectPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [effect, setEffect] = useState<VisualEffect | null>(null);
+  const [effect, setEffect] = useState<TextEffect | null>(null);
   const [previewImage, setPreviewImage] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    category: 'text_effect' as 'text_effect' | 'background_effect' | 'image_filter' | 'ui_enhancement',
     description: '',
     css_code: '',
     html_structure: '',
@@ -41,15 +40,15 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
 
   useEffect(() => {
     fetchEffect();
-  }, [params.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchEffect = async () => {
     try {
-      const data = await getVisualEffectById(parseInt(params.id));
+      const data = await getTextEffectById(Number.parseInt(params.id));
       setEffect(data);
       setFormData({
         name: data.attributes.name,
-        category: data.attributes.category,
         description: data.attributes.description || '',
         css_code: data.attributes.css_code,
         html_structure: data.attributes.html_structure || '',
@@ -88,7 +87,6 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
 
       const data = {
         name: formData.name,
-        category: formData.category,
         description: formData.description || undefined,
         css_code: formData.css_code,
         html_structure: formData.html_structure || undefined,
@@ -98,7 +96,7 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
         is_default: formData.is_default,
       };
 
-      await updateVisualEffect(parseInt(params.id), data, previewImage || undefined);
+      await updateTextEffect(Number.parseInt(params.id), data, previewImage ?? undefined);
       router.push('/admin-portal/styles/effects');
     } catch (error) {
       console.error('Failed to update visual effect:', error);
@@ -114,7 +112,7 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
     }
 
     try {
-      await deleteVisualEffect(parseInt(params.id));
+      await deleteTextEffect(Number.parseInt(params.id));
       router.push('/admin-portal/styles/effects');
     } catch (error) {
       console.error('Failed to delete visual effect:', error);
@@ -135,7 +133,7 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
   }
 
   const currentImageUrl = effect.attributes.preview_image?.data
-    ? getImageUrl(effect.attributes.preview_image.data.attributes.url)
+    ? getImageUrl(effect.attributes.preview_image.data)
     : null;
 
   return (
@@ -170,22 +168,6 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g., Glassmorphism"
                   />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <select
-                    id="category"
-                    required
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                    className="w-full px-3 py-2 border rounded-md"
-                  >
-                    <option value="text_effect">Text Effect</option>
-                    <option value="background_effect">Background Effect</option>
-                    <option value="image_filter">Image Filter</option>
-                    <option value="ui_enhancement">UI Enhancement</option>
-                  </select>
                 </div>
 
                 <div>
@@ -246,7 +228,7 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
                       id="sort_order"
                       type="number"
                       value={formData.sort_order}
-                      onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, sort_order: Number.parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="flex items-end pb-2">
@@ -268,9 +250,8 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
                 <div>
                   <Label>Preview Image</Label>
                   <ImageUpload
-                    currentImage={currentImageUrl}
-                    onImageChange={setPreviewImage}
-                    aspectRatio="square"
+                    value={currentImageUrl || undefined}
+                    onChange={setPreviewImage}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     Recommended for text effects (1:1 ratio)
@@ -310,7 +291,6 @@ export default function EditVisualEffectPage({ params }: { params: { id: string 
 
             <EffectPreview
               cssCode={formData.css_code}
-              category={formData.category}
             />
 
             <div className="flex gap-4">

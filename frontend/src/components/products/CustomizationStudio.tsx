@@ -474,7 +474,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
           <div className="absolute inset-0 flex items-center justify-center p-8">
             <img
               src={budImageUrl}
-              alt={budImage?.name || 'Bud image'}
+              alt={budImage?.attributes.name || 'Bud image'}
               className={`${budSizeClass} max-w-[80%] object-contain`}
               style={{ filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))' }}
             />
@@ -702,7 +702,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                       >
                         <img
                           src={budImageUrl || ''}
-                          alt={budImage.name || 'Bud image'}
+                          alt={budImage.attributes.name || 'Bud image'}
                           className="w-full h-full object-cover"
                         />
                         {isSelected && (
@@ -713,7 +713,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                           </div>
                         )}
                         <div className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-xs text-center py-1 px-1 truncate">
-                          {budImage.name || `Image ${budImage.id}`}
+                          {budImage.attributes.name || `Image ${budImage.id}`}
                         </div>
                       </button>
                     );
@@ -1006,7 +1006,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                       Variation #{index + 1}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {budImage?.name || `photo_${index + 1}.png`}
+                      {budImage?.attributes.name || `photo_${index + 1}.png`}
                     </div>
                   </div>
                 </div>

@@ -48,15 +48,25 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
     attributes: {
       name: "Smoke Texture",
       type: "image",
-      color_hex: null,
+      color_hex: undefined,
       text_background: "#1f2937",
       text_color: "#ffffff",
       preview_image: {
         data: {
           id: 1,
           attributes: {
+            name: "smoke-texture.jpg",
             url: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&h=1200&fit=crop",
             alternativeText: "Smoke texture",
+            width: 800,
+            height: 1200,
+            hash: "smoke_texture_hash",
+            ext: ".jpg",
+            mime: "image/jpeg",
+            size: 150,
+            provider: "unsplash",
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
             formats: null
           }
         }
@@ -71,15 +81,25 @@ export const MOCK_BACKGROUNDS: BackgroundStyle[] = [
     attributes: {
       name: "Fire Texture",
       type: "image",
-      color_hex: null,
+      color_hex: undefined,
       text_background: "#7c2d12",
       text_color: "#ffffff",
       preview_image: {
         data: {
           id: 2,
           attributes: {
+            name: "fire-texture.jpg",
             url: "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800&h=1200&fit=crop",
             alternativeText: "Fire texture",
+            width: 800,
+            height: 1200,
+            hash: "fire_texture_hash",
+            ext: ".jpg",
+            mime: "image/jpeg",
+            size: 160,
+            provider: "unsplash",
+            createdAt: "2024-01-01T00:00:00.000Z",
+            updatedAt: "2024-01-01T00:00:00.000Z",
             formats: null
           }
         }

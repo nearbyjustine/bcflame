@@ -32,7 +32,8 @@ export default function TextEffectsPage() {
 
   useEffect(() => {
     fetchEffects();
-  }, [page, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchEffects = async () => {
     try {
@@ -80,19 +81,13 @@ export default function TextEffectsPage() {
 
   const truncateCss = (css: string, maxLength = 100) => {
     if (css.length <= maxLength) return css;
-    return css.substring(0, maxLength) + '...';
+    return `${css.substring(0, maxLength)}...`;
   };
 
   const stats = {
     total,
     published: effects.filter(e => e.attributes.publishedAt).length,
     draft: effects.filter(e => !e.attributes.publishedAt).length,
-    byCategory: {
-      text_effect: effects.filter(e => e.attributes.category === 'text_effect').length,
-      background_effect: effects.filter(e => e.attributes.category === 'background_effect').length,
-      image_filter: effects.filter(e => e.attributes.category === 'image_filter').length,
-      ui_enhancement: effects.filter(e => e.attributes.category === 'ui_enhancement').length,
-    },
   };
 
   return (
@@ -130,38 +125,6 @@ export default function TextEffectsPage() {
             <div className="text-2xl font-bold">{stats.published}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Text</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.byCategory.text_effect}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Background</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.byCategory.background_effect}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Filter</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.byCategory.image_filter}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">UI</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.byCategory.ui_enhancement}</div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Filters */}
@@ -185,20 +148,6 @@ export default function TextEffectsPage() {
                 />
               </div>
             </div>
-            <select
-              value={categoryFilter}
-              onChange={(e) => {
-                setCategoryFilter(e.target.value);
-                setPage(1);
-              }}
-              className="px-3 py-2 border rounded-md"
-            >
-              <option value="">All Categories</option>
-              <option value="text_effect">Text Effect</option>
-              <option value="background_effect">Background Effect</option>
-              <option value="image_filter">Image Filter</option>
-              <option value="ui_enhancement">UI Enhancement</option>
-            </select>
           </div>
         </CardContent>
       </Card>
@@ -223,7 +172,6 @@ export default function TextEffectsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Category</TableHead>
                   <TableHead>Preview</TableHead>
                   <TableHead>CSS Code</TableHead>
                   <TableHead>Status</TableHead>
@@ -243,14 +191,9 @@ export default function TextEffectsPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge className={CATEGORY_COLORS[effect.attributes.category]}>
-                        {CATEGORY_LABELS[effect.attributes.category]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
                       {effect.attributes.preview_image?.data ? (
                         <img
-                          src={getImageUrl(effect.attributes.preview_image.data.attributes.url)}
+                          src={getImageUrl(effect.attributes.preview_image.data) || ''}
                           alt={effect.attributes.name}
                           className="w-16 h-16 object-cover rounded"
                         />
@@ -262,14 +205,15 @@ export default function TextEffectsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="max-w-xs">
-                        <code
-                          className="text-xs bg-muted p-2 rounded block cursor-pointer hover:bg-muted/80"
+                        <button
+                          type="button"
+                          className="text-xs bg-muted p-2 rounded block cursor-pointer hover:bg-muted/80 text-left w-full font-mono"
                           onClick={() => setExpandedCss(expandedCss === effect.id ? null : effect.id)}
                         >
                           {expandedCss === effect.id
                             ? effect.attributes.css_code
                             : truncateCss(effect.attributes.css_code)}
-                        </code>
+                        </button>
                       </div>
                     </TableCell>
                     <TableCell>

@@ -7,24 +7,42 @@ const mockOptions = [
     id: 1,
     attributes: {
       name: 'No Pre-Bagging',
-      unit_size: null,
+      packaging_type: 'mylar_bag' as const,
+      description: 'No pre-bagging',
+      available_weights: [],
+      unit_size: 0,
       unit_size_unit: 'g',
+      sort_order: 1,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     },
   },
   {
     id: 2,
     attributes: {
       name: '3.5g Bags',
+      packaging_type: 'mylar_bag' as const,
+      description: '3.5g mylar bags',
+      available_weights: ['3.5g'],
       unit_size: 3.5,
       unit_size_unit: 'g',
+      sort_order: 2,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     },
   },
   {
     id: 3,
     attributes: {
       name: '7g Bags',
+      packaging_type: 'mylar_bag' as const,
+      description: '7g mylar bags',
+      available_weights: ['7g'],
       unit_size: 7,
       unit_size_unit: 'g',
+      sort_order: 3,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     },
   },
 ];
@@ -59,7 +77,10 @@ describe('PreBaggingConfig', () => {
     // Click increment button for 3.5g Bags option
     const buttons = screen.getAllByRole('button');
     const incrementButtons = buttons.filter(btn => btn.textContent === '+');
-    fireEvent.click(incrementButtons[1]!); // Second option (3.5g)
+    const secondIncrementButton = incrementButtons[1];
+    if (secondIncrementButton) {
+      fireEvent.click(secondIncrementButton); // Second option (3.5g)
+    }
 
     expect(onUpdate).toHaveBeenCalledWith(2, 1, 3.5, 'g');
   });
@@ -94,7 +115,10 @@ describe('PreBaggingConfig', () => {
     // Find and click the + button for option 2
     const buttons = screen.getAllByRole('button');
     const incrementButtons = buttons.filter(btn => btn.textContent === '+');
-    fireEvent.click(incrementButtons[1]!); // Second option
+    const secondIncrementButton = incrementButtons[1];
+    if (secondIncrementButton) {
+      fireEvent.click(secondIncrementButton); // Second option
+    }
 
     expect(onUpdate).toHaveBeenCalledWith(2, 6, 3.5, 'g');
   });
@@ -113,7 +137,10 @@ describe('PreBaggingConfig', () => {
     // Find and click the - button for option 2
     const buttons = screen.getAllByRole('button');
     const decrementButtons = buttons.filter(btn => btn.textContent === '-');
-    fireEvent.click(decrementButtons[1]!); // Second option
+    const secondDecrementButton = decrementButtons[1];
+    if (secondDecrementButton) {
+      fireEvent.click(secondDecrementButton); // Second option
+    }
 
     expect(onUpdate).toHaveBeenCalledWith(2, 4, 3.5, 'g');
   });
@@ -132,7 +159,10 @@ describe('PreBaggingConfig', () => {
     // Click - button when quantity is 1, should call onRemove
     const buttons = screen.getAllByRole('button');
     const decrementButtons = buttons.filter(btn => btn.textContent === '-');
-    fireEvent.click(decrementButtons[1]!); // Second option
+    const secondDecrementButton = decrementButtons[1];
+    if (secondDecrementButton) {
+      fireEvent.click(secondDecrementButton); // Second option
+    }
 
     expect(onRemove).toHaveBeenCalledWith(2);
   });

@@ -7,11 +7,11 @@ import { Eye, EyeOff } from 'lucide-react';
 
 interface EffectPreviewProps {
   cssCode: string;
-  category: 'text_effect' | 'background_effect' | 'image_filter' | 'ui_enhancement';
+  category?: 'text_effect' | 'background_effect' | 'image_filter' | 'ui_enhancement';
   className?: string;
 }
 
-export function EffectPreview({ cssCode, category, className }: EffectPreviewProps) {
+export function EffectPreview({ cssCode, category = 'text_effect', className }: EffectPreviewProps) {
   const [enabled, setEnabled] = useState(true);
   const [styleId] = useState(() => `effect-preview-${Math.random().toString(36).substring(7)}`);
 
