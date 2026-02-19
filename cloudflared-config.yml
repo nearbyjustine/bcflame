@@ -3,18 +3,12 @@ credentials-file: /etc/cloudflared/a81f971c-0bbf-46f5-a212-f21c66475617.json
 
 ingress:
   - hostname: bcflame.online
-    service: https://nginx
-    originRequest:
-      noTLSVerify: true
+    service: http://nginx:80
   
   - hostname: www.bcflame.online
-    service: https://nginx
-    originRequest:
-      noTLSVerify: true
+    service: http://nginx:80
 
   - hostname: api.bcflame.online
-    service: https://nginx
-    originRequest:
-      noTLSVerify: true
+    service: http://nginx:80
 
   - service: http_status:404
