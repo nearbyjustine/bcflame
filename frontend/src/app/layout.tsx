@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${dmSans.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`dark ${cormorant.variable} ${dmSans.variable}`}>
       <body className={dmSans.className}>
         <ThemeProvider
           attribute="class"

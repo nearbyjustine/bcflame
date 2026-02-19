@@ -427,7 +427,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
       );
     }
 
-    return <div className={`${className} bg-gray-200`} />;
+    return <div className={`${className} bg-white/10`} />;
   };
 
   const renderPreviewCanvas = (slotIndex: number, size: 'normal' | 'large' | 'thumbnail' | 'download' = 'normal', refKey?: number) => {
@@ -552,10 +552,10 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
   // Loading state
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
+      <div className="h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center space-y-4">
-          <Loader2 className="w-8 h-8 animate-spin text-orange-600 mx-auto" />
-          <p className="text-gray-600">Loading customization options...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-orange-500 mx-auto" />
+          <p className="text-white/60">Loading customization options...</p>
         </div>
       </div>
     );
@@ -564,21 +564,22 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
   // Screen renderers
   if (currentScreen === 'customize') {
     return (
-      <div className="h-screen flex flex-col bg-slate-50">
+      <div className="h-screen flex flex-col bg-[#0a0a0a]">
         {/* Header */}
-        <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
+        <div className="bg-black/95 border-b border-white/10 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClose}
+              className="text-white/70 hover:text-white hover:bg-white/10"
             >
               <X className="w-4 h-4 mr-1" />
               Close
             </Button>
             <div>
-              <h1 className="text-lg font-bold">{product.attributes.name}</h1>
-              <p className="text-xs text-gray-500">{filledSlotsCount} of 5 images selected</p>
+              <h1 className="text-lg font-bold text-white">{product.attributes.name}</h1>
+              <p className="text-xs text-white/50">{filledSlotsCount} of 5 images selected</p>
             </div>
           </div>
           <Button
@@ -594,8 +595,8 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
         {/* Main Layout */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Sidebar - Font Controls */}
-          <div className="w-64 bg-white border-r p-4 overflow-y-auto">
-            <h2 className="text-sm font-bold text-gray-700 mb-3">FONT STYLE</h2>
+          <div className="w-64 bg-black/60 border-r border-white/10 p-4 overflow-y-auto">
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">FONT STYLE</h2>
             <div className="space-y-2 mb-6">
               {fonts.map(font => (
                 <button
@@ -604,21 +605,21 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                   onClick={() => setActiveFontId(font.id)}
                   className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                     activeFontId === font.id
-                      ? 'border-orange-600 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-orange-500 bg-orange-500/10'
+                      : 'border-white/10 hover:border-white/30 bg-white/5'
                   }`}
                   style={{ fontFamily: font.attributes.font_family }}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold">Aa Bb</span>
-                    {activeFontId === font.id && <Check className="w-4 h-4 text-orange-600" />}
+                    <span className="text-2xl font-bold text-white">Aa Bb</span>
+                    {activeFontId === font.id && <Check className="w-4 h-4 text-orange-500" />}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">{font.attributes.name}</div>
+                  <div className="text-xs text-white/50 mt-1">{font.attributes.name}</div>
                 </button>
               ))}
             </div>
 
-            <h2 className="text-sm font-bold text-gray-700 mb-3">FONT SIZE</h2>
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">FONT SIZE</h2>
             <div className="flex gap-2 mb-6">
               {Object.entries(FONT_SIZES).map(([key, size]) => (
                 <button
@@ -627,8 +628,8 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                   onClick={() => setActiveSizeId(key as 'sm' | 'md' | 'lg')}
                   className={`flex-1 py-2 px-3 rounded-lg border-2 transition-all ${
                     activeSizeId === key
-                      ? 'border-orange-600 bg-orange-50 text-orange-700'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-orange-500 bg-orange-500/10 text-orange-400'
+                      : 'border-white/10 hover:border-white/30 bg-white/5 text-white/70'
                   }`}
                 >
                   <div className="text-xs font-medium">{size.label}</div>
@@ -636,7 +637,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
               ))}
             </div>
 
-            <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               TEXT EFFECTS
             </h2>
@@ -654,17 +655,17 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                   }}
                   className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                     activeTextEffectIds.includes(effect.id)
-                      ? 'border-orange-600 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-orange-500 bg-orange-500/10'
+                      : 'border-white/10 hover:border-white/30 bg-white/5'
                   }`}
                   disabled={!activeTextEffectIds.includes(effect.id) && activeTextEffectIds.length >= 3}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{effect.attributes.name}</span>
-                    {activeTextEffectIds.includes(effect.id) && <Check className="w-4 h-4 text-orange-600" />}
+                    <span className="text-sm font-medium text-white">{effect.attributes.name}</span>
+                    {activeTextEffectIds.includes(effect.id) && <Check className="w-4 h-4 text-orange-500" />}
                   </div>
                   {effect.attributes.description && (
-                    <div className="text-xs text-gray-500 mt-1 line-clamp-2">{effect.attributes.description}</div>
+                    <div className="text-xs text-white/40 mt-1 line-clamp-2">{effect.attributes.description}</div>
                   )}
                 </button>
               ))}
@@ -675,9 +676,9 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
           <div className="flex-1 flex flex-col items-center overflow-y-auto p-8">
             {/* Bud Picker - Select Bud Images (TOP) */}
             <div className="w-full mb-8">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">SELECT BUD IMAGES</h2>
+              <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">SELECT BUD IMAGES</h2>
               {budImages.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-white/40">
                   <p>No bud images available for this product.</p>
                   <p className="text-sm mt-2">Contact support to add images.</p>
                 </div>
@@ -694,10 +695,10 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                         disabled={isSelected || filledSlotsCount >= 5}
                         className={`relative flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden border-2 transition-all ${
                           isSelected
-                            ? 'border-orange-600 opacity-50 cursor-not-allowed'
+                            ? 'border-orange-500 opacity-50 cursor-not-allowed'
                             : filledSlotsCount >= 5
-                            ? 'border-gray-300 opacity-30 cursor-not-allowed'
-                            : 'border-gray-300 hover:border-orange-400 hover:scale-105 cursor-pointer'
+                            ? 'border-white/20 opacity-30 cursor-not-allowed'
+                            : 'border-white/20 hover:border-orange-400 hover:scale-105 cursor-pointer'
                         }`}
                       >
                         <img
@@ -724,7 +725,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
 
             {/* Snapshots - Slot Tabs (MIDDLE) */}
             <div className="w-full mb-6">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">SNAPSHOTS</h2>
+              <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">SNAPSHOTS</h2>
               <div className="flex gap-2">
                 {slots.map((budImageId, index) => {
                   const budImage = budImageId ? budImages.find(b => b.id === budImageId) : null;
@@ -736,8 +737,8 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                       onClick={() => setCurrentSlotIndex(index)}
                       className={`relative w-16 h-20 rounded-lg border-2 transition-all overflow-hidden ${
                         currentSlotIndex === index
-                          ? 'border-orange-600 ring-2 ring-orange-200'
-                          : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-orange-500 ring-2 ring-orange-500/30'
+                          : 'border-white/20 hover:border-white/40'
                       }`}
                     >
                       {budImageUrl ? (
@@ -759,7 +760,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                           </button>
                         </>
                       ) : (
-                        <div className="flex items-center justify-center h-full text-gray-400 text-2xl">
+                        <div className="flex items-center justify-center h-full text-white/30 text-2xl bg-white/5">
                           +
                         </div>
                       )}
@@ -774,7 +775,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
 
             {/* Generated Image - Preview (BOTTOM) */}
             <div className="w-full">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">GENERATED IMAGE</h2>
+              <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">GENERATED IMAGE</h2>
               <div className="flex flex-col items-center">
                 <div className="mb-4">
                   {renderPreviewCanvas(currentSlotIndex)}
@@ -795,8 +796,8 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
           </div>
 
           {/* Right Sidebar - Backgrounds */}
-          <div className="w-72 bg-white border-l p-4 overflow-y-auto">
-            <h2 className="text-sm font-bold text-gray-700 mb-3">BACKGROUND STYLE</h2>
+          <div className="w-72 bg-black/60 border-l border-white/10 p-4 overflow-y-auto">
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">BACKGROUND STYLE</h2>
             <div className="grid grid-cols-2 gap-3">
               {backgrounds.map(background => (
                 <button
@@ -805,13 +806,13 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                   onClick={() => setActiveBackgroundId(background.id)}
                   className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                     activeBackgroundId === background.id
-                      ? 'border-orange-600 ring-2 ring-orange-200'
-                      : 'border-gray-300 hover:border-orange-400 hover:scale-105'
+                      ? 'border-orange-500 ring-2 ring-orange-500/30'
+                      : 'border-white/20 hover:border-orange-400 hover:scale-105'
                   }`}
                 >
                   {renderBackground(background, 'w-full h-full')}
                   {activeBackgroundId === background.id && (
-                    <div className="absolute top-1 right-1 w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
+                    <div className="absolute top-1 right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
@@ -862,7 +863,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(false)}
-                className="absolute -top-4 -right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className="absolute -top-4 -right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -875,7 +876,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
           <DialogContent>
             <div className="p-6">
               <h2 className="text-xl font-bold mb-4">Discard changes?</h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-white/60 mb-6">
                 You have unsaved customizations. Are you sure you want to exit?
               </p>
               <div className="flex gap-3 justify-end">
@@ -895,33 +896,33 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
 
   if (currentScreen === 'checkout') {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
+      <div className="min-h-screen bg-[#0a0a0a] p-8">
         <div className="max-w-4xl mx-auto">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setCurrentScreen('customize')}
-            className="mb-6"
+            className="mb-6 text-white/70 hover:text-white hover:bg-white/10"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Editor
           </Button>
 
-          <Card className="p-8">
-            <h1 className="text-3xl font-bold mb-6">Review & Submit</h1>
+          <Card className="p-8 bg-black/60 border-white/10">
+            <h1 className="text-3xl font-bold mb-6 text-white">Review & Submit</h1>
 
             {/* Order Summary */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Your Customizations</h2>
+              <h2 className="text-xl font-semibold mb-4 text-white/80">Your Customizations</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                 {slots.map((budImageId, index) => {
                   if (!budImageId) return null;
                   return (
                     <div key={index} className="relative">
-                      <div className="aspect-[2/3] rounded-lg overflow-hidden border-2 border-gray-200">
+                      <div className="aspect-[2/3] rounded-lg overflow-hidden border-2 border-white/10">
                         {renderPreviewCanvas(index, 'thumbnail')}
                       </div>
-                      <div className="text-xs text-center text-gray-600 mt-1">
+                      <div className="text-xs text-center text-white/50 mt-1">
                         Variation {index + 1}
                       </div>
                     </div>
@@ -929,26 +930,26 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
                 })}
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Product:</span>
-                  <span className="font-semibold">{product.attributes.name}</span>
+                  <span className="text-white/60">Product:</span>
+                  <span className="font-semibold text-white">{product.attributes.name}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Customizations:</span>
-                  <span className="font-semibold">{filledSlotsCount} variations</span>
+                  <span className="text-white/60">Customizations:</span>
+                  <span className="font-semibold text-white">{filledSlotsCount} variations</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Background:</span>
-                  <span className="font-semibold">{activeBackground?.attributes.name}</span>
+                  <span className="text-white/60">Background:</span>
+                  <span className="font-semibold text-white">{activeBackground?.attributes.name}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Font:</span>
-                  <span className="font-semibold">{activeFont?.attributes.name}</span>
+                  <span className="text-white/60">Font:</span>
+                  <span className="font-semibold text-white">{activeFont?.attributes.name}</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                  <span className="text-sm text-gray-600">Order Type:</span>
-                  <span className="text-sm font-semibold">Custom Inquiry</span>
+                <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                  <span className="text-sm text-white/50">Order Type:</span>
+                  <span className="text-sm font-semibold text-white">Custom Inquiry</span>
                 </div>
               </div>
             </div>
@@ -978,14 +979,14 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
 
   if (currentScreen === 'success') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
-        <Card className="max-w-2xl w-full p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-8">
+        <Card className="max-w-2xl w-full p-8 text-center bg-black/60 border-white/10">
+          <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-green-400" />
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Inquiry Submitted!</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">Order Inquiry Submitted!</h1>
+          <p className="text-white/60 mb-8">
             Thank you for your inquiry. Our team will review your customization and contact you shortly.
           </p>
 
@@ -996,16 +997,16 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
               return (
                 <div
                   key={index}
-                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
+                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg"
                 >
-                  <div className="w-16 h-24 rounded overflow-hidden border border-gray-200 flex-shrink-0">
+                  <div className="w-16 h-24 rounded overflow-hidden border border-white/10 flex-shrink-0">
                     {renderPreviewCanvas(index, 'thumbnail')}
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="font-semibold text-gray-900">
+                    <div className="font-semibold text-white">
                       Variation #{index + 1}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-white/50">
                       {budImage?.attributes.name || `photo_${index + 1}.png`}
                     </div>
                   </div>
@@ -1036,7 +1037,7 @@ export function CustomizationStudio({ product, onClose }: CustomizationStudioPro
             <Button
               onClick={onClose}
               variant="outline"
-              className="w-full py-6 text-lg"
+              className="w-full py-6 text-lg border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
             >
               Back to Products
             </Button>

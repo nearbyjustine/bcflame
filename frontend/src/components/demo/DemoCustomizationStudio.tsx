@@ -130,7 +130,7 @@ export function DemoCustomizationStudio() {
       );
     }
 
-    return <div className={`${className} bg-gray-200`} />;
+    return <div className={`${className} bg-white/10`} />;
   };
 
   const renderPreviewCanvas = (slotIndex: number, size: 'normal' | 'large' = 'normal') => {
@@ -200,30 +200,30 @@ export function DemoCustomizationStudio() {
   // Screen renderers
   if (currentScreen === 'products') {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
+      <div className="min-h-screen bg-[#0a0a0a] p-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Customize Your Products</h1>
-            <p className="text-gray-600">Select a product to start customizing your packaging</p>
-            <div className="mt-2 inline-block px-3 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full">
+            <h1 className="text-4xl font-bold text-white mb-2">Customize Your Products</h1>
+            <p className="text-white/60">Select a product to start customizing your packaging</p>
+            <div className="mt-2 inline-block px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-semibold rounded-full border border-orange-500/30">
               DEMO PROTOTYPE
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {MOCK_PRODUCTS.map(product => (
-              <Card key={product.id} className="p-6 hover:shadow-lg transition-shadow">
+              <Card key={product.id} className="p-6 hover:shadow-lg transition-shadow bg-black/60 border-white/10">
                 <div className="mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">{product.attributes.name}</h2>
-                  <p className="text-sm text-orange-600 font-medium">{product.attributes.tagline}</p>
+                  <h2 className="text-2xl font-bold text-white">{product.attributes.name}</h2>
+                  <p className="text-sm text-orange-400 font-medium">{product.attributes.tagline}</p>
                 </div>
-                <p className="text-gray-600 mb-4">{product.attributes.description}</p>
+                <p className="text-white/60 mb-4">{product.attributes.description}</p>
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded">
+                  <div className="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 text-sm font-medium rounded">
                     {product.attributes.category}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    THC: <span className="font-semibold">{product.attributes.thc_content}</span>
+                  <div className="text-sm text-white/50">
+                    THC: <span className="font-semibold text-white/80">{product.attributes.thc_content}</span>
                   </div>
                 </div>
                 <Button
@@ -242,21 +242,22 @@ export function DemoCustomizationStudio() {
 
   if (currentScreen === 'customize') {
     return (
-      <div className="h-screen flex flex-col bg-slate-50">
+      <div className="h-screen flex flex-col bg-[#0a0a0a]">
         {/* Header */}
-        <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
+        <div className="bg-black/95 border-b border-white/10 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setCurrentScreen('products')}
+              className="text-white/70 hover:text-white hover:bg-white/10"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
             <div>
-              <h1 className="text-lg font-bold">{selectedProduct?.attributes.name}</h1>
-              <p className="text-xs text-gray-500">{filledSlotsCount} of 5 images selected</p>
+              <h1 className="text-lg font-bold text-white">{selectedProduct?.attributes.name}</h1>
+              <p className="text-xs text-white/50">{filledSlotsCount} of 5 images selected</p>
             </div>
           </div>
           <Button
@@ -272,8 +273,8 @@ export function DemoCustomizationStudio() {
         {/* Main Layout */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Sidebar - Font Controls */}
-          <div className="w-64 bg-white border-r p-4 overflow-y-auto">
-            <h2 className="text-sm font-bold text-gray-700 mb-3">FONT STYLE</h2>
+          <div className="w-64 bg-black/60 border-r border-white/10 p-4 overflow-y-auto">
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">FONT STYLE</h2>
             <div className="space-y-2 mb-6">
               {MOCK_FONTS.map(font => (
                 <button
@@ -281,21 +282,21 @@ export function DemoCustomizationStudio() {
                   onClick={() => setActiveFontId(font.id)}
                   className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                     activeFontId === font.id
-                      ? 'border-orange-600 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-orange-500 bg-orange-500/10'
+                      : 'border-white/10 hover:border-white/30 bg-white/5'
                   }`}
                   style={{ fontFamily: font.attributes.font_family }}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold">Aa Bb</span>
-                    {activeFontId === font.id && <Check className="w-4 h-4 text-orange-600" />}
+                    <span className="text-2xl font-bold text-white">Aa Bb</span>
+                    {activeFontId === font.id && <Check className="w-4 h-4 text-orange-500" />}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">{font.attributes.name}</div>
+                  <div className="text-xs text-white/50 mt-1">{font.attributes.name}</div>
                 </button>
               ))}
             </div>
 
-            <h2 className="text-sm font-bold text-gray-700 mb-3">FONT SIZE</h2>
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">FONT SIZE</h2>
             <div className="flex gap-2">
               {MOCK_FONT_SIZES.map(size => (
                 <button
@@ -303,8 +304,8 @@ export function DemoCustomizationStudio() {
                   onClick={() => setActiveSizeId(size.id as 'sm' | 'md' | 'lg')}
                   className={`flex-1 py-2 px-3 rounded-lg border-2 transition-all ${
                     activeSizeId === size.id
-                      ? 'border-orange-600 bg-orange-50 text-orange-700'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-orange-500 bg-orange-500/10 text-orange-400'
+                      : 'border-white/10 hover:border-white/30 bg-white/5 text-white/70'
                   }`}
                 >
                   <div className="text-xs font-medium">{size.name}</div>
@@ -325,8 +326,8 @@ export function DemoCustomizationStudio() {
                     onClick={() => setCurrentSlotIndex(index)}
                     className={`relative w-16 h-20 rounded-lg border-2 transition-all overflow-hidden ${
                       currentSlotIndex === index
-                        ? 'border-orange-600 ring-2 ring-orange-200'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-orange-500 ring-2 ring-orange-500/30'
+                        : 'border-white/20 hover:border-white/40'
                     }`}
                   >
                     {budImage ? (
@@ -347,7 +348,7 @@ export function DemoCustomizationStudio() {
                         </button>
                       </>
                     ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400 text-2xl">
+                      <div className="flex items-center justify-center h-full text-white/30 text-2xl bg-white/5">
                         +
                       </div>
                     )}
@@ -369,6 +370,7 @@ export function DemoCustomizationStudio() {
               <Button
                 variant="outline"
                 onClick={() => handlePreviewSlot(currentSlotIndex)}
+                className="border-white/20 text-white/80 hover:bg-white/10 hover:text-white"
               >
                 <ZoomIn className="w-4 h-4 mr-2" />
                 Preview Fullscreen
@@ -377,7 +379,7 @@ export function DemoCustomizationStudio() {
 
             {/* Bud Picker - Horizontal Scroll */}
             <div className="mt-8 w-full">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">SELECT BUD IMAGES</h2>
+              <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">SELECT BUD IMAGES</h2>
               <div className="flex gap-3 overflow-x-auto pb-4">
                 {MOCK_BUD_IMAGES.map(bud => {
                   const isSelected = slots.includes(bud.id);
@@ -388,10 +390,10 @@ export function DemoCustomizationStudio() {
                       disabled={isSelected || filledSlotsCount >= 5}
                       className={`relative flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden border-2 transition-all ${
                         isSelected
-                          ? 'border-orange-600 opacity-50 cursor-not-allowed'
+                          ? 'border-orange-500 opacity-50 cursor-not-allowed'
                           : filledSlotsCount >= 5
-                          ? 'border-gray-300 opacity-30 cursor-not-allowed'
-                          : 'border-gray-300 hover:border-orange-400 hover:scale-105 cursor-pointer'
+                          ? 'border-white/20 opacity-30 cursor-not-allowed'
+                          : 'border-white/20 hover:border-orange-400 hover:scale-105 cursor-pointer'
                       }`}
                     >
                       <img
@@ -417,8 +419,8 @@ export function DemoCustomizationStudio() {
           </div>
 
           {/* Right Sidebar - Backgrounds */}
-          <div className="w-72 bg-white border-l p-4 overflow-y-auto">
-            <h2 className="text-sm font-bold text-gray-700 mb-3">BACKGROUND STYLE</h2>
+          <div className="w-72 bg-black/60 border-l border-white/10 p-4 overflow-y-auto">
+            <h2 className="text-sm font-bold text-white/60 mb-3 tracking-widest">BACKGROUND STYLE</h2>
             <div className="grid grid-cols-2 gap-3">
               {MOCK_BACKGROUNDS.map(background => (
                 <button
@@ -426,13 +428,13 @@ export function DemoCustomizationStudio() {
                   onClick={() => setActiveBackgroundId(background.id)}
                   className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                     activeBackgroundId === background.id
-                      ? 'border-orange-600 ring-2 ring-orange-200'
-                      : 'border-gray-300 hover:border-orange-400 hover:scale-105'
+                      ? 'border-orange-500 ring-2 ring-orange-500/30'
+                      : 'border-white/20 hover:border-orange-400 hover:scale-105'
                   }`}
                 >
                   {renderBackground(background, 'w-full h-full')}
                   {activeBackgroundId === background.id && (
-                    <div className="absolute top-1 right-1 w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
+                    <div className="absolute top-1 right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
@@ -482,7 +484,7 @@ export function DemoCustomizationStudio() {
               {/* Close Button */}
               <button
                 onClick={() => setIsPreviewOpen(false)}
-                className="absolute -top-4 -right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className="absolute -top-4 -right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -495,33 +497,33 @@ export function DemoCustomizationStudio() {
 
   if (currentScreen === 'checkout') {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
+      <div className="min-h-screen bg-[#0a0a0a] p-8">
         <div className="max-w-4xl mx-auto">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setCurrentScreen('customize')}
-            className="mb-6"
+            className="mb-6 text-white/70 hover:text-white hover:bg-white/10"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Editor
           </Button>
 
-          <Card className="p-8">
-            <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+          <Card className="p-8 bg-black/60 border-white/10">
+            <h1 className="text-3xl font-bold mb-6 text-white">Checkout</h1>
 
             {/* Order Summary */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Your Customizations</h2>
+              <h2 className="text-xl font-semibold mb-4 text-white/80">Your Customizations</h2>
               <div className="grid grid-cols-5 gap-4 mb-6">
                 {slots.map((budId, index) => {
                   if (!budId) return null;
                   return (
                     <div key={index} className="relative">
-                      <div className="aspect-[2/3] rounded-lg overflow-hidden border-2 border-gray-200">
+                      <div className="aspect-[2/3] rounded-lg overflow-hidden border-2 border-white/10">
                         {renderPreviewCanvas(index)}
                       </div>
-                      <div className="text-xs text-center text-gray-600 mt-1">
+                      <div className="text-xs text-center text-white/50 mt-1">
                         Variation {index + 1}
                       </div>
                     </div>
@@ -529,18 +531,18 @@ export function DemoCustomizationStudio() {
                 })}
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Product:</span>
-                  <span className="font-semibold">{selectedProduct?.attributes.name}</span>
+                  <span className="text-white/60">Product:</span>
+                  <span className="font-semibold text-white">{selectedProduct?.attributes.name}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Customizations:</span>
-                  <span className="font-semibold">{filledSlotsCount} variations</span>
+                  <span className="text-white/60">Customizations:</span>
+                  <span className="font-semibold text-white">{filledSlotsCount} variations</span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                  <span className="text-lg font-bold">Total:</span>
-                  <span className="text-2xl font-bold text-orange-600">
+                <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                  <span className="text-lg font-bold text-white">Total:</span>
+                  <span className="text-2xl font-bold text-orange-400">
                     ${(filledSlotsCount * 25).toFixed(2)}
                   </span>
                 </div>
@@ -549,37 +551,37 @@ export function DemoCustomizationStudio() {
 
             {/* Mock Payment Form */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
+              <h2 className="text-xl font-semibold mb-4 text-white/80">Payment Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white/60 mb-1">
                     Card Number
                   </label>
                   <input
                     type="text"
                     placeholder="1234 5678 9012 3456"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/30 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-white/60 mb-1">
                       Expiry Date
                     </label>
                     <input
                       type="text"
                       placeholder="MM / YY"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/30 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-white/60 mb-1">
                       CVC
                     </label>
                     <input
                       type="text"
                       placeholder="123"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/30 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
                     />
                   </div>
                 </div>
@@ -601,14 +603,14 @@ export function DemoCustomizationStudio() {
 
   if (currentScreen === 'success') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
-        <Card className="max-w-2xl w-full p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-8">
+        <Card className="max-w-2xl w-full p-8 text-center bg-black/60 border-white/10">
+          <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-10 h-10 text-green-400" />
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">Payment Successful!</h1>
+          <p className="text-white/60 mb-8">
             Your customized packaging images are ready to download
           </p>
 
@@ -619,18 +621,18 @@ export function DemoCustomizationStudio() {
               return (
                 <div
                   key={index}
-                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors"
                 >
-                  <div className="w-16 h-24 rounded overflow-hidden border border-gray-200 flex-shrink-0">
+                  <div className="w-16 h-24 rounded overflow-hidden border border-white/10 flex-shrink-0">
                     {renderPreviewCanvas(index)}
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="font-semibold text-gray-900">
+                    <div className="font-semibold text-white">
                       Image #{index + 1} - High Res PNG
                     </div>
-                    <div className="text-sm text-gray-500">{budImage?.name}</div>
+                    <div className="text-sm text-white/50">{budImage?.name}</div>
                   </div>
-                  <Button variant="outline" className="flex-shrink-0">
+                  <Button variant="outline" className="flex-shrink-0 border-white/20 text-white/70 hover:bg-white/10 hover:text-white">
                     <Download className="w-4 h-4 mr-2" />
                     Download
                   </Button>
