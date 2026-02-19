@@ -5,10 +5,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: bcflame_tunnel
     restart: unless-stopped
-    command: tunnel --config /etc/cloudflared/config.yml run
-    volumes:
-      - ~/.cloudflared:/etc/cloudflared
-      - ./cloudflared-config.yml:/etc/cloudflared/config.yml
+    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
       - bcflame_network
 
