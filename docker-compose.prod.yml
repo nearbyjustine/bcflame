@@ -33,14 +33,13 @@ services:
       - nginx
 
   strapi:
-    image: ghcr.io/${GITHUB_USERNAME:-YOUR_GITHUB_USERNAME}/bcflame-backend:${IMAGE_TAG:-latest}
     build:
       context: ./backend
       dockerfile: Dockerfile
       target: production
       args:
         PUBLIC_URL: ${NEXT_PUBLIC_STRAPI_URL}
-    pull_policy: always
+    pull_policy: build
     container_name: bcflame_strapi_prod
     restart: always
     environment:
@@ -89,7 +88,6 @@ services:
     # nginx will proxy to this service
 
   frontend:
-    image: ghcr.io/${GITHUB_USERNAME:-YOUR_GITHUB_USERNAME}/bcflame-frontend:${IMAGE_TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -97,7 +95,7 @@ services:
       args:
         NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:-https://api.yourdomain.com}
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://yourdomain.com}
-    pull_policy: always
+    pull_policy: build
     container_name: bcflame_frontend_prod
     restart: always
     environment:
