@@ -12,5 +12,6 @@ services:
 networks:
   bcflame_network:
     external: true
+    name: bcflame_bcflame_network
 
 
