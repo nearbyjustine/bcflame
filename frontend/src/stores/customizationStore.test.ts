@@ -233,9 +233,10 @@ describe('customizationStore', () => {
 
       expect(selections).toEqual({
         photos: [1, 2],
-        budStyles: [3],
+        bud_images: [3],
         backgrounds: [4],
         fonts: [5],
+        text_effects: [],
         preBagging: [{ optionId: 1, quantity: 10, unitSize: 3.5, unitSizeUnit: 'g', customText: 'Custom' }]
       })
     })

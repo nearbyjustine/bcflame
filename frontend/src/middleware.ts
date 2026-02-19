@@ -38,13 +38,13 @@ export function middleware(request: NextRequest) {
 
     // Redirect from login based on user type
     if (pathname === '/login') {
-      const redirectUrl = userType === 'admin' ? '/admin-portal/dashboard' : '/dashboard';
+      const redirectUrl = userType === 'admin' ? '/admin-portal/dashboard' : '/products';
       return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
 
     // Prevent resellers from accessing admin routes
     if (isAdminRoute && userType !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL('/products', request.url));
     }
 
     // Prevent admins from accessing reseller routes (optional - admins can access both)

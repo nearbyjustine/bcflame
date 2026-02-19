@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useOnboardingTour, type TourStepConfig } from './useOnboardingTour';
 
@@ -21,16 +21,16 @@ const mockOn = vi.fn();
 
 vi.mock('shepherd.js', () => ({
   default: {
-    Tour: function Tour() {
-      this.addStep = mockAddStep;
-      this.start = mockStart;
-      this.destroy = mockDestroy;
-      this.on = mockOn;
+    Tour: class Tour {
+      addStep = mockAddStep;
+      start = mockStart;
+      destroy = mockDestroy;
+      on = mockOn;
     },
   },
 }));
 
-vi.mock('shepherd.js/dist/css/shepherd.css', () => ({}), { virtual: true });
+vi.mock('shepherd.js/dist/css/shepherd.css', () => ({}));
 
 import { useAuthStore } from '@/stores/authStore';
 import { markTourComplete } from '@/lib/api/onboarding';
@@ -50,8 +50,13 @@ describe('useOnboardingTour', () => {
   });
 
   it('does not start the tour when the module is already completed', async () => {
-    (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = {
+    type AuthStoreState = {
+      userProfile: { onboarding_progress: { products: { completed: boolean; completedAt: string } } } | null;
+      isLoading: boolean;
+      setUserProfile: typeof mockSetUserProfile;
+    };
+    (useAuthStore as unknown as Mock).mockImplementation((selector: (state: AuthStoreState) => unknown) => {
+      const state: AuthStoreState = {
         userProfile: {
           onboarding_progress: {
             products: { completed: true, completedAt: '2026-02-05T10:00:00.000Z' },
@@ -71,8 +76,9 @@ describe('useOnboardingTour', () => {
   });
 
   it('does not start the tour while isLoading is true', async () => {
-    (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: null, isLoading: true, setUserProfile: mockSetUserProfile };
+    type AuthStoreState = { userProfile: null; isLoading: boolean; setUserProfile: typeof mockSetUserProfile };
+    (useAuthStore as unknown as Mock).mockImplementation((selector: (state: AuthStoreState) => unknown) => {
+      const state: AuthStoreState = { userProfile: null, isLoading: true, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 
@@ -84,8 +90,9 @@ describe('useOnboardingTour', () => {
   });
 
   it('does not start the tour when enabled is false', async () => {
-    (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
+    type AuthStoreState = { userProfile: { onboarding_progress: Record<string, never> }; isLoading: boolean; setUserProfile: typeof mockSetUserProfile };
+    (useAuthStore as unknown as Mock).mockImplementation((selector: (state: AuthStoreState) => unknown) => {
+      const state: AuthStoreState = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 
@@ -97,8 +104,9 @@ describe('useOnboardingTour', () => {
   });
 
   it('calls markTourComplete on tour complete event', async () => {
-    (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
+    type AuthStoreState = { userProfile: { onboarding_progress: Record<string, never> }; isLoading: boolean; setUserProfile: typeof mockSetUserProfile };
+    (useAuthStore as unknown as Mock).mockImplementation((selector: (state: AuthStoreState) => unknown) => {
+      const state: AuthStoreState = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 
@@ -114,8 +122,9 @@ describe('useOnboardingTour', () => {
   });
 
   it('calls markTourComplete on tour cancel event', async () => {
-    (useAuthStore as any).mockImplementation((selector: any) => {
-      const state = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
+    type AuthStoreState = { userProfile: { onboarding_progress: Record<string, never> }; isLoading: boolean; setUserProfile: typeof mockSetUserProfile };
+    (useAuthStore as unknown as Mock).mockImplementation((selector: (state: AuthStoreState) => unknown) => {
+      const state: AuthStoreState = { userProfile: { onboarding_progress: {} }, isLoading: false, setUserProfile: mockSetUserProfile };
       return selector(state);
     });
 

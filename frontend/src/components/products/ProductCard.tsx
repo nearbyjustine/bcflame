@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Settings } from 'lucide-react';
 import type { Product, ProductPricing } from '@/types/product';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,13 @@ interface ProductCardProps {
   product: Product;
   onCustomize?: () => void;
   stockStatus?: StockStatus;
+}
+
+function useProductCustomize(productId: number) {
+  const router = useRouter();
+  return useCallback(() => {
+    router.push(`/products/${productId}/customize`);
+  }, [router, productId]);
 }
 
 const getCategoryStyles = (category: 'Indica' | 'Hybrid') => {
@@ -53,6 +61,7 @@ const getStockBadge = (status?: StockStatus) => {
 };
 
 export function ProductCard({ product, onCustomize, stockStatus }: ProductCardProps) {
+  const navigateToCustomize = useProductCustomize(product.id);
   const { attributes } = product;
   const images = attributes.images?.data || [];
 
@@ -77,14 +86,14 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
 
   return (
     <Link href={`/products/${product.id}`} className="block">
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-        <div className="aspect-square relative bg-muted group">
+      <Card className="overflow-hidden bg-[#111] border border-white/10 rounded-sm hover:border-[hsl(var(--gold))]/50 transition-colors cursor-pointer">
+        <div className="aspect-square relative bg-[#0d0d0d] group">
         {imageUrl ? (
           <>
             <img
               src={imageUrl}
               alt={getImageAlt(currentImage, attributes.name)}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
 
             {/* Carousel Navigation - Only show if multiple images */}
@@ -167,9 +176,9 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
       </div>
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg">{attributes.name}</CardTitle>
+          <CardTitle className="font-display text-xl font-medium text-white">{attributes.name}</CardTitle>
           <span
-            className={`text-xs font-semibold px-2 py-1 rounded ${getCategoryStyles(
+            className={`text-luxury-label px-2 py-1 rounded-sm ${getCategoryStyles(
               attributes.category
             )}`}
           >
@@ -179,7 +188,7 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
       </CardHeader>
       <CardContent>
         {attributes.tagline && (
-          <p className="text-sm text-muted-foreground mb-2">{attributes.tagline}</p>
+          <p className="text-luxury-label text-white/40 mb-3">{attributes.tagline}</p>
         )}
         {attributes.thc_content && (
           <div className="flex items-center gap-2 mb-3">
@@ -190,9 +199,9 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
 
         {/* Price display - show per-pound/half-pound pricing or tiered pricing */}
         {attributes.base_price_per_pound && attributes.pricing_model === 'per_pound' ? (
-          <div className="flex items-center justify-between pt-2 border-t">
-            <p className="text-sm text-muted-foreground">Starting at</p>
-            <p className="text-xl font-bold">
+          <div className="flex items-center justify-between pt-3 border-t border-white/5">
+            <p className="text-luxury-label text-white/40">Starting at</p>
+            <p className="font-body text-lg font-medium text-white">
               {formatPrice(attributes.base_price_per_pound)}
               {attributes.pricing_unit === 'per_half_pound' ? HALF_WEIGHT_UNIT_DISPLAY : WEIGHT_UNIT_DISPLAY}
             </p>
@@ -201,16 +210,17 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
           <>
             {/* Size selector - button group/pills */}
             <div className="mb-4">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Select Size:</p>
+              <p className="text-luxury-label text-white/40 mb-2">Select Size:</p>
               <div className="flex gap-2">
                 {attributes.pricing.map((pricing) => (
                   <button
                     key={pricing.id}
+                    type="button"
                     onClick={() => setSelectedPricing(pricing)}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border-2 transition-all ${
+                    className={`flex-1 px-3 py-2 text-luxury-label rounded-sm border transition-all ${
                       selectedPricing.id === pricing.id
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:border-primary/50'
+                        ? 'border-[hsl(var(--gold))] bg-[hsl(var(--gold))]/10 text-[hsl(var(--gold))]'
+                        : 'border-white/10 text-white/40 hover:border-[hsl(var(--gold))]/30 hover:text-white/60'
                     }`}
                   >
                     {pricing.weight}
@@ -220,25 +230,29 @@ export function ProductCard({ product, onCustomize, stockStatus }: ProductCardPr
             </div>
 
             {/* Dynamic price display */}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <p className="text-sm text-muted-foreground">Price</p>
-              <p className="text-xl font-bold">{formatPrice(selectedPricing.amount, selectedPricing.currency)}</p>
+            <div className="flex items-center justify-between pt-3 border-t border-white/5">
+              <p className="text-luxury-label text-white/40">Price</p>
+              <p className="font-body text-lg font-medium text-white">{formatPrice(selectedPricing.amount, selectedPricing.currency)}</p>
             </div>
           </>
         ) : null}
 
         {/* Customize button - only show if customization is enabled */}
-        {attributes.customization_enabled && onCustomize && (
-          <div className="mt-4 pt-4 border-t">
+        {attributes.customization_enabled && (
+          <div className="mt-4 pt-4 border-t border-white/5">
             <Button
               onClick={(e) => {
                 e.preventDefault(); // Prevent Link navigation
                 e.stopPropagation(); // Stop event bubbling
-                onCustomize();
+                if (onCustomize) {
+                  onCustomize();
+                } else {
+                  navigateToCustomize();
+                }
               }}
-              className="w-full bg-gradient-to-r from-primary to-destructive hover:opacity-90 transition-opacity"
+              className="w-full bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--gold-dark))] text-black hover:opacity-90 transition-opacity font-body text-luxury-label rounded-sm"
             >
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings className="mr-2 h-3.5 w-3.5" />
               Customize
             </Button>
           </div>

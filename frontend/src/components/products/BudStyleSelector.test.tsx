@@ -7,24 +7,33 @@ const mockBudStyles = [
     id: 1,
     attributes: {
       name: 'Whole Flower',
-      category: 'Premium',
+      category: 'trim_quality' as const,
       description: 'Full flower buds',
+      sort_order: 1,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     },
   },
   {
     id: 2,
     attributes: {
       name: 'Shake',
-      category: 'Economy',
+      category: 'trim_quality' as const,
       description: 'Small pieces',
+      sort_order: 2,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     },
   },
   {
     id: 3,
     attributes: {
       name: 'Popcorn Buds',
-      category: 'Standard',
+      category: 'trim_quality' as const,
       description: 'Small whole buds',
+      sort_order: 3,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
     },
   },
 ];

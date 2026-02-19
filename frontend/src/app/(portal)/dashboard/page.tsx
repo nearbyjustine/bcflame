@@ -81,230 +81,223 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="flex items-center justify-center min-h-[60vh] bg-[#0a0a0a]">
+        <div className="animate-spin rounded-full h-8 w-8 border border-[hsl(var(--gold))] border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="bg-[#0a0a0a] min-h-screen px-6 py-12 mx-auto max-w-screen-2xl space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-tour="res-dashboard-header">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4" data-tour="res-dashboard-header">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, {user?.companyName || user?.username}!
+          <p className="text-luxury-label text-[hsl(var(--gold))]/60 mb-2">Welcome back</p>
+          <h1 className="text-luxury-lg font-display text-white">
+            {user?.companyName || user?.username}
           </h1>
-          <p className="text-muted-foreground mt-2">
-            Here's what's happening with your account today.
+          <p className="font-body text-sm text-white/30 mt-2">
+            Here&apos;s what&apos;s happening with your account today.
           </p>
         </div>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => fetchDashboardStats(true)}
           disabled={isRefreshing}
+          className="border border-white/10 text-white/40 hover:text-white hover:bg-white/5 text-luxury-label rounded-sm self-start sm:self-auto"
         >
-          <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`mr-2 h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-tour="res-dashboard-stats">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Orders
-            </CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardData?.totalOrders || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              All-time order inquiries
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Orders
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardData?.pendingOrders || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Awaiting review or approval
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Available Products
-            </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardData?.availableProducts || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Products in catalog
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Spent
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {dashboardData?.totalSpent ? formatCurrency(dashboardData.totalSpent) : '$0.00'}
+        <div className="bg-[#111] border border-white/10 rounded-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-luxury-label text-white/40">Total Orders</span>
+            <div className="w-8 h-8 rounded-full border border-[hsl(var(--gold))]/30 flex items-center justify-center">
+              <ShoppingBag className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Total order value
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="font-display text-4xl font-light text-white">{dashboardData?.totalOrders || 0}</div>
+          <p className="text-luxury-label text-white/25 mt-2">All-time order inquiries</p>
+        </div>
+
+        <div className="bg-[#111] border border-white/10 rounded-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-luxury-label text-white/40">Pending Orders</span>
+            <div className="w-8 h-8 rounded-full border border-[hsl(var(--gold))]/30 flex items-center justify-center">
+              <Clock className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
+            </div>
+          </div>
+          <div className="font-display text-4xl font-light text-white">{dashboardData?.pendingOrders || 0}</div>
+          <p className="text-luxury-label text-white/25 mt-2">Awaiting review or approval</p>
+        </div>
+
+        <div className="bg-[#111] border border-white/10 rounded-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-luxury-label text-white/40">Available Products</span>
+            <div className="w-8 h-8 rounded-full border border-[hsl(var(--gold))]/30 flex items-center justify-center">
+              <Package className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
+            </div>
+          </div>
+          <div className="font-display text-4xl font-light text-white">{dashboardData?.availableProducts || 0}</div>
+          <p className="text-luxury-label text-white/25 mt-2">Products in catalog</p>
+        </div>
+
+        <div className="bg-[#111] border border-white/10 rounded-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-luxury-label text-white/40">Total Spent</span>
+            <div className="w-8 h-8 rounded-full border border-[hsl(var(--gold))]/30 flex items-center justify-center">
+              <DollarSign className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
+            </div>
+          </div>
+          <div className="font-display text-4xl font-light text-white">
+            {dashboardData?.totalSpent ? formatCurrency(dashboardData.totalSpent) : '$0'}
+          </div>
+          <p className="text-luxury-label text-white/25 mt-2">Total order value</p>
+        </div>
       </div>
 
       {/* Recent Activity */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2" data-tour="res-dashboard-activity">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <div className="lg:col-span-2 bg-[#111] border border-white/10 rounded-sm" data-tour="res-dashboard-activity">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
             <div>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your latest order inquiries</CardDescription>
+              <h3 className="font-display text-lg text-white">Recent Activity</h3>
+              <p className="text-luxury-label text-white/30 mt-0.5">Your latest order inquiries</p>
             </div>
             <Link href="/orders">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-[hsl(var(--gold))] hover:bg-[hsl(var(--gold))]/10 text-luxury-label rounded-sm">
                 View All
-                <ChevronRight className="ml-1 h-4 w-4" />
+                <ChevronRight className="ml-1 h-3 w-3" />
               </Button>
             </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {!dashboardData?.recentActivity || dashboardData.recentActivity.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground">No recent orders</p>
-                  <Link href="/products">
-                    <Button variant="outline" size="sm" className="mt-4">
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      Browse Products
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                dashboardData.recentActivity.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/30 transition-colors"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-                        <Package className="h-5 w-5 text-slate-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{order.inquiry_number}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {order.product?.name} • {formatRelativeTime(order.createdAt)}
-                        </p>
-                      </div>
+          </div>
+          <div className="p-6 space-y-3">
+            {!dashboardData?.recentActivity || dashboardData.recentActivity.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="font-display text-base text-white/30">No recent orders</p>
+                <Link href="/products">
+                  <Button variant="ghost" size="sm" className="mt-4 border border-white/10 text-white/40 hover:text-white hover:bg-white/5 text-luxury-label rounded-sm">
+                    <ShoppingBag className="mr-2 h-3 w-3" />
+                    Browse Products
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              dashboardData.recentActivity.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between p-4 border border-white/5 rounded-sm hover:border-white/10 hover:bg-white/[0.02] transition-colors"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[hsl(var(--gold))]/20">
+                      <Package className="h-4 w-4 text-[hsl(var(--gold))]/60" />
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <StatusBadge status={order.status} variant="order" size="sm" />
-                      <Link href={`/orders/${order.id}`}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </Link>
+                    <div>
+                      <p className="font-body text-sm font-medium text-white">{order.inquiry_number}</p>
+                      <p className="text-luxury-label text-white/30 mt-0.5">
+                        {order.product?.name} · {formatRelativeTime(order.createdAt)}
+                      </p>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="flex items-center space-x-3">
+                    <StatusBadge status={order.status} variant="order" size="sm" />
+                    <Link href={`/orders/${order.id}`}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-white/30 hover:text-white hover:bg-white/5">
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
         {/* Quick Actions */}
-        <Card data-tour="res-dashboard-quick-actions">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>What would you like to do?</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
+        <div className="bg-[#111] border border-white/10 rounded-sm" data-tour="res-dashboard-quick-actions">
+          <div className="px-6 py-5 border-b border-white/5">
+            <h3 className="font-display text-lg text-white">Quick Actions</h3>
+            <p className="text-luxury-label text-white/30 mt-0.5">What would you like to do?</p>
+          </div>
+          <div className="p-6 space-y-2">
             <Link href="/products" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <Package className="mr-2 h-4 w-4" />
-                Browse Products
-              </Button>
+              <button
+                type="button"
+                className="w-full flex items-center px-4 py-3 border border-white/10 rounded-sm text-white/50 hover:border-[hsl(var(--gold))]/30 hover:text-[hsl(var(--gold-light))] hover:bg-[hsl(var(--gold))]/5 transition-colors text-left"
+              >
+                <Package className="mr-3 h-3.5 w-3.5" />
+                <span className="text-luxury-label">Browse Products</span>
+              </button>
             </Link>
             <Link href="/orders" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <ShoppingBag className="mr-2 h-4 w-4" />
-                View My Orders
-              </Button>
+              <button
+                type="button"
+                className="w-full flex items-center px-4 py-3 border border-white/10 rounded-sm text-white/50 hover:border-[hsl(var(--gold))]/30 hover:text-[hsl(var(--gold-light))] hover:bg-[hsl(var(--gold))]/5 transition-colors text-left"
+              >
+                <ShoppingBag className="mr-3 h-3.5 w-3.5" />
+                <span className="text-luxury-label">View My Orders</span>
+              </button>
             </Link>
             <Link href="/media-hub" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <Image className="mr-2 h-4 w-4" />
-                Media Hub
-              </Button>
+              <button
+                type="button"
+                className="w-full flex items-center px-4 py-3 border border-white/10 rounded-sm text-white/50 hover:border-[hsl(var(--gold))]/30 hover:text-[hsl(var(--gold-light))] hover:bg-[hsl(var(--gold))]/5 transition-colors text-left"
+              >
+                <Image className="mr-3 h-3.5 w-3.5" />
+                <span className="text-luxury-label">Media Hub</span>
+              </button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Quick Start Guide */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Start Guide</CardTitle>
-          <CardDescription>Get started with the BC Flame Premium Portal</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-start space-x-4">
-            <div className="bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
-              <span className="text-primary font-semibold">1</span>
+      <div className="bg-[#111] border border-white/10 rounded-sm">
+        <div className="px-6 py-5 border-b border-white/5">
+          <h3 className="font-display text-lg text-white">Quick Start Guide</h3>
+          <p className="text-luxury-label text-white/30 mt-0.5">Get started with the BC Flame Premium Portal</p>
+        </div>
+        <div className="p-6 space-y-6">
+          <div className="flex items-start space-x-5">
+            <div className="w-7 h-7 rounded-full border border-[hsl(var(--gold))]/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="font-display text-sm text-[hsl(var(--gold))]">1</span>
             </div>
             <div>
-              <h3 className="font-semibold">Browse Products</h3>
-              <p className="text-sm text-muted-foreground">
+              <h4 className="font-body text-sm font-medium text-white">Browse Products</h4>
+              <p className="text-luxury-label text-white/30 mt-1">
                 Explore our catalog of premium cannabis products and check real-time inventory
               </p>
             </div>
           </div>
-          <div className="flex items-start space-x-4">
-            <div className="bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
-              <span className="text-primary font-semibold">2</span>
+          <div className="flex items-start space-x-5">
+            <div className="w-7 h-7 rounded-full border border-[hsl(var(--gold))]/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="font-display text-sm text-[hsl(var(--gold))]">2</span>
             </div>
             <div>
-              <h3 className="font-semibold">Customize Packaging</h3>
-              <p className="text-sm text-muted-foreground">
+              <h4 className="font-body text-sm font-medium text-white">Customize Packaging</h4>
+              <p className="text-luxury-label text-white/30 mt-1">
                 Use our Smart Packaging Studio to design custom packaging with your brand
               </p>
             </div>
           </div>
-          <div className="flex items-start space-x-4">
-            <div className="bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
-              <span className="text-primary font-semibold">3</span>
+          <div className="flex items-start space-x-5">
+            <div className="w-7 h-7 rounded-full border border-[hsl(var(--gold))]/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="font-display text-sm text-[hsl(var(--gold))]">3</span>
             </div>
             <div>
-              <h3 className="font-semibold">Submit Inquiry</h3>
-              <p className="text-sm text-muted-foreground">
-                Send us your requirements and we'll get back to you with a custom quote
+              <h4 className="font-body text-sm font-medium text-white">Submit Inquiry</h4>
+              <p className="text-luxury-label text-white/30 mt-1">
+                Send us your requirements and we&apos;ll get back to you with a custom quote
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

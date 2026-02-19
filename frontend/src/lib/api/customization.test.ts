@@ -173,9 +173,10 @@ describe('Customization API', () => {
 
       const selections = {
         photos: [1, 2, 3],
-        budStyles: [1, 2],
+        bud_images: [1, 2],
         backgrounds: [1],
         fonts: [1],
+        text_effects: [],
         preBagging: [
           {
             optionId: 1,
@@ -196,6 +197,7 @@ describe('Customization API', () => {
           selected_bud_styles: [1, 2],
           selected_backgrounds: [1],
           selected_fonts: [1],
+          selected_text_effects: [],
           selected_prebagging: [
             {
               option_id: 1,
@@ -232,9 +234,10 @@ describe('Customization API', () => {
 
       const selections = {
         photos: [1],
-        budStyles: [1],
+        bud_images: [1],
         backgrounds: [1],
         fonts: [1],
+        text_effects: [],
         preBagging: [],
       };
 
@@ -247,6 +250,7 @@ describe('Customization API', () => {
           selected_bud_styles: [1],
           selected_backgrounds: [1],
           selected_fonts: [1],
+          selected_text_effects: [],
           selected_prebagging: [],
           total_weight: 0,
           weight_unit: 'P',

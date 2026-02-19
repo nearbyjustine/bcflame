@@ -37,7 +37,7 @@ export function CartDrawer() {
       const inquiries = items.map((item) => ({
         product: item.product.id,
         selected_photos: item.selections.photos,
-        selected_bud_styles: item.selections.budStyles,
+        selected_bud_styles: item.selections.bud_images,
         selected_backgrounds: item.selections.backgrounds,
         selected_fonts: item.selections.fonts,
         selected_prebagging: item.selections.preBagging.map((pb) => pb.optionId),
@@ -90,10 +90,10 @@ export function CartDrawer() {
             <div className="space-y-4">
               {items.map((item) => {
                 const productImage = item.product.attributes.images?.data?.[0];
-                const imageUrl = productImage?.url
-                  ? productImage.url.startsWith('http')
-                    ? productImage.url
-                    : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${productImage.url}`
+                const imageUrl = productImage?.attributes.url
+                  ? productImage.attributes.url.startsWith('http')
+                    ? productImage.attributes.url
+                    : `${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${productImage.attributes.url}`
                   : null;
 
                 return (

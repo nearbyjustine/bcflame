@@ -24,7 +24,7 @@ export default function PackagePreview({
   height = 200,
 }: PackagePreviewProps) {
   const fontFamily = font?.attributes?.font_family || 'sans-serif';
-  useGoogleFonts(font?.attributes?.font_family ? [font.attributes.font_family] : []);
+  useGoogleFonts(font ? [font] : []);
 
   const displayName = companyName || 'YOUR BRAND';
 

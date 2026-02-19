@@ -4,12 +4,14 @@ import type {
   BudStyle,
   BackgroundStyle,
   FontStyle,
+  TextEffect,
   PreBaggingOption,
   CustomizationSelections,
   OrderInquiry,
   BudStylesResponse,
   BackgroundStylesResponse,
   FontStylesResponse,
+  TextEffectsResponse,
   PreBaggingOptionsResponse,
   OrderInquiriesResponse,
   SingleOrderInquiryResponse,
@@ -55,6 +57,20 @@ export async function getFontStyles(): Promise<FontStyle[]> {
 }
 
 /**
+ * Fetch all text effect options (CSS-based text styling effects)
+ */
+export async function getTextEffects(): Promise<TextEffect[]> {
+  const response = await strapiApi.get<TextEffectsResponse>('/api/text-effects', {
+    params: {
+      sort: 'sort_order:asc',
+      populate: 'preview_image',
+      publicationState: 'live',
+    },
+  });
+  return response.data.data;
+}
+
+/**
  * Fetch all pre-bagging packaging options
  */
 export async function getPreBaggingOptions(): Promise<PreBaggingOption[]> {
@@ -92,9 +108,10 @@ export async function submitOrderInquiry(
     data: {
       product: productId,
       selected_photos: selections.photos,
-      selected_bud_styles: selections.budStyles,
+      selected_bud_styles: selections.bud_images,
       selected_backgrounds: selections.backgrounds,
       selected_fonts: selections.fonts,
+      selected_text_effects: selections.text_effects,
       selected_prebagging: selections.preBagging.map((s) => ({
         option_id: s.optionId,
         quantity: s.quantity,

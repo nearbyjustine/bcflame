@@ -25,7 +25,7 @@ export function LoginForm() {
       await login(email, password);
       // Get user from store to check userType for routing
       const user = useAuthStore.getState().user;
-      const redirectUrl = user?.userType === 'admin' ? '/admin-portal/dashboard' : '/dashboard';
+      const redirectUrl = user?.userType === 'admin' ? '/admin-portal/dashboard' : '/products';
       router.push(redirectUrl);
     } catch (err: any) {
       setError(err.response?.data?.error?.message || 'Invalid credentials. Please try again.');

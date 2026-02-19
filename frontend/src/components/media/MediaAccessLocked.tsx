@@ -33,7 +33,7 @@ export function MediaAccessLocked({ paidOrdersCount = 0 }: MediaAccessLockedProp
 
           {/* Benefits List */}
           <div className="bg-muted/50 rounded-lg p-4 space-y-2 text-left">
-            <p className="text-sm font-medium">Once you have a paid order, you'll get access to:</p>
+            <p className="text-sm font-medium">Once you have a paid order, you&apos;ll get access to:</p>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• High-resolution product photography</li>
               <li>• Marketing materials and templates</li>

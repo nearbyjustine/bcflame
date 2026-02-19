@@ -50,11 +50,11 @@ export const rateLimitRules: RateLimitRules = {
     message: 'Rate limit exceeded. Please slow down your requests.',
   },
 
-  // File uploads - Very generous but size-limited
+  // File uploads - Generous (covers GET browse + actual uploads)
   upload: {
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 50, // 50 uploads per hour
-    message: 'Too many file uploads. Please try again later.',
+    max: 500, // 500 requests per hour (admin browsing + uploads)
+    message: 'Too many file upload requests. Please try again later.',
   },
 
   // Admin endpoints - Generous
@@ -98,14 +98,14 @@ export function determineRateLimitRule(path: string, isAuthenticated: boolean, i
     return 'monitoring';
   }
 
-  // Upload endpoints
-  if (path.includes('/upload')) {
-    return 'upload';
+  // Admin endpoints (checked before upload so admin media browsing uses admin limit)
+  if (isAdmin && (path.includes('/admin') || path.includes('/upload'))) {
+    return 'admin';
   }
 
-  // Admin endpoints
-  if (isAdmin && path.includes('/admin')) {
-    return 'admin';
+  // Upload endpoints (non-admin)
+  if (path.includes('/upload')) {
+    return 'upload';
   }
 
   // Authenticated vs public

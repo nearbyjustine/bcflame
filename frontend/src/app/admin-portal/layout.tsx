@@ -16,6 +16,7 @@ import {
   Check,
   X,
   MessageSquare,
+  Palette,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useAdminStore } from '@/stores/adminStore';
@@ -47,6 +48,7 @@ const navItems: NavItem[] = [
   { href: '/admin-portal/orders', label: 'Orders', icon: <ShoppingCart className="w-5 h-5" /> },
   { href: '/admin-portal/messages', label: 'Messages', icon: <MessageSquare className="w-5 h-5" /> },
   { href: '/admin-portal/media', label: 'Media', icon: <ImageIcon className="w-5 h-5" /> },
+  { href: '/admin-portal/styles', label: 'Styles', icon: <Palette className="w-5 h-5" /> },
   { href: '/admin-portal/products', label: 'Products', icon: <Package className="w-5 h-5" /> },
   { href: '/admin-portal/users', label: 'Users', icon: <Users className="w-5 h-5" /> },
 ];

@@ -119,6 +119,13 @@
       "type": "component",
       "repeatable": true,
       "component": "customization.selection-limits"
+    },
+    "bud_images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"],
+      "description": "Bud images for customization slots (1-10 unique images per product)"
     }
   }
 }
