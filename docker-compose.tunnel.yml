@@ -11,7 +11,9 @@ services:
       - ./cloudflared-config.yml:/etc/cloudflared/config.yml
     networks:
       - bcflame_network
-    depends_on:
-      - nginx
+
+networks:
+  bcflame_network:
+    external: true
 
 
