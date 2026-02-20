@@ -9,7 +9,8 @@ describe('hexToGradient', () => {
     const result = hexToGradient('#6B3FA0');
     expect(result).toMatch(/^linear-gradient\(135deg,/);
     expect(result).toContain('#6b3fa0');
-    expect(result).toContain('color-mix');
+    // Lighter stop is computed in JS (no color-mix) so html2canvas can render it
+    expect(result).toMatch(/#[0-9a-f]{6}/);
   });
 
   it('expands 3-char shorthand hex', () => {
